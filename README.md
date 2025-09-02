@@ -1,240 +1,323 @@
 # DeepTrip 🌍✈️
 
-## 📑 Table of Contents
-- [Project Overview](#project-overview)
-- [Core Features](#core-features)
-- [System Architecture](#system-architecture)
-  - [Logical Architecture](#logical-architecture)
-- [Technical Stack](#technical-stack)
-- [Database Design](#database-design)
-- [Quick Start](#quick-start)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-  - [Deployment](#deployment)
-- [Module Documentation](#module-documentation)
-- [API Reference](#api-reference)
-- [Contribution Guidelines](#contribution-guidelines)
-- [License](#license)
-- [Contact](#contact)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
+[![Vue 3](https://img.shields.io/badge/Vue-3.x-brightgreen.svg)](https://vuejs.org/)
+[![Flutter](https://img.shields.io/badge/Flutter-3.19%2B-blue.svg)](https://flutter.dev/)
+[![Contributions Welcome](https://img.shields.io/badge/Contributions-Welcome-brightgreen.svg)](CONTRIBUTING.md)
+[![Paper](https://img.shields.io/badge/Paper-In%20Progress-red.svg)]()
+
+## 📑 目录
+
+- [项目概述](#-项目概述)
+- [核心功能](#-核心功能)
+- [系统架构](#-系统架构)
+  - [逻辑架构](#-逻辑架构)
+- [技术栈](#-技术栈)
+- [数据库设计](#-数据库设计)
+- [快速开始](#-快速开始)
+  - [环境要求](#-环境要求)
+  - [安装](#-安装)
+  - [部署](#-部署)
+- [模块文档](#-模块文档)
+- [API 参考](#-api-参考)
+- [贡献指南](#-贡献指南)
+- [许可证](#-许可证)
+- [联系方式](#-联系方式)
 
 ---
 
-## 🌐 Project Overview
-**DeepTrip** is an intelligent travel assistant system that integrates AI planning, multi-resource aggregation, and full-process service capabilities.  
+## 🌐 项目概述
 
-It addresses pain points of traditional travel platforms such as:
-- ❌ Fragmented information
-- ❌ Inefficient planning
-- ❌ Delayed responses  
+**DeepTrip** 是一款集成了 AI 规划、多资源聚合与全流程服务能力的智能旅行助手系统。
 
-By leveraging:
-- 🧠 **Natural Language Processing (NLP)**
-- 🎯 **Recommendation algorithms**
-- 📱 **Cross-terminal adaptation**
+它解决了传统旅游平台的痛点：
 
-The system connects **travelers**, **merchants**, and **administrators** to provide a **closed-loop service** covering:
-- Pre-trip planning 📅  
-- In-trip assistance 🗺️  
-- Post-trip feedback ⭐  
+- ❌ 信息碎片化
+- ❌ 规划效率低
+- ❌ 响应不及时
 
-➡️ Result: Enhanced **user experience** and improved **operational efficiency**.
+通过以下技术实现：
 
----
+- 🧠 **自然语言处理（NLP）**
+- 🎯 **推荐算法**
+- 📱 **多端适配**
 
-## 🌟 Core Features
+系统连接了**旅行者**、**商家**和**管理员**，提供涵盖：
 
-### 👤 For Travelers
-- 🧭 **AI-Powered Planning**: Personalized itineraries based on preferences (budget, style, diet).  
-- 💬 **Natural Language Interaction**: Chat with AI assistant to ask or adjust plans.  
-- 🏨 **One-Click Booking**: Reserve hotels, attractions, restaurants.  
-- 🌦️ **Real-Time Updates**: Weather alerts, crowd forecasts, dynamic changes.  
-- 📔 **Travel Journal**: Auto-organize trip photos & notes, easy sharing.  
+- 行前规划 📅
+- 行中助手 🗺️
+- 行后反馈 ⭐
 
-### 🏪 For Merchants
-- 📝 **Simplified Onboarding**: Submit business info via portal.  
-- 📦 **Order Management**: Real-time tracking, inventory control.  
-- ⭐ **User Feedback**: View ratings & reviews.  
-- 🎯 **Targeted Promotion**: Reach potential customers via recommendations.  
+的**闭环服务**。
 
-### 🔧 For Administrators
-- 📊 **Dashboard Analytics**: Active users, bookings, merchant count.  
-- ✅ **Merchant Review**: Approve/reject applications.  
-- 📑 **Data Reporting**: Generate custom reports.  
-- ⚙️ **System Config**: Permissions, moderation, service integration.  
+➡️ 结果：极大提升**用户体验**和**运营效率**。
 
 ---
 
-## 🏗️ System Architecture
+## 🌟 核心功能
 
-### 🧩 Logical Architecture
-DeepTrip adopts a **microservices-based architecture** with clear separation of concerns for scalability & maintainability.
+### 👤 面向旅行者
+
+- 🧭 **AI 智能规划**：根据预算、风格、饮食等偏好生成个性化行程。
+- 💬 **自然语言交互**：与 AI 助手对话，提问或调整行程。
+- 🏨 **一键预订**：可直接预订酒店、景点、餐厅。
+- 🌦️ **实时动态**：天气预警、人流预测、行程动态调整。
+- 📔 **旅行日记**：自动整理照片与笔记，便捷分享。
+
+### 🏪 面向商家
+
+- 📝 **简易入驻**：通过商家门户提交信息。
+- 📦 **订单管理**：实时跟踪订单与库存。
+- ⭐ **用户反馈**：查看评分与评价。
+- 🎯 **精准推广**：通过推荐系统触达潜在客户。
+
+### 🔧 面向管理员
+
+- 📊 **数据看板**：活跃用户、订单、商家数量统计。
+- ✅ **商家审核**：审批/拒绝商家入驻申请。
+- 📑 **数据报表**：生成自定义运营报表。
+- ⚙️ **系统配置**：权限、内容审核、服务集成。
+
+---
+
+## 🏗️ 系统架构
+
+### 🧩 逻辑架构
+
+DeepTrip 采用**微服务架构**，关注点分离，具备良好的可扩展性与可维护性。
 
 ```plaintext
 ┌─────────────────────────────────────────────────────────────────┐
-│                        Client Layer                              │
+│                        客户端层                                 │
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────────┐  │
-│  │  Web App    │  │ Mobile App  │  │  Merchant Portal        │  │
-│  │ (Vue 3 + TS)│  │ (Flutter)   │  │ (Vue 3 + TS)            │  │
+│  │  Web 应用   │  │ 移动端应用  │  │  商家门户               │  │
+│  │ (Vue 3 + TS)│ │ (Flutter)   │  │ (Vue 3 + TS)            │  │
 │  └─────────────┘  └─────────────┘  └─────────────────────────┘  │
 └───────────────────────────────┬─────────────────────────────────┘
                                 │
 ┌───────────────────────────────▼─────────────────────────────────┐
-│                        API Gateway Layer                         │
-│  (Routing, Auth, Rate Limit, Logging)                            │
+│                        API 网关层                               │
+│  (路由、认证、限流、日志)                                       │
 └───────────────────────────────┬─────────────────────────────────┘
                                 │
 ┌───────────────────────────────▼─────────────────────────────────┐
-│                     Microservice Layer                           │
+│                     微服务层                                    │
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────┐ │
-│  │ User Service│  │ Travel Svc  │  │ Booking Svc │  │ AI Svc  │ │
+│  │ 用户服务    │  │ 行程服务    │  │ 预订服务    │  │ AI 服务 │ │
 │  └─────────────┘  └─────────────┘  └─────────────┘  └─────────┘ │
 │                                                                 │
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐             │
-│  │ Merchant Svc│  │ Admin Svc   │  │ Feedback Svc│             │
+│  │ 商家服务    │  │ 管理员服务  │  │ 反馈服务    │             │
 │  └─────────────┘  └─────────────┘  └─────────────┘             │
 └───────────────────────────────┬─────────────────────────────────┘
                                 │
 ┌───────────────────────────────▼─────────────────────────────────┐
-│                      Data & Integration Layer                    │
+│                      数据与集成层                               │
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────────┐  │
-│  │ MySQL 8.0   │  │ Redis 7+    │  │ Third-Party APIs        │  │
-│  │ (Core Data) │  │ (Cache)     │  │ - Amap (Maps)           │  │
-│  └─────────────┘  └─────────────┘  │ - Alipay/WeChat Pay     │  │
-│                                    │ - HeWeather              │  │
+│  │ MySQL 8.0   │  │ Redis 7+    │  │ 第三方 API              │  │
+│  │ (核心数据)  │  │ (缓存)      │  │ - 高德地图              │  │
+│  └─────────────┘  └─────────────┘  │ - 支付宝/微信支付        │  │
+│                                    │ - 和风天气               │  │
 │                                    └─────────────────────────┘  │
 └─────────────────────────────────────────────────────────────────┘
 
 ```
 
-## ⚙️ Technical Stack 
+## ⚙️ 技术栈
 
-| **Layer**          | **Technology Stack** |
-|---------------------|-----------------------|
-| 🎨 **Frontend**  | Web: Vue 3, TypeScript, Pinia, Vite <br> Mobile: Flutter 3.19+, Dart 3.3+ |
-| 🐍 **Backend**  | Framework: FastAPI (Python 3.10+) <br> Microservices: Spring Cloud <br> API: RESTful |
-| 🤖 **AI & Algorithm**  | NLP: Hugging Face Transformers <br> Recommendation: Collaborative Filtering |
-| 💾 **Data Storage**  | Database: MySQL 8.0 <br> Cache: Redis 7+ <br> Message Queue: RabbitMQ/Kafka |
-| 🛠️ **DevOps**  | Containerization: Docker <br> Orchestration: Kubernetes <br> CI/CD: GitHub Actions |
-| 🔐 **Security**  | Authentication: JWT <br> Encryption: SSL/TLS, AES <br> Permission: RBAC |
-
----
-
-## 🗄️ Database Design 
-The database is divided into three core modules with normalized tables to avoid redundancy:
-
-- **User Service Module**
-  - `TRAVELLER`: User profile, preferences, and authentication.
-  - `PATHLIST`: Travel itineraries created by users.
-  - `AIMESSAGE`: Chat history between users and the AI assistant.
-
-- **Merchant Service Module**
-  - `MERCHANT`: Merchant account and authentication.
-  - `MERCHANTINFO`: Business details (address, opening hours, menu/room types).
-
-- **System Management Module**
-  - `BOOK`: Booking records (user, merchant, status).
-  - `COMMENT`: User reviews and ratings.
-  - `ADMIN`: Administrator accounts and permissions.
-
-📑 For detailed schemas, check the **Database Design Document**.
+| **层级**         | **技术栈**                                                                |
+| ---------------- | ------------------------------------------------------------------------- |
+| 🎨 **前端**      | Web：Vue 3、TypeScript、Pinia、Vite <br> 移动端：Flutter 3.19+、Dart 3.3+ |
+| 🐍 **后端**      | 框架：FastAPI（Python 3.10+）<br> 微服务：Spring Cloud <br> API：RESTful  |
+| 🤖 **AI 与算法** | NLP：Hugging Face Transformers <br> 推荐：协同过滤                        |
+| 💾 **数据存储**  | 数据库：MySQL 8.0 <br> 缓存：Redis 7+ <br> 消息队列：RabbitMQ/Kafka       |
+| 🛠️ **运维**      | 容器化：Docker <br> 编排：Kubernetes <br> CI/CD：GitHub Actions           |
+| 🔐 **安全**      | 认证：JWT <br> 加密：SSL/TLS、AES <br> 权限：RBAC                         |
 
 ---
 
-## 🚀 Quick Start 
+## 🗄️ 数据库设计
 
-### 📋 Prerequisites 
-- Python 3.10+ (for backend/AI services)
-- Node.js 16+ (for frontend)
-- Flutter 3.19+ (for mobile app)
+数据库分为三大核心模块，采用规范化表结构避免冗余：
+
+- **用户服务模块**
+
+  - `TRAVELLER`：用户信息、偏好、认证
+  - `PATHLIST`：用户创建的行程
+  - `AIMESSAGE`：用户与 AI 助手的聊天记录
+
+- **商家服务模块**
+
+  - `MERCHANT`：商家账号与认证
+  - `MERCHANTINFO`：商家详细信息（地址、营业时间、菜单/房型等）
+
+- **系统管理模块**
+  - `BOOK`：预订记录（用户、商家、状态）
+  - `COMMENT`：用户评价与评分
+  - `ADMIN`：管理员账号与权限
+
+📑 详细表结构请参见**数据库设计文档**。
+
+---
+
+## 🚀 快速开始
+
+### 📋 环境要求
+
+- Python 3.10+（后端/AI 服务）
+- Node.js 16+（前端）
+- Flutter 3.19+（移动端）
 - MySQL 8.0
 - Redis 7+
-- Docker & Docker Compose (optional, for containerized deployment)
+- Docker & Docker Compose（可选，容器化部署）
 
-### ⚡ Installation 
+### ⚡ 安装
 
-#### 1. Clone the Repository
+#### 1. 克隆仓库
+
 ```bash
 git clone https://github.com/your-username/DeepTrip.git
 cd DeepTrip
 ```
 
-#### 2. Backend Setup
+#### 2. 后端部署
+
 ```bash
 cd backend
 pip install -r requirements.txt
 
 cp .env.example .env
-# Edit .env to set database credentials, API keys, etc.
+# 编辑 .env，配置数据库、API 密钥等
 
 python scripts/init_db.py
 
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-#### 3. Frontend Setup (Web App)
+#### 3. 前端部署（Web 应用）
+
 ```bash
 cd frontend/user-web
 npm install
 npm run dev
 ```
 
-#### 4. Mobile App Setup (Flutter)
+#### 4. 移动端部署（Flutter）
+
 ```bash
 cd mobile
 flutter pub get
 flutter run
 ```
 
-### 🚢 Deployment 
-For production deployment, use **Docker Compose**:
+### 🚢 部署
+
+生产环境推荐使用 **Docker Compose**：
+
 ```bash
 docker-compose up -d --build
 docker-compose ps
 ```
 
-## 📚 Module Documentation 
+## 📚 模块文档
 
-DeepTrip is divided into several core modules. Each module is designed to be independent, extensible, and easy to integrate.  
+DeepTrip 拆分为多个核心模块，每个模块均独立、可扩展、易集成。
 
-### 👤 1. User Service 
-- **Description**: Handles user authentication, profile management, and preference storage.  
-- **Key Features**:
-  - User registration & login  
-  - OAuth2 authentication  
-  - Profile editing (interests, travel preferences, history)  
-  - Secure session management  
+### 👤 1. 用户服务
 
-### 🤖 2. AI Assistant Service 
-- **Description**: Core AI engine responsible for itinerary generation, Q&A, and real-time travel insights.  
-- **Key Features**:
-  - AI-powered trip plan generation (single or multiple options)  
-  - Natural language Q&A for travel-related queries  
-  - Real-time data integration (maps, weather, traffic)  
-  - Dynamic re-planning in case of disruptions  
+- **简介**：负责用户认证、资料管理与偏好存储
+- **主要功能**：
+  - 用户注册与登录
+  - OAuth2 第三方认证
+  - 资料编辑（兴趣、偏好、历史）
+  - 安全会话管理
 
-### 🏨 3. Booking Service 
-- **Description**: Provides reservation and booking functionalities for hotels, restaurants, and attractions.  
-- **Key Features**:
-  - Hotel and restaurant booking  
-  - Attraction/ticket booking  
-  - Review and rating system integration  
-  - Secure payment gateway support  
+### 🤖 2. AI 助手服务
 
-### 🏪 4. Merchant Service 
-- **Description**: Enables local merchants to onboard their businesses and interact with users.  
-- **Key Features**:
-  - Merchant data upload & verification  
-  - Business profile management  
-  - Viewing user feedback and ratings  
-  - Recommendation engine integration  
+- **简介**：核心 AI 引擎，负责行程生成、问答与实时旅行洞察
+- **主要功能**：
+  - AI 智能行程生成（单/多方案）
+  - 旅行相关自然语言问答
+  - 实时数据集成（地图、天气、交通）
+  - 行程中断时动态重规划
 
-### 🛠️ 5. Admin Service 
-- **Description**: Platform management and analytics tools for administrators.  
-- **Key Features**:
-  - Merchant approval & data management  
-  - User activity monitoring  
-  - System-wide configuration settings  
-  - Data analytics on popular routes, bookings, and merchant activity  
+### 🏨 3. 预订服务
+
+- **简介**：提供酒店、餐厅、景点等预订功能
+- **主要功能**：
+  - 酒店与餐厅预订
+  - 景点/门票预订
+  - 评价与评分系统集成
+  - 支持安全支付网关
+
+### 🏪 4. 商家服务
+
+- **简介**：支持本地商家入驻及与用户互动
+- **主要功能**：
+  - 商家资料上传与审核
+  - 商家信息管理
+  - 查看用户反馈与评分
+  - 推荐引擎集成
+
+### 🛠️ 5. 管理员服务
+
+- **简介**：平台管理与分析工具
+- **主要功能**：
+  - 商家审批与数据管理
+  - 用户行为监控
+  - 系统全局配置
+  - 热门路线、预订、商家活跃度数据分析
+
+---
+
+## 🛠️ API 参考
+
+DeepTrip 提供完整的 RESTful API，并支持自动生成的 Swagger/OpenAPI 文档：
+
+- 开发环境：[http://localhost:8000/docs](http://localhost:8000/docs)
+- 生产环境：[https://api.deeptrip.com/docs](https://api.deeptrip.com/docs)
+
+**主要接口示例：**
+
+| 接口地址              | 方法 | 说明             |
+| --------------------- | ---- | ---------------- |
+| `/api/v1/users/login` | POST | 用户登录         |
+| `/api/v1/ai/plan`     | POST | 生成旅行行程     |
+| `/api/v1/bookings`    | POST | 创建预订         |
+| `/api/v1/merchants`   | POST | 商家入驻         |
+| `/api/v1/admin/stats` | GET  | 获取平台统计数据 |
+
+更多接口详情请参考在线 API 文档。
+
+---
+
+## 🤝 贡献指南
+
+欢迎任何形式的贡献！请遵循以下流程：
+
+1. Fork 本仓库
+2. 创建功能分支：`git checkout -b feature/your-feature`
+3. 提交更改：`git commit -m "Add your feature"`
+4. 推送分支：`git push origin feature/your-feature`
+5. 提交 Pull Request
+
+请确保代码符合项目规范并包含必要的单元测试。
+
+---
+
+## 📄 许可证
+
+本项目基于 [Apache License 2.0](LICENSE) 开源发布。
+
+---
+
+## 📬 联系方式
+
+如有问题、建议或合作意向，欢迎联系：
+
+- 邮箱：213222111@seu.edu.cn
+- GitHub Issues：[提交 Issue](https://github.com/AIZ2201/DeepTrip/issues)
 
 ---
 
