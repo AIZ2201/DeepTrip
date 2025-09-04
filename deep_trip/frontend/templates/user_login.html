@@ -233,6 +233,16 @@
 {% endblock %}
 
 {% block content %}
+<!-- 添加flash消息显示 -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flashes">
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
 <div class="user-login-container">
     <div class="user-login-header">
         <div class="user-logo">
@@ -242,7 +252,7 @@
         <p class="user-login-subtitle">登录您的旅游小助手账号</p>
     </div>
     
-    <form method="POST" action="/user/login" id="login-form">
+    <form method="POST" action="{{ url_for('user.user_login') }}" id="login-form">
         <div class="form-group">
             <label for="email">邮箱</label>
             <input type="email" id="email" name="email" class="form-control" placeholder="请输入您的邮箱" required>
@@ -264,9 +274,9 @@
         <button type="submit" class="btn btn-primary" id="login-button">登录</button>
         
         <div class="login-links">
-            <a href="/user/register">立即注册</a>
+            <a href="{{ url_for('user.user_register') }}">立即注册</a>
             <span>|</span>
-            <a href="/user/forgot-password">忘记密码？</a>
+            <a href="#">忘记密码？</a>
         </div>
     </form>
     
@@ -293,103 +303,29 @@
 {% block js %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const loginForm = document.getElementById('login-form');
-        const emailInput = document.getElementById('email');
         const passwordInput = document.getElementById('password');
         const togglePasswordBtn = document.getElementById('toggle-password');
-        const loginButton = document.getElementById('login-button');
-        
-        // 表单验证
-        function validateForm() {
-            const emailValid = emailInput.value.trim() !== '';
-            const passwordValid = passwordInput.value.trim() !== '';
-            
-            // 简单的邮箱格式验证
-            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            const emailFormatValid = emailPattern.test(emailInput.value.trim());
-            
-            if (emailInput.value.trim() && !emailFormatValid) {
-                emailInput.classList.add('error');
-                showAlert('请输入有效的邮箱地址', 'error');
-                return false;
-            } else {
-                emailInput.classList.remove('error');
-            }
-            
-            return emailValid && passwordValid && emailFormatValid;
-        }
-        
         // 密码可见性切换
         togglePasswordBtn.addEventListener('click', function() {
             const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
             passwordInput.setAttribute('type', type);
-            
-            // 切换图标
             togglePasswordBtn.classList.toggle('fa-eye');
             togglePasswordBtn.classList.toggle('fa-eye-slash');
         });
-        
-        // 表单提交处理
-        loginForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            if (!validateForm()) {
-                return;
-            }
-            
-            // 显示加载状态
-            loginButton.disabled = true;
-            loginButton.textContent = '登录中...';
-            showLoading();
-            
-            // 模拟表单提交
-            setTimeout(() => {
-                // 这里可以添加实际的表单提交代码
-                // 例如: loginForm.submit();
-                
-                // 模拟登录成功
-                hideLoading();
-                showAlert('登录成功！正在跳转到首页...', 'success');
-                
-                // 模拟跳转到首页
-                setTimeout(() => {
-                    window.location.href = '/';
-                }, 1500);
-            }, 2000);
+        // 输入时移除错误样式（如有）
+        document.getElementById('email').addEventListener('input', function() {
+            this.classList.remove('error');
         });
-        
-        // 其他登录方式处理
+        passwordInput.addEventListener('input', function() {
+            this.classList.remove('error');
+        });
+        // 其他登录方式按钮可保留
         document.querySelectorAll('.login-option-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 const provider = this.getAttribute('data-provider');
-                
-                // 显示加载状态
-                this.disabled = true;
-                showLoading();
-                
-                // 模拟第三方登录请求
-                setTimeout(() => {
-                    hideLoading();
-                    showAlert(`正在跳转到${provider === 'wechat' ? '微信' : '支付宝'}授权页面...`, 'info');
-                    
-                    // 实际项目中，这里应该跳转到相应的授权页面
-                    // 例如: window.location.href = `/auth/${provider}`;
-                    
-                    // 模拟跳转
-                    setTimeout(() => {
-                        window.location.href = '/';
-                    }, 2000);
-                }, 1500);
+                // 这里可以跳转到第三方登录
+                window.location.href = `/auth/${provider}`;
             });
-        });
-        
-        // 输入时移除错误样式
-        emailInput.addEventListener('input', function() {
-            this.classList.remove('error');
-        });
-        
-        passwordInput.addEventListener('input', function() {
-            this.classList.remove('error');
         });
     });
 </script>

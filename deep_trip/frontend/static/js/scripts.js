@@ -2,6 +2,8 @@
 
 document.addEventListener('DOMContentLoaded', function() {
     // 表单验证功能
+    // 移除或注释掉全局表单提交拦截，避免影响后端交互
+    /*
     const forms = document.querySelectorAll('form');
     forms.forEach(form => {
         form.addEventListener('submit', function(e) {
@@ -46,6 +48,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+    */
     
     // 为所有带error类的输入框添加输入事件监听器
     const inputs = document.querySelectorAll('input, textarea, select');
