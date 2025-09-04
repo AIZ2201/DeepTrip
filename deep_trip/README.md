@@ -143,6 +143,149 @@ npm run lint
 3. 图表功能依赖 Chart.js 库，确保正确引入。
 4. 页面使用响应式设计，可适应不同屏幕尺寸。
 
+# 启动后端与前后端连接说明
+
+## 一、后端启动方法
+
+1. 进入 backend 目录：
+
+   ```bash
+   cd backend
+   ```
+
+2. 安装依赖（建议使用虚拟环境）：
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. 启动 FastAPI 服务（默认端口 8000）：
+   ```bash
+   uvicorn main:app --reload --host 0.0.0.0 --port 8000
+   ```
+   - `--reload` 便于开发调试，生产环境可去掉。
+   - 启动后访问 [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs) 可查看 API 文档。
+
+## 二、前后端连接方式
+
+- **模板渲染模式（如 Flask/Jinja2）**  
+  前端页面通过后端渲染，直接访问如 `/user/login`、`/merchant/login` 等路由即可。
+
+- **API 模式（推荐，前后端分离）**  
+  前端页面通过 AJAX/Fetch/axios 等方式请求后端 API（如 `/api/v1/users/login`），后端返回 JSON 数据，前端根据数据动态渲染页面。
+
+### 连接示例
+
+- 前端登录表单提交到 `/api/v1/users/login`，后端处理并返回结果。
+- 前端通过 `fetch` 或 `axios` 访问后端 API，例如：
+  ```js
+  fetch("http://127.0.0.1:8000/api/v1/users/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      /* 处理登录结果 */
+    });
+  ```
+
+### 注意事项
+
+- 前端开发时如有跨域问题，确保后端已配置 CORS（`main.py` 已配置允许所有来源）。
+- 生产环境建议将 `allow_origins` 设置为你的前端实际域名。
+- 前端静态资源和模板可由 Flask/FastAPI 提供，也可用独立 Web 服务器（如 Nginx）托管。
+
+---
+
+**总结：**
+
+- 后端用 `uvicorn` 启动 FastAPI 服务。
+- 前端通过 HTTP 请求（API 或模板渲染）与后端通信。
+- 推荐前后端分离开发，接口通过 `/api/v1/...` 访问。
+
+如需具体某一端的启动命令或代码示例，可继续提问。
+
+# FastAPI 后端启动与测试方法
+
+## 启动后端服务
+
+1. 打开命令行，进入 backend 目录（如有虚拟环境请先激活）：
+
+   ```bash
+   cd backend
+   ```
+
+2. 安装依赖（只需首次或依赖变更时）：
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. 启动 FastAPI 服务（开发模式）：
+
+   ```bash
+   uvicorn main:app --reload --host 0.0.0.0 --port 8000
+   ```
+
+   - `--reload` 支持热重载，便于开发调试。
+
+4. 打开浏览器访问接口文档：
+   - [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs) （Swagger UI）
+   - [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc) （ReDoc）
+
+## 测试 API
+
+- 直接在 `/docs` 页面可以在线测试所有已注册的 API。
+- 也可以用 Postman、curl、httpie 等工具测试接口。
+
+## 常见问题
+
+- **端口被占用**：换一个端口，如 `--port 8080`
+- **依赖未安装**：请确保已执行 `pip install -r requirements.txt`
+- **模块找不到**：请确保当前目录为 backend，且目录结构正确。
+
+---
+
+如需测试前端与后端联调，请确保前端请求的 API 地址与后端一致（如 `http://127.0.0.1:8000/api/v1/users/login`）。
+
 ## License
 
 [MIT](LICENSE)
+
+# 如何使用终端运行后端服务
+
+1. 打开命令行（终端），进入 backend 目录（确保路径为 deep_trip\backend）：
+
+   ```bash
+   cd deep_trip\backend
+   ```
+
+2. 安装依赖（只需首次或依赖变更时）：
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. 启动 FastAPI 服务（推荐从 deep_trip 目录启动，确保包导入无误）：
+
+   ```bash
+   cd ..
+   uvicorn backend.main:app --reload
+   ```
+
+   或者（如果你就在 backend 目录下，也可以这样）：
+
+   ```bash
+   uvicorn main:app --reload
+   ```
+
+4. 打开浏览器访问接口文档：
+   - [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+
+---
+
+**注意事项：**
+
+- 推荐在 `deep_trip` 目录下运行 `uvicorn backend.main:app --reload`，这样包导入最稳定。
+- 如果遇到导入错误，检查 `__init__.py` 文件和启动路径。
