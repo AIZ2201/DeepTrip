@@ -1,0 +1,396 @@
+{% extends "layout.html" %}
+
+{% block title %}用户登录 - 旅游小助手{% endblock %}
+
+{% block css %}
+<style>
+    /* 用户登录页面样式 */
+    .user-login-container {
+        max-width: 400px;
+        margin: 0 auto;
+        padding: 40px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        margin-top: 50px;
+        margin-bottom: 50px;
+    }
+    
+    .user-login-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    
+    .user-login-title {
+        font-size: 28px;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 10px;
+    }
+    
+    .user-login-subtitle {
+        color: #7f8c8d;
+    }
+    
+    .user-logo {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 20px;
+        background-color: #3498db;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 40px;
+    }
+    
+    /* 表单样式增强 */
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: #34495e;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 4px;
+        font-size: 16px;
+        transition: border-color 0.3s ease;
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: #3498db;
+    }
+    
+    .password-input-container {
+        position: relative;
+    }
+    
+    .toggle-password {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #7f8c8d;
+        transition: color 0.3s ease;
+    }
+    
+    .toggle-password:hover {
+        color: #3498db;
+    }
+    
+    /* 记住我选项 */
+    .remember-me {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    
+    .remember-me input[type="checkbox"] {
+        margin-right: 10px;
+        width: 18px;
+        height: 18px;
+    }
+    
+    .remember-me label {
+        font-weight: normal;
+        color: #34495e;
+        margin-bottom: 0;
+    }
+    
+    /* 按钮样式 */
+    .btn-primary {
+        width: 100%;
+        padding: 12px;
+        font-size: 16px;
+        font-weight: 600;
+        border: none;
+        border-radius: 4px;
+        background-color: #3498db;
+        color: white;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+        background-color: #2980b9;
+    }
+    
+    .btn-primary:disabled {
+        background-color: #bdc3c7;
+        cursor: not-allowed;
+    }
+    
+    /* 链接样式 */
+    .login-links {
+        margin-top: 20px;
+        text-align: center;
+    }
+    
+    .login-links a {
+        color: #3498db;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+    
+    .login-links a:hover {
+        color: #2980b9;
+        text-decoration: underline;
+    }
+    
+    .login-links span {
+        color: #7f8c8d;
+        margin: 0 10px;
+    }
+    
+    /* 登录选项 */
+    .login-options {
+        margin-top: 25px;
+        padding-top: 25px;
+        border-top: 1px solid #eee;
+    }
+    
+    .login-option-title {
+        text-align: center;
+        color: #7f8c8d;
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
+    
+    .login-option-buttons {
+        display: flex;
+        gap: 15px;
+    }
+    
+    .login-option-btn {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background-color: #fff;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+    
+    .login-option-btn:hover {
+        background-color: #f8f9fa;
+        border-color: #3498db;
+    }
+    
+    .login-option-btn i {
+        font-size: 20px;
+    }
+    
+    /* 安全提示 */
+    .security-info {
+        margin-top: 20px;
+        text-align: center;
+        font-size: 14px;
+        color: #7f8c8d;
+    }
+    
+    .security-info i {
+        color: #27ae60;
+    }
+    
+    /* 响应式调整 */
+    @media (max-width: 576px) {
+        .user-login-container {
+            padding: 30px 20px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .user-logo {
+            width: 60px;
+            height: 60px;
+            font-size: 30px;
+        }
+        
+        .user-login-title {
+            font-size: 24px;
+        }
+        
+        .login-option-buttons {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="user-login-container">
+    <div class="user-login-header">
+        <div class="user-logo">
+            <i class="fas fa-user"></i>
+        </div>
+        <h1 class="user-login-title">用户登录</h1>
+        <p class="user-login-subtitle">登录您的旅游小助手账号</p>
+    </div>
+    
+    <form method="POST" action="/user/login" id="login-form">
+        <div class="form-group">
+            <label for="email">邮箱</label>
+            <input type="email" id="email" name="email" class="form-control" placeholder="请输入您的邮箱" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="password">密码</label>
+            <div class="password-input-container">
+                <input type="password" id="password" name="password" class="form-control" placeholder="请输入您的密码" required>
+                <i class="fas fa-eye-slash toggle-password" id="toggle-password"></i>
+            </div>
+        </div>
+        
+        <div class="remember-me">
+            <input type="checkbox" id="remember" name="remember" class="form-check-input">
+            <label for="remember">记住我</label>
+        </div>
+        
+        <button type="submit" class="btn btn-primary" id="login-button">登录</button>
+        
+        <div class="login-links">
+            <a href="/user/register">立即注册</a>
+            <span>|</span>
+            <a href="/user/forgot-password">忘记密码？</a>
+        </div>
+    </form>
+    
+    <div class="login-options">
+        <div class="login-option-title">其他登录方式</div>
+        <div class="login-option-buttons">
+            <button type="button" class="login-option-btn" data-provider="wechat">
+                <i class="fab fa-weixin" style="color: #27ae60;"></i>
+                <span>微信</span>
+            </button>
+            <button type="button" class="login-option-btn" data-provider="alipay">
+                <i class="fab fa-alipay" style="color: #1677FF;"></i>
+                <span>支付宝</span>
+            </button>
+        </div>
+    </div>
+    
+    <div class="security-info">
+        <i class="fas fa-shield-alt"></i> 旅游小助手保障您的账号安全
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const loginForm = document.getElementById('login-form');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const togglePasswordBtn = document.getElementById('toggle-password');
+        const loginButton = document.getElementById('login-button');
+        
+        // 表单验证
+        function validateForm() {
+            const emailValid = emailInput.value.trim() !== '';
+            const passwordValid = passwordInput.value.trim() !== '';
+            
+            // 简单的邮箱格式验证
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const emailFormatValid = emailPattern.test(emailInput.value.trim());
+            
+            if (emailInput.value.trim() && !emailFormatValid) {
+                emailInput.classList.add('error');
+                showAlert('请输入有效的邮箱地址', 'error');
+                return false;
+            } else {
+                emailInput.classList.remove('error');
+            }
+            
+            return emailValid && passwordValid && emailFormatValid;
+        }
+        
+        // 密码可见性切换
+        togglePasswordBtn.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            
+            // 切换图标
+            togglePasswordBtn.classList.toggle('fa-eye');
+            togglePasswordBtn.classList.toggle('fa-eye-slash');
+        });
+        
+        // 表单提交处理
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (!validateForm()) {
+                return;
+            }
+            
+            // 显示加载状态
+            loginButton.disabled = true;
+            loginButton.textContent = '登录中...';
+            showLoading();
+            
+            // 模拟表单提交
+            setTimeout(() => {
+                // 这里可以添加实际的表单提交代码
+                // 例如: loginForm.submit();
+                
+                // 模拟登录成功
+                hideLoading();
+                showAlert('登录成功！正在跳转到首页...', 'success');
+                
+                // 模拟跳转到首页
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 1500);
+            }, 2000);
+        });
+        
+        // 其他登录方式处理
+        document.querySelectorAll('.login-option-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const provider = this.getAttribute('data-provider');
+                
+                // 显示加载状态
+                this.disabled = true;
+                showLoading();
+                
+                // 模拟第三方登录请求
+                setTimeout(() => {
+                    hideLoading();
+                    showAlert(`正在跳转到${provider === 'wechat' ? '微信' : '支付宝'}授权页面...`, 'info');
+                    
+                    // 实际项目中，这里应该跳转到相应的授权页面
+                    // 例如: window.location.href = `/auth/${provider}`;
+                    
+                    // 模拟跳转
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 2000);
+                }, 1500);
+            });
+        });
+        
+        // 输入时移除错误样式
+        emailInput.addEventListener('input', function() {
+            this.classList.remove('error');
+        });
+        
+        passwordInput.addEventListener('input', function() {
+            this.classList.remove('error');
+        });
+    });
+</script>
+{% endblock %}

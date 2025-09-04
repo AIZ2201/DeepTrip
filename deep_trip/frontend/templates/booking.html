@@ -1,0 +1,1103 @@
+{% extends "layout.html" %}
+
+{% block title %}资源预定 - 旅游小助手{% endblock %}
+
+{% block css %}
+<style>
+    /* 资源预定页面样式 */
+    .booking-container {
+        margin-bottom: 40px;
+    }
+    
+    .booking-tabs {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 30px;
+        border-bottom: 2px solid #eee;
+    }
+    
+    .booking-tab {
+        padding: 10px 20px;
+        cursor: pointer;
+        font-size: 18px;
+        font-weight: 500;
+        color: #7f8c8d;
+        border-bottom: 3px solid transparent;
+        transition: all 0.3s ease;
+    }
+    
+    .booking-tab.active {
+        color: #3498db;
+        border-bottom-color: #3498db;
+    }
+    
+    .booking-content {
+        display: none;
+    }
+    
+    .booking-content.active {
+        display: block;
+    }
+    
+    /* 筛选器样式 */
+    .filter-bar {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* 资源列表样式 */
+    .resource-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 30px;
+    }
+    
+    .resource-card {
+        background-color: #fff;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .resource-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .resource-image {
+        height: 200px;
+        overflow: hidden;
+    }
+    
+    .resource-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+    
+    .resource-card:hover .resource-image img {
+        transform: scale(1.05);
+    }
+    
+    .resource-content {
+        padding: 20px;
+    }
+    
+    .resource-title {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 10px;
+        color: #2c3e50;
+    }
+    
+    .resource-location {
+        display: flex;
+        align-items: center;
+        color: #7f8c8d;
+        margin-bottom: 15px;
+    }
+    
+    .resource-location i {
+        margin-right: 5px;
+    }
+    
+    .resource-rating {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    
+    .star-rating {
+        color: #f39c12;
+        margin-right: 10px;
+    }
+    
+    .rating-score {
+        font-weight: 600;
+    }
+    
+    .resource-price {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 1px solid #eee;
+    }
+    
+    .price-value {
+        font-size: 24px;
+        font-weight: 700;
+        color: #e74c3c;
+    }
+    
+    .price-unit {
+        font-size: 14px;
+        color: #7f8c8d;
+    }
+    
+    /* 分页样式增强 */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin-top: 40px;
+    }
+    
+    /* 预定模态框样式 */
+    .booking-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1001;
+    }
+    
+    .booking-modal.active {
+        display: flex;
+    }
+    
+    .modal-dialog {
+        background-color: white;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 600px;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+    
+    .modal-header {
+        padding: 20px;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .modal-title {
+        margin: 0;
+        font-size: 24px;
+    }
+    
+    .close-modal {
+        font-size: 24px;
+        cursor: pointer;
+        color: #7f8c8d;
+    }
+    
+    .close-modal:hover {
+        color: #333;
+    }
+    
+    .modal-body {
+        padding: 20px;
+    }
+    
+    .modal-footer {
+        padding: 20px;
+        border-top: 1px solid #eee;
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+    
+    /* 订单历史样式 */
+    .order-history {
+        margin-top: 40px;
+    }
+    
+    .order-item {
+        background-color: #fff;
+        padding: 20px;
+        margin-bottom: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .order-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    
+    .order-id {
+        font-weight: 600;
+        color: #34495e;
+    }
+    
+    .order-status {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 500;
+    }
+    
+    .status-pending {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+    
+    .status-confirmed {
+        background-color: #d4edda;
+        color: #155724;
+    }
+    
+    .status-cancelled {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+    
+    .order-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 15px;
+    }
+    
+    .detail-item {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .detail-label {
+        font-size: 14px;
+        color: #7f8c8d;
+        margin-bottom: 5px;
+    }
+    
+    .detail-value {
+        font-weight: 500;
+    }
+    
+    .order-actions {
+        margin-top: 20px;
+        display: flex;
+        gap: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>资源预定</h1>
+<p>预订您的完美旅程，包括酒店、景区门票和特色餐饮。</p>
+
+<!-- 预定标签页 -->
+<div class="booking-tabs">
+    <div class="booking-tab active" data-tab="hotels">酒店</div>
+    <div class="booking-tab" data-tab="attractions">景区</div>
+    <div class="booking-tab" data-tab="restaurants">餐饮</div>
+    <div class="booking-tab" data-tab="history">订单历史</div>
+</div>
+
+<!-- 酒店内容 -->
+<div class="booking-content active" id="hotels-content">
+    <div class="filter-bar">
+        <div class="form-group">
+            <label for="hotel-destination">目的地</label>
+            <input type="text" id="hotel-destination" class="form-control" placeholder="请输入城市或地区">
+        </div>
+        <div class="form-group">
+            <label for="hotel-checkin">入住日期</label>
+            <input type="date" id="hotel-checkin" class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="hotel-checkout">离店日期</label>
+            <input type="date" id="hotel-checkout" class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="hotel-guests">客人数量</label>
+            <select id="hotel-guests" class="form-control">
+                <option value="1">1位成人</option>
+                <option value="2" selected>2位成人</option>
+                <option value="3">3位成人</option>
+                <option value="4">4位成人</option>
+                <option value="5+">5位及以上</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="hotel-rating">星级</label>
+            <select id="hotel-rating" class="form-control">
+                <option value="all" selected>不限</option>
+                <option value="5">五星级</option>
+                <option value="4">四星级</option>
+                <option value="3">三星级</option>
+                <option value="2+">二星级及以上</option>
+            </select>
+        </div>
+        <div class="form-group" style="display: flex; align-items: flex-end;">
+            <button id="hotel-search" class="btn btn-primary">搜索</button>
+        </div>
+    </div>
+    
+    <div class="resource-grid">
+        <!-- 酒店1 -->
+        <div class="resource-card" data-id="1" data-type="hotel">
+            <div class="resource-image">
+                <img src="https://picsum.photos/id/1031/800/500" alt="豪华海景酒店">
+            </div>
+            <div class="resource-content">
+                <h3 class="resource-title">豪华海景酒店</h3>
+                <div class="resource-location">
+                    <i class="icon-map-marker">&#x1F4CD;</i>
+                    <span>三亚湾海滨路123号</span>
+                </div>
+                <div class="resource-rating">
+                    <div class="star-rating">★★★★★</div>
+                    <div class="rating-score">4.9 (238条评价)</div>
+                </div>
+                <p>位于三亚湾核心位置，拥有无敌海景房和私人沙滩，提供高端SPA服务和多国美食。</p>
+                <div class="resource-price">
+                    <div>
+                        <span class="price-value">¥888</span>
+                        <span class="price-unit">/晚起</span>
+                    </div>
+                    <button class="btn btn-primary book-now">立即预订</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 酒店2 -->
+        <div class="resource-card" data-id="2" data-type="hotel">
+            <div class="resource-image">
+                <img src="https://picsum.photos/id/1040/800/500" alt="城市中心精品酒店">
+            </div>
+            <div class="resource-content">
+                <h3 class="resource-title">城市中心精品酒店</h3>
+                <div class="resource-location">
+                    <i class="icon-map-marker">&#x1F4CD;</i>
+                    <span>北京市朝阳区建国门外大街88号</span>
+                </div>
+                <div class="resource-rating">
+                    <div class="star-rating">★★★★</div>
+                    <div class="rating-score">4.7 (186条评价)</div>
+                </div>
+                <p>地处北京商务中心区，交通便利，紧邻地铁站和购物中心，客房设计现代舒适。</p>
+                <div class="resource-price">
+                    <div>
+                        <span class="price-value">¥688</span>
+                        <span class="price-unit">/晚起</span>
+                    </div>
+                    <button class="btn btn-primary book-now">立即预订</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 酒店3 -->
+        <div class="resource-card" data-id="3" data-type="hotel">
+            <div class="resource-image">
+                <img src="https://picsum.photos/id/164/800/500" alt="古城墙精品民宿">
+            </div>
+            <div class="resource-content">
+                <h3 class="resource-title">古城墙精品民宿</h3>
+                <div class="resource-location">
+                    <i class="icon-map-marker">&#x1F4CD;</i>
+                    <span>西安市碑林区南大街15号</span>
+                </div>
+                <div class="resource-rating">
+                    <div class="star-rating">★★★★</div>
+                    <div class="rating-score">4.8 (152条评价)</div>
+                </div>
+                <p>位于西安古城墙内，保留了传统建筑风格，同时提供现代化设施，步行可达多个景点。</p>
+                <div class="resource-price">
+                    <div>
+                        <span class="price-value">¥458</span>
+                        <span class="price-unit">/晚起</span>
+                    </div>
+                    <button class="btn btn-primary book-now">立即预订</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="pagination">
+        <a href="#" class="page-item">上一页</a>
+        <a href="#" class="page-item active">1</a>
+        <a href="#" class="page-item">2</a>
+        <a href="#" class="page-item">3</a>
+        <span class="page-item">...</span>
+        <a href="#" class="page-item">10</a>
+        <a href="#" class="page-item">下一页</a>
+    </div>
+</div>
+
+<!-- 景区内容 -->
+<div class="booking-content" id="attractions-content">
+    <div class="filter-bar">
+        <div class="form-group">
+            <label for="attraction-location">所在地</label>
+            <input type="text" id="attraction-location" class="form-control" placeholder="请输入城市或地区">
+        </div>
+        <div class="form-group">
+            <label for="attraction-date">参观日期</label>
+            <input type="date" id="attraction-date" class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="attraction-category">类型</label>
+            <select id="attraction-category" class="form-control">
+                <option value="all" selected>不限</option>
+                <option value="museum">博物馆</option>
+                <option value="nature">自然风光</option>
+                <option value="historical">历史古迹</option>
+                <option value="amusement">主题乐园</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="attraction-price">价格区间</label>
+            <select id="attraction-price" class="form-control">
+                <option value="all" selected>不限</option>
+                <option value="free">免费</option>
+                <option value="0-50">0-50元</option>
+                <option value="50-100">50-100元</option>
+                <option value="100+">100元以上</option>
+            </select>
+        </div>
+        <div class="form-group" style="display: flex; align-items: flex-end;">
+            <button id="attraction-search" class="btn btn-primary">搜索</button>
+        </div>
+    </div>
+    
+    <div class="resource-grid">
+        <!-- 景区1 -->
+        <div class="resource-card" data-id="101" data-type="attraction">
+            <div class="resource-image">
+                <img src="https://picsum.photos/id/252/800/500" alt="故宫博物院">
+            </div>
+            <div class="resource-content">
+                <h3 class="resource-title">故宫博物院</h3>
+                <div class="resource-location">
+                    <i class="icon-map-marker">&#x1F4CD;</i>
+                    <span>北京市东城区景山前街4号</span>
+                </div>
+                <div class="resource-rating">
+                    <div class="star-rating">★★★★★</div>
+                    <div class="rating-score">4.9 (1258条评价)</div>
+                </div>
+                <p>中国明清两代的皇家宫殿，世界上现存规模最大、保存最为完整的木质结构古建筑之一。</p>
+                <div class="resource-price">
+                    <div>
+                        <span class="price-value">¥60</span>
+                        <span class="price-unit">/人</span>
+                    </div>
+                    <button class="btn btn-primary book-now">立即预订</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 景区2 -->
+        <div class="resource-card" data-id="102" data-type="attraction">
+            <div class="resource-image">
+                <img src="https://picsum.photos/id/10/800/500" alt="长城 - 八达岭段">
+            </div>
+            <div class="resource-content">
+                <h3 class="resource-title">长城 - 八达岭段</h3>
+                <div class="resource-location">
+                    <i class="icon-map-marker">&#x1F4CD;</i>
+                    <span>北京市延庆区军都山关沟古道北口</span>
+                </div>
+                <div class="resource-rating">
+                    <div class="star-rating">★★★★★</div>
+                    <div class="rating-score">4.8 (986条评价)</div>
+                </div>
+                <p>万里长城的重要组成部分，是明长城的一个隘口，以其宏伟的景观、完善的设施和深厚的文化历史内涵而著称于世。</p>
+                <div class="resource-price">
+                    <div>
+                        <span class="price-value">¥40</span>
+                        <span class="price-unit">/人</span>
+                    </div>
+                    <button class="btn btn-primary book-now">立即预订</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 景区3 -->
+        <div class="resource-card" data-id="103" data-type="attraction">
+            <div class="resource-image">
+                <img src="https://picsum.photos/id/325/800/500" alt="张家界国家森林公园">
+            </div>
+            <div class="resource-content">
+                <h3 class="resource-title">张家界国家森林公园</h3>
+                <div class="resource-location">
+                    <i class="icon-map-marker">&#x1F4CD;</i>
+                    <span>湖南省张家界市武陵源区</span>
+                </div>
+                <div class="resource-rating">
+                    <div class="star-rating">★★★★★</div>
+                    <div class="rating-score">4.9 (1568条评价)</div>
+                </div>
+                <p>中国第一个国家森林公园，以峰林、峡谷、溪流、瀑布等景观著称，被誉为"中国山水画的原本"。</p>
+                <div class="resource-price">
+                    <div>
+                        <span class="price-value">¥225</span>
+                        <span class="price-unit">/人</span>
+                    </div>
+                    <button class="btn btn-primary book-now">立即预订</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 餐饮内容 -->
+<div class="booking-content" id="restaurants-content">
+    <div class="filter-bar">
+        <div class="form-group">
+            <label for="restaurant-location">所在地</label>
+            <input type="text" id="restaurant-location" class="form-control" placeholder="请输入城市或地区">
+        </div>
+        <div class="form-group">
+            <label for="restaurant-date">用餐日期</label>
+            <input type="date" id="restaurant-date" class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="restaurant-time">用餐时间</label>
+            <input type="time" id="restaurant-time" class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="restaurant-guests">人数</label>
+            <select id="restaurant-guests" class="form-control">
+                <option value="1">1人</option>
+                <option value="2" selected>2人</option>
+                <option value="3-4">3-4人</option>
+                <option value="5-6">5-6人</option>
+                <option value="7+">7人及以上</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="restaurant-cuisine">菜系</label>
+            <select id="restaurant-cuisine" class="form-control">
+                <option value="all" selected>不限</option>
+                <option value="chinese">中餐</option>
+                <option value="western">西餐</option>
+                <option value="japanese">日料</option>
+                <option value="korean">韩餐</option>
+                <option value="other">其他</option>
+            </select>
+        </div>
+        <div class="form-group" style="display: flex; align-items: flex-end;">
+            <button id="restaurant-search" class="btn btn-primary">搜索</button>
+        </div>
+    </div>
+    
+    <div class="resource-grid">
+        <!-- 餐厅1 -->
+        <div class="resource-card" data-id="201" data-type="restaurant">
+            <div class="resource-image">
+                <img src="https://picsum.photos/id/292/800/500" alt="江南风味馆">
+            </div>
+            <div class="resource-content">
+                <h3 class="resource-title">江南风味馆</h3>
+                <div class="resource-location">
+                    <i class="icon-map-marker">&#x1F4CD;</i>
+                    <span>上海市黄浦区南京东路123号</span>
+                </div>
+                <div class="resource-rating">
+                    <div class="star-rating">★★★★★</div>
+                    <div class="rating-score">4.9 (568条评价)</div>
+                </div>
+                <p>正宗江南风味餐厅，提供精致的江浙沪菜系，环境优雅，服务周到。特色菜：西湖醋鱼、龙井虾仁。</p>
+                <div class="resource-price">
+                    <div>
+                        <span class="price-value">¥188</span>
+                        <span class="price-unit">/人起</span>
+                    </div>
+                    <button class="btn btn-primary book-now">立即预订</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 餐厅2 -->
+        <div class="resource-card" data-id="202" data-type="restaurant">
+            <div class="resource-image">
+                <img src="https://picsum.photos/id/314/800/500" alt="长安食府">
+            </div>
+            <div class="resource-content">
+                <h3 class="resource-title">长安食府</h3>
+                <div class="resource-location">
+                    <i class="icon-map-marker">&#x1F4CD;</i>
+                    <span>西安市碑林区南大街56号</span>
+                </div>
+                <div class="resource-rating">
+                    <div class="star-rating">★★★★★</div>
+                    <div class="rating-score">4.8 (425条评价)</div>
+                </div>
+                <p>百年老字号餐厅，提供正宗陕西风味美食，装修典雅，具有浓郁的西北风情。特色菜：肉夹馍、羊肉泡馍。</p>
+                <div class="resource-price">
+                    <div>
+                        <span class="price-value">¥128</span>
+                        <span class="price-unit">/人起</span>
+                    </div>
+                    <button class="btn btn-primary book-now">立即预订</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 餐厅3 -->
+        <div class="resource-card" data-id="203" data-type="restaurant">
+            <div class="resource-image">
+                <img src="https://picsum.photos/id/365/800/500" alt="海景西餐厅">
+            </div>
+            <div class="resource-content">
+                <h3 class="resource-title">海景西餐厅</h3>
+                <div class="resource-location">
+                    <i class="icon-map-marker">&#x1F4CD;</i>
+                    <span>三亚市海棠湾路88号</span>
+                </div>
+                <div class="resource-rating">
+                    <div class="star-rating">★★★★★</div>
+                    <div class="rating-score">4.9 (356条评价)</div>
+                </div>
+                <p>位于海边的高端西餐厅，提供正宗西式料理，可欣赏无敌海景，适合情侣约会和商务宴请。特色菜：香煎龙虾、牛排。</p>
+                <div class="resource-price">
+                    <div>
+                        <span class="price-value">¥298</span>
+                        <span class="price-unit">/人起</span>
+                    </div>
+                    <button class="btn btn-primary book-now">立即预订</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 订单历史内容 -->
+<div class="booking-content" id="history-content">
+    <div class="order-history">
+        <h3>我的订单</h3>
+        
+        <!-- 订单1 -->
+        <div class="order-item">
+            <div class="order-header">
+                <div class="order-id">订单编号：ORD-20230528-001</div>
+                <div class="order-status status-confirmed">已确认</div>
+            </div>
+            <div class="order-details">
+                <div class="detail-item">
+                    <div class="detail-label">预订项目</div>
+                    <div class="detail-value">豪华海景酒店 - 海景大床房</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">入住日期</div>
+                    <div class="detail-value">2023-06-10</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">离店日期</div>
+                    <div class="detail-value">2023-06-13</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">客人数量</div>
+                    <div class="detail-value">2位成人</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">总金额</div>
+                    <div class="detail-value">¥2664</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">预订时间</div>
+                    <div class="detail-value">2023-05-28 14:30</div>
+                </div>
+            </div>
+            <div class="order-actions">
+                <button class="btn btn-secondary">查看详情</button>
+                <button class="btn btn-secondary">申请退订</button>
+                <button class="btn btn-primary">评价</button>
+            </div>
+        </div>
+        
+        <!-- 订单2 -->
+        <div class="order-item">
+            <div class="order-header">
+                <div class="order-id">订单编号：ORD-20230515-002</div>
+                <div class="order-status status-pending">处理中</div>
+            </div>
+            <div class="order-details">
+                <div class="detail-item">
+                    <div class="detail-label">预订项目</div>
+                    <div class="detail-value">故宫博物院门票 - 成人票</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">参观日期</div>
+                    <div class="detail-value">2023-06-05</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">门票数量</div>
+                    <div class="detail-value">3张</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">总金额</div>
+                    <div class="detail-value">¥180</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">预订时间</div>
+                    <div class="detail-value">2023-05-15 09:15</div>
+                </div>
+            </div>
+            <div class="order-actions">
+                <button class="btn btn-secondary">查看详情</button>
+                <button class="btn btn-secondary">取消预订</button>
+            </div>
+        </div>
+        
+        <!-- 订单3 -->
+        <div class="order-item">
+            <div class="order-header">
+                <div class="order-id">订单编号：ORD-20230420-003</div>
+                <div class="order-status status-cancelled">已取消</div>
+            </div>
+            <div class="order-details">
+                <div class="detail-item">
+                    <div class="detail-label">预订项目</div>
+                    <div class="detail-value">江南风味馆 - 四人套餐</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">用餐日期</div>
+                    <div class="detail-value">2023-05-01</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">用餐时间</div>
+                    <div class="detail-value">19:00</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">总金额</div>
+                    <div class="detail-value">¥752</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">预订时间</div>
+                    <div class="detail-value">2023-04-20 16:45</div>
+                </div>
+            </div>
+            <div class="order-actions">
+                <button class="btn btn-secondary">查看详情</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 预订模态框 -->
+<div class="booking-modal" id="booking-modal">
+    <div class="modal-dialog">
+        <div class="modal-header">
+            <h2 class="modal-title" id="modal-resource-title">预订确认</h2>
+            <span class="close-modal">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="booking-form">
+                <input type="hidden" id="resource-id" name="resource_id">
+                <input type="hidden" id="resource-type" name="resource_type">
+                
+                <div id="booking-fields">
+                    <!-- 预订字段将通过JavaScript动态生成 -->
+                </div>
+                
+                <div class="form-group">
+                    <label for="contact-name">联系人姓名</label>
+                    <input type="text" id="contact-name" name="contact_name" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="contact-phone">联系电话</label>
+                    <input type="tel" id="contact-phone" name="contact_phone" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="contact-email">电子邮箱</label>
+                    <input type="email" id="contact-email" name="contact_email" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="special-requests">特殊要求（可选）</label>
+                    <textarea id="special-requests" name="special_requests" class="form-control" rows="3" placeholder="如有特殊要求，请在此说明"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="payment-method">支付方式</label>
+                    <select id="payment-method" name="payment_method" class="form-control" required>
+                        <option value="wechat">微信支付</option>
+                        <option value="alipay">支付宝</option>
+                        <option value="credit_card">信用卡</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-check-label">
+                        <input type="checkbox" name="agree_terms" class="form-check-input" required>
+                        我已阅读并同意<a href="#" target="_blank">预订条款</a>和<a href="#" target="_blank">退款政策</a>
+                    </label>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary close-modal">取消</button>
+            <button type="submit" form="booking-form" class="btn btn-primary">提交预订</button>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 标签页切换功能
+        const bookingTabs = document.querySelectorAll('.booking-tab');
+        const bookingContents = document.querySelectorAll('.booking-content');
+        
+        bookingTabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                // 移除所有激活状态
+                bookingTabs.forEach(t => t.classList.remove('active'));
+                bookingContents.forEach(c => c.classList.remove('active'));
+                
+                // 添加当前激活状态
+                this.classList.add('active');
+                const tabId = this.getAttribute('data-tab');
+                document.getElementById(`${tabId}-content`).classList.add('active');
+            });
+        });
+        
+        // 预订模态框相关
+        const bookingModal = document.getElementById('booking-modal');
+        const closeModalButtons = document.querySelectorAll('.close-modal');
+        const bookNowButtons = document.querySelectorAll('.book-now');
+        const bookingForm = document.getElementById('booking-form');
+        const modalResourceTitle = document.getElementById('modal-resource-title');
+        const bookingFields = document.getElementById('booking-fields');
+        
+        // 打开预订模态框
+        bookNowButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const resourceCard = this.closest('.resource-card');
+                const resourceId = resourceCard.getAttribute('data-id');
+                const resourceType = resourceCard.getAttribute('data-type');
+                const resourceTitle = resourceCard.querySelector('.resource-title').textContent;
+                
+                // 设置模态框标题
+                modalResourceTitle.textContent = `预订：${resourceTitle}`;
+                
+                // 设置隐藏字段
+                document.getElementById('resource-id').value = resourceId;
+                document.getElementById('resource-type').value = resourceType;
+                
+                // 根据资源类型生成不同的预订字段
+                generateBookingFields(resourceType);
+                
+                // 显示模态框
+                bookingModal.classList.add('active');
+            });
+        });
+        
+        // 关闭预订模态框
+        closeModalButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                bookingModal.classList.remove('active');
+            });
+        });
+        
+        // 点击模态框外部关闭
+        bookingModal.addEventListener('click', function(e) {
+            if (e.target === bookingModal) {
+                bookingModal.classList.remove('active');
+            }
+        });
+        
+        // 根据资源类型生成预订字段
+        function generateBookingFields(resourceType) {
+            let fieldsHtml = '';
+            
+            if (resourceType === 'hotel') {
+                fieldsHtml = `
+                    <div class="form-group">
+                        <label for="hotel-checkin">入住日期</label>
+                        <input type="date" id="hotel-checkin" name="checkin_date" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="hotel-checkout">离店日期</label>
+                        <input type="date" id="hotel-checkout" name="checkout_date" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="hotel-room-type">房型</label>
+                        <select id="hotel-room-type" name="room_type" class="form-control" required>
+                            <option value="standard">标准间</option>
+                            <option value="deluxe">豪华间</option>
+                            <option value="suite">套房</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="hotel-guests">客人数量</label>
+                        <select id="hotel-guests" name="guests" class="form-control" required>
+                            <option value="1">1位成人</option>
+                            <option value="2" selected>2位成人</option>
+                            <option value="2_1">2位成人, 1位儿童</option>
+                            <option value="2_2">2位成人, 2位儿童</option>
+                        </select>
+                    </div>
+                `;
+            } else if (resourceType === 'attraction') {
+                fieldsHtml = `
+                    <div class="form-group">
+                        <label for="attraction-date">参观日期</label>
+                        <input type="date" id="attraction-date" name="visit_date" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="attraction-ticket-type">票种</label>
+                        <select id="attraction-ticket-type" name="ticket_type" class="form-control" required>
+                            <option value="adult">成人票</option>
+                            <option value="child">儿童票</option>
+                            <option value="student">学生票</option>
+                            <option value="senior">老人票</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="attraction-ticket-count">数量</label>
+                        <input type="number" id="attraction-ticket-count" name="ticket_count" class="form-control" min="1" value="1" required>
+                    </div>
+                `;
+            } else if (resourceType === 'restaurant') {
+                fieldsHtml = `
+                    <div class="form-group">
+                        <label for="restaurant-date">用餐日期</label>
+                        <input type="date" id="restaurant-date" name="dining_date" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="restaurant-time">用餐时间</label>
+                        <input type="time" id="restaurant-time" name="dining_time" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="restaurant-guests">人数</label>
+                        <select id="restaurant-guests" name="guests" class="form-control" required>
+                            <option value="1">1人</option>
+                            <option value="2" selected>2人</option>
+                            <option value="3-4">3-4人</option>
+                            <option value="5-6">5-6人</option>
+                            <option value="7+">7人及以上</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="restaurant-menu">套餐选择（可选）</label>
+                        <select id="restaurant-menu" name="menu" class="form-control">
+                            <option value="">不选择套餐</option>
+                            <option value="set1">双人套餐A - ¥368</option>
+                            <option value="set2">双人套餐B - ¥428</option>
+                            <option value="set3">精选套餐 - ¥568</option>
+                        </select>
+                    </div>
+                `;
+            }
+            
+            bookingFields.innerHTML = fieldsHtml;
+        }
+        
+        // 提交预订表单
+        bookingForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            showLoading();
+            
+            // 模拟预订请求
+            setTimeout(() => {
+                hideLoading();
+                bookingModal.classList.remove('active');
+                
+                // 显示预订成功提示
+                showAlert('预订提交成功！我们将尽快处理您的预订请求。', 'success');
+                
+                // 重置表单
+                bookingForm.reset();
+            }, 2000);
+        });
+        
+        // 搜索按钮点击事件
+        document.getElementById('hotel-search').addEventListener('click', function() {
+            performSearch('hotel');
+        });
+        
+        document.getElementById('attraction-search').addEventListener('click', function() {
+            performSearch('attraction');
+        });
+        
+        document.getElementById('restaurant-search').addEventListener('click', function() {
+            performSearch('restaurant');
+        });
+        
+        // 执行搜索
+        function performSearch(type) {
+            showLoading();
+            
+            // 模拟搜索请求
+            setTimeout(() => {
+                hideLoading();
+                showAlert(`已为您找到符合条件的${type === 'hotel' ? '酒店' : type === 'attraction' ? '景区' : '餐厅'}，请查看下方结果。`, 'success');
+            }, 1500);
+        }
+        
+        // 订单操作按钮事件
+        const orderButtons = document.querySelectorAll('.order-actions button');
+        orderButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const action = this.textContent.trim();
+                const orderId = this.closest('.order-item').querySelector('.order-id').textContent;
+                
+                if (action === '取消预订' || action === '申请退订') {
+                    if (confirm(`确定要${action}此订单吗？`)) {
+                        showLoading();
+                        
+                        // 模拟取消/退订请求
+                        setTimeout(() => {
+                            hideLoading();
+                            showAlert(`订单${action}申请已提交，请等待处理结果。`, 'info');
+                        }, 1500);
+                    }
+                } else if (action === '查看详情') {
+                    showLoading();
+                    
+                    // 模拟查看详情请求
+                    setTimeout(() => {
+                        hideLoading();
+                        showAlert(`正在加载订单${orderId}的详细信息...`, 'info');
+                        // 在实际应用中，这里会打开订单详情模态框
+                    }, 1000);
+                } else if (action === '评价') {
+                    showLoading();
+                    
+                    // 模拟跳转到评价页面
+                    setTimeout(() => {
+                        hideLoading();
+                        // 在实际应用中，这里会跳转到评价页面或打开评价模态框
+                        alert('即将跳转到评价页面...');
+                    }, 1000);
+                }
+            });
+        });
+        
+        // 设置日期选择器的最小日期为今天
+        const dateInputs = document.querySelectorAll('input[type="date"]');
+        const today = new Date().toISOString().split('T')[0];
+        dateInputs.forEach(input => {
+            input.min = today;
+        });
+        
+        // 为酒店搜索的离店日期设置最小值为入住日期
+        const hotelCheckin = document.getElementById('hotel-checkin');
+        const hotelCheckout = document.getElementById('hotel-checkout');
+        
+        if (hotelCheckin && hotelCheckout) {
+            hotelCheckin.addEventListener('change', function() {
+                hotelCheckout.min = this.value;
+                if (hotelCheckout.value < this.value) {
+                    hotelCheckout.value = this.value;
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

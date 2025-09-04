@@ -1,0 +1,94 @@
+{% extends "layout.html" %}
+
+{% block title %}模板测试 - 旅游小助手{% endblock %}
+
+{% block content %}
+<h1>模板引擎测试页面</h1>
+
+<div class="container">
+    <div class="test-section">
+        <h2>基础模板继承测试</h2>
+        <p>如果能看到这个页面，说明模板继承功能正常工作。</p>
+    </div>
+    
+    <div class="test-section">
+        <h2>变量渲染测试</h2>
+        <p>当前时间: {{ now.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+        <p>测试变量: {{ test_var | default('默认值') }}</p>
+    </div>
+    
+    <div class="test-section">
+        <h2>条件语句测试</h2>
+        {% if True %}
+            <p class="success">条件语句正常工作！</p>
+        {% else %}
+            <p class="error">条件语句未正常工作。</p>
+        {% endif %}
+    </div>
+    
+    <div class="test-section">
+        <h2>循环测试</h2>
+        <ul>
+            {% for item in ['项目1', '项目2', '项目3'] %}
+                <li>{{ loop.index }}. {{ item }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    
+    <div class="test-section">
+        <h2>route_planner 相关测试</h2>
+        <p>下面是route_planner.html中使用的标签选择示例：</p>
+        <div class="tag-selection">
+            {% for tag in ['自然风光', '历史文化', '美食探索'] %}
+                <label class="checkbox-tag">
+                    <input type="checkbox" name="interests" value="{{ tag }}">
+                    <span>{{ tag }}</span>
+                </label>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .test-section {
+        margin-bottom: 30px;
+        padding: 20px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+    }
+    
+    .success {
+        color: green;
+        font-weight: bold;
+    }
+    
+    .error {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+
+{% block js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('模板测试页面加载完成');
+        
+        // 标签选择样式测试
+        const checkboxTags = document.querySelectorAll('.checkbox-tag');
+        checkboxTags.forEach(tag => {
+            tag.addEventListener('change', function() {
+                const checkbox = this.querySelector('input[type="checkbox"]');
+                const span = this.querySelector('span');
+                
+                if (checkbox.checked) {
+                    span.style.backgroundColor = '#3498db';
+                    span.style.color = 'white';
+                } else {
+                    span.style.backgroundColor = 'transparent';
+                    span.style.color = '#333';
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,512 @@
+{% extends "layout.html" %}
+
+{% block title %}旅游问答 - 旅游小助手{% endblock %}
+
+{% block css %}
+<style>
+    /* 聊天界面样式 */
+    .chat-container {
+        display: grid;
+        grid-template-rows: 1fr auto;
+        height: 70vh;
+        max-width: 800px;
+        margin: 0 auto;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+    
+    .chat-messages {
+        padding: 20px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .message {
+        max-width: 70%;
+        padding: 12px 16px;
+        border-radius: 18px;
+        word-wrap: break-word;
+    }
+    
+    .message.user {
+        align-self: flex-end;
+        background-color: #3498db;
+        color: white;
+        border-bottom-right-radius: 4px;
+    }
+    
+    .message.ai {
+        align-self: flex-start;
+        background-color: #ecf0f1;
+        color: #333;
+        border-bottom-left-radius: 4px;
+    }
+    
+    .message-time {
+        font-size: 12px;
+        opacity: 0.7;
+        margin-top: 5px;
+        text-align: right;
+    }
+    
+    .message.ai .message-time {
+        text-align: left;
+    }
+    
+    .chat-input {
+        padding: 20px;
+        border-top: 1px solid #eee;
+        background-color: #f8f9fa;
+    }
+    
+    .input-group {
+        display: flex;
+        gap: 10px;
+        align-items: flex-end;
+    }
+    
+    .chat-textarea {
+        flex: 1;
+        resize: none;
+        height: 60px;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 30px;
+        font-size: 16px;
+    }
+    
+    .chat-textarea:focus {
+        outline: none;
+        border-color: #3498db;
+    }
+    
+    .chat-controls {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .voice-btn {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background-color: #3498db;
+        color: white;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.3s ease;
+    }
+    
+    .voice-btn:hover {
+        background-color: #2980b9;
+    }
+    
+    .send-btn {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background-color: #2ecc71;
+        color: white;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.3s ease;
+    }
+    
+    .send-btn:hover {
+        background-color: #27ae60;
+    }
+    
+    .send-btn:disabled {
+        background-color: #bdc3c7;
+        cursor: not-allowed;
+    }
+    
+    /* 预设问题样式 */
+    .preset-questions {
+        margin-bottom: 20px;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .preset-questions h3 {
+        margin-bottom: 15px;
+    }
+    
+    .question-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .question-tag {
+        padding: 8px 16px;
+        background-color: #ecf0f1;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .question-tag:hover {
+        background-color: #3498db;
+        color: white;
+    }
+    
+    /* 加载动画 */
+    .typing-indicator {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    
+    .typing-dot {
+        width: 8px;
+        height: 8px;
+        background-color: #95a5a6;
+        border-radius: 50%;
+        animation: typing 1.4s infinite ease-in-out;
+    }
+    
+    .typing-dot:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+    
+    .typing-dot:nth-child(3) {
+        animation-delay: 0.4s;
+    }
+    
+    @keyframes typing {
+        0%, 60%, 100% {
+            transform: translateY(0);
+        }
+        30% {
+            transform: translateY(-10px);
+        }
+    }
+    
+    /* 会话历史记录 */
+    .chat-history {
+        max-width: 800px;
+        margin: 0 auto 20px auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .chat-history h3 {
+        margin-bottom: 15px;
+    }
+    
+    .history-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .history-item {
+        padding: 12px;
+        border: 1px solid #eee;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .history-item:hover {
+        background-color: #f8f9fa;
+        border-color: #3498db;
+    }
+    
+    .history-item .timestamp {
+        font-size: 12px;
+        color: #7f8c8d;
+        margin-top: 5px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>旅游问答</h1>
+<p>有任何旅游相关的问题？随时向AI助手提问，我们将为您提供专业的解答！</p>
+
+<!-- 预设问题区域 -->
+<div class="preset-questions">
+    <h3>热门问题</h3>
+    <div class="question-tags">
+        <div class="question-tag" data-question="故宫门票怎么预订？">故宫门票怎么预订？</div>
+        <div class="question-tag" data-question="三亚最佳旅游季节是什么时候？">三亚最佳旅游季节</div>
+        <div class="question-tag" data-question="如何从上海浦东机场到市区？">机场到市区交通</div>
+        <div class="question-tag" data-question="张家界景区门票价格？">张家界门票价格</div>
+        <div class="question-tag" data-question="西安有哪些必吃美食？">西安必吃美食</div>
+        <div class="question-tag" data-question="长城一日游攻略">长城一日游攻略</div>
+    </div>
+</div>
+
+<!-- 会话历史记录 -->
+<div class="chat-history">
+    <div class="flex justify-between items-center">
+        <h3>会话历史</h3>
+        <button id="new-chat" class="btn btn-primary btn-sm">新建会话</button>
+    </div>
+    <div class="history-list">
+        <div class="history-item" data-session-id="1">
+            <div class="question">故宫游览相关问题</div>
+            <div class="timestamp">今天 10:30</div>
+        </div>
+        <div class="history-item" data-session-id="2">
+            <div class="question">上海三日游行程规划</div>
+            <div class="timestamp">昨天 15:45</div>
+        </div>
+        <div class="history-item" data-session-id="3">
+            <div class="question">关于机票预订的问题</div>
+            <div class="timestamp">3天前</div>
+        </div>
+    </div>
+</div>
+
+<!-- 聊天界面 -->
+<div class="chat-container">
+    <div class="chat-messages" id="chat-messages">
+        <!-- 欢迎消息 -->
+        <div class="message ai">
+            <div class="content">您好！我是您的旅游助手，请问有什么可以帮助您的？</div>
+            <div class="message-time">10:00</div>
+        </div>
+        
+        <!-- 示例对话 -->
+        <div class="message user">
+            <div class="content">我计划下个月去北京旅游，有什么推荐的景点吗？</div>
+            <div class="message-time">10:01</div>
+        </div>
+        
+        <div class="message ai">
+            <div class="content">北京是一座历史悠久的城市，有许多值得一游的景点。以下是我的推荐：
+                <br><br>1. 故宫博物院 - 中国明清两代的皇家宫殿，世界上现存规模最大、保存最为完整的木质结构古建筑之一
+                <br>2. 长城 - 世界七大奇迹之一，建议去慕田峪或八达岭段
+                <br>3. 天坛公园 - 明清两代皇帝祭天、求雨和祈祷丰年的专用祭坛
+                <br>4. 颐和园 - 中国现存规模最大、保存最完整的皇家园林
+                <br>5. 圆明园遗址公园 - 了解中国近代历史的重要场所
+                <br><br>您有具体想了解哪个景点的详细信息吗？或者您有其他关于北京旅游的问题？</div>
+            <div class="message-time">10:02</div>
+        </div>
+    </div>
+    
+    <div class="chat-input">
+        <form id="chat-form">
+            <div class="input-group">
+                <textarea id="message-input" class="chat-textarea" placeholder="请输入您的问题..." required></textarea>
+                <div class="chat-controls">
+                    <button type="button" class="voice-btn" title="语音输入">
+                        <i class="icon-mic">&#x1F3A4;</i>
+                    </button>
+                    <button type="submit" class="send-btn" title="发送消息">
+                        <i class="icon-send">&#x27A1;</i>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const chatForm = document.getElementById('chat-form');
+        const messageInput = document.getElementById('message-input');
+        const chatMessages = document.getElementById('chat-messages');
+        const voiceBtn = document.querySelector('.voice-btn');
+        const sendBtn = document.querySelector('.send-btn');
+        const questionTags = document.querySelectorAll('.question-tag');
+        const historyItems = document.querySelectorAll('.history-item');
+        const newChatBtn = document.getElementById('new-chat');
+        
+        // 聊天表单提交处理
+        chatForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            sendMessage();
+        });
+        
+        // 按Enter发送消息，但Shift+Enter换行
+        messageInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+        
+        // 发送消息函数
+        function sendMessage() {
+            const message = messageInput.value.trim();
+            if (message === '') return;
+            
+            // 添加用户消息到聊天界面
+            addMessageToChat(message, 'user');
+            
+            // 清空输入框
+            messageInput.value = '';
+            sendBtn.disabled = true;
+            
+            // 显示AI正在输入的状态
+            showTypingIndicator();
+            
+            // 模拟AI回复延迟
+            setTimeout(() => {
+                hideTypingIndicator();
+                
+                // 生成AI回复
+                const aiResponse = generateAIResponse(message);
+                
+                // 添加AI回复到聊天界面
+                addMessageToChat(aiResponse, 'ai');
+                
+                sendBtn.disabled = false;
+            }, 2000);
+        }
+        
+        // 添加消息到聊天界面
+        function addMessageToChat(content, sender) {
+            const now = new Date();
+            const timeString = now.getHours().toString().padStart(2, '0') + ':' + 
+                              now.getMinutes().toString().padStart(2, '0');
+            
+            const messageElement = document.createElement('div');
+            messageElement.className = `message ${sender}`;
+            messageElement.innerHTML = `
+                <div class="content">${content}</div>
+                <div class="message-time">${timeString}</div>
+            `;
+            
+            chatMessages.appendChild(messageElement);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // 显示AI正在输入的状态
+        function showTypingIndicator() {
+            const typingElement = document.createElement('div');
+            typingElement.className = 'message ai';
+            typingElement.id = 'typing-indicator';
+            typingElement.innerHTML = `
+                <div class="typing-indicator">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            `;
+            
+            chatMessages.appendChild(typingElement);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // 隐藏AI正在输入的状态
+        function hideTypingIndicator() {
+            const typingElement = document.getElementById('typing-indicator');
+            if (typingElement) {
+                typingElement.remove();
+            }
+        }
+        
+        // 生成AI回复（模拟）
+        function generateAIResponse(question) {
+            // 简单的回复匹配，实际应用中会调用AI API
+            const responses = {
+                '故宫门票怎么预订？': '故宫门票可以通过故宫博物院官方网站或微信公众号进行预订。建议提前7天预订，因为门票通常会很快售罄。预订时需要提供身份证信息，入园时需出示身份证和预订凭证。\n\n门票价格：\n- 旺季（4月1日-10月31日）：60元/人\n- 淡季（11月1日-次年3月31日）：40元/人\n\n开放时间：\n- 旺季：8:30-17:00（16:10停止入场）\n- 淡季：8:30-16:30（15:40停止入场）\n\n每周一闭馆（法定节假日除外）。',
+                '三亚最佳旅游季节是什么时候？': '三亚最佳旅游季节是11月至次年4月，这段时间三亚的气候温暖宜人，气温在20-28℃之间，非常适合海滩度假和户外活动。\n\n- 11月至次年2月：天气凉爽，是旅游高峰期，酒店价格较高\n- 3-4月：气温逐渐升高，游客相对减少，是性价比不错的选择\n- 5-10月：是三亚的雨季和台风季，天气炎热潮湿，但是酒店价格相对便宜\n\n如果您想避开人群，可以选择5-6月或9-10月前往。',
+                '如何从上海浦东机场到市区？': '从上海浦东机场到市区有多种交通方式：\n\n1. 地铁：乘坐2号线东延伸段，可直达市区的人民广场、南京东路等主要站点，票价约8-9元，车程约1小时。\n\n2. 磁悬浮列车：连接浦东机场和龙阳路地铁站，全程约8分钟，票价50元（单程），100元（往返）。在龙阳路可换乘地铁2号线前往市区。\n\n3. 机场大巴：多条线路连接浦东机场与市区各主要区域，票价16-30元不等，车程约40-60分钟。\n\n4. 出租车：排队等候出租车，车程约40-60分钟，费用约150-200元（不含过路费）。\n\n5. 网约车：可以通过各大网约车平台预约车辆，价格与出租车相近。\n\n推荐时间充裕的游客选择地铁，追求速度的可以选择磁悬浮，行李较多的可以考虑机场大巴或出租车。',
+                '张家界景区门票价格？': '张家界主要景区门票价格如下（仅供参考，具体以官方公布为准）：\n\n1. 张家界国家森林公园：\n   - 旺季（3月1日-11月30日）：225元/人（含环保车）\n   - 淡季（12月1日-次年2月28日）：115元/人（含环保车）\n   - 门票有效期4天\n\n2. 天门山国家森林公园：\n   - 旺季（3月1日-11月30日）：258元/人（含索道）\n   - 淡季（12月1日-次年2月28日）：225元/人（含索道）\n\n3. 大峡谷玻璃桥：\n   - 普通票：219元/人\n   - 优惠票：111元/人\n\n4. 黄龙洞：\n   - 普通票：100元/人\n   - 优惠票：50元/人\n\n建议提前通过官方渠道预订门票，尤其是在旅游旺季。',
+                '西安有哪些必吃美食？': '西安作为十三朝古都，有着丰富的美食文化。以下是一些必吃的西安美食：\n\n1. 肉夹馍：陕西特色小吃，外皮酥脆，肉质鲜嫩\n2. 羊肉泡馍：将馍掰碎后加入羊肉汤煮制而成，味道浓郁\n3. biangbiang面：宽如裤带的面条，配上各种调料，非常有特色\n4. 油泼面：细面配上辣椒面和热油泼制而成，香辣可口\n5. 葫芦头：猪大肠熬制的汤，配以馍块，风味独特\n6. 甑糕：糯米、红枣、红豆蒸制而成的甜点\n7. 柿子糊塌：柿子制成的小吃，外酥里嫩\n8. 贾三灌汤包：皮薄馅大，汤汁丰富\n\n推荐去回民街、永兴坊等地方品尝这些美食，但注意选择当地人多的店铺，品质更有保障。',
+                '长城一日游攻略': '长城一日游攻略：\n\n### 选择长城段\n- 八达岭长城：开发最完善，交通最便利，适合家庭和初次游览者\n- 慕田峪长城：游客相对较少，风景优美，适合拍照和徒步\n- 司马台长城：保留较为原始，适合喜欢探险的游客\n- 居庸关长城：距离市区较近，地形险峻\n\n### 交通方式\n- 公交车：德胜门乘坐877路直达八达岭长城\n- 旅游专线：前门、建国门等地有旅游专线车\n- 自驾：走京藏高速，有停车场\n- 高铁：北京北站乘坐高铁到八达岭长城站\n\n### 行程安排\n- 建议早出发，避开人流高峰\n- 上午游览长城，午餐可以在景区内或附近解决\n- 下午可以参观长城博物馆了解长城历史\n- 傍晚返回市区\n\n### 小贴士\n- 穿着舒适的鞋子，准备防晒用品和足够的水\n- 旺季建议提前预约门票\n- 长城上风较大，注意保暖\n- 可以选择乘坐缆车上下长城，节省体力' 
+            };
+            
+            // 检查是否有匹配的预设问题
+            for (const [key, value] of Object.entries(responses)) {
+                if (question.includes(key) || key.includes(question)) {
+                    return value;
+                }
+            }
+            
+            // 默认回复
+            return "感谢您的提问！这是一个很好的问题。我需要为您查询更详细的信息，请稍候...\n\n（在实际应用中，这里会调用AI模型生成更准确的回答）";
+        }
+        
+        // 预设问题点击处理
+        questionTags.forEach(tag => {
+            tag.addEventListener('click', function() {
+                const question = this.getAttribute('data-question');
+                messageInput.value = question;
+                sendBtn.disabled = false;
+                messageInput.focus();
+            });
+        });
+        
+        // 会话历史点击处理
+        historyItems.forEach(item => {
+            item.addEventListener('click', function() {
+                const sessionId = this.getAttribute('data-session-id');
+                loadChatHistory(sessionId);
+            });
+        });
+        
+        // 新建会话
+        newChatBtn.addEventListener('click', function() {
+            if (confirm('确定要开始新的会话吗？当前会话内容将被清空。')) {
+                clearChat();
+            }
+        });
+        
+        // 加载聊天历史
+        function loadChatHistory(sessionId) {
+            showLoading();
+            
+            // 模拟加载历史记录
+            setTimeout(() => {
+                hideLoading();
+                // 在实际应用中，这里会根据sessionId从服务器获取聊天历史
+                clearChat();
+                addMessageToChat('您好！欢迎回到之前的会话。', 'ai');
+                
+                // 根据不同的会话ID显示不同的历史记录
+                if (sessionId === '1') {
+                    addMessageToChat('故宫门票需要提前预订吗？', 'user');
+                    addMessageToChat('是的，故宫门票需要提前7天预订。您可以通过官方网站或微信公众号进行预订。', 'ai');
+                } else if (sessionId === '2') {
+                    addMessageToChat('上海三日游有什么推荐的行程？', 'user');
+                    addMessageToChat('上海三日游推荐行程：\n第一天：外滩-南京路-豫园\n第二天：上海博物馆-田子坊-新天地\n第三天：迪士尼乐园', 'ai');
+                } else {
+                    addMessageToChat('机票预订有什么技巧吗？', 'user');
+                    addMessageToChat('机票预订技巧：提前30-45天预订，周二下午或周三凌晨价格通常较低，使用价格比较工具。', 'ai');
+                }
+            }, 1000);
+        }
+        
+        // 清空聊天
+        function clearChat() {
+            chatMessages.innerHTML = '';
+            addMessageToChat('您好！我是您的旅游助手，请问有什么可以帮助您的？', 'ai');
+        }
+        
+        // 语音输入按钮点击处理
+        voiceBtn.addEventListener('click', function() {
+            // 模拟语音输入功能
+            // 在实际应用中，这里会调用浏览器的语音识别API
+            showAlert('语音输入功能正在开发中...', 'info');
+        });
+        
+        // 监听输入框变化，启用/禁用发送按钮
+        messageInput.addEventListener('input', function() {
+            sendBtn.disabled = this.value.trim() === '';
+        });
+    });
+</script>
+{% endblock %}

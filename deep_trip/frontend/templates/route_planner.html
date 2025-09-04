@@ -1,0 +1,641 @@
+{% extends "layout.html" %}
+
+{% block title %}旅游路线规划 - 旅游小助手{% endblock %}
+
+{% block css %}
+<style>
+    /* 路线规划页面特定样式 */
+    .route-planner {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 30px;
+        margin-bottom: 40px;
+    }
+    
+    @media (max-width: 992px) {
+        .route-planner {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    .filters {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .route-results {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .route-card {
+        border: 1px solid #eee;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .route-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .route-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    
+    .route-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: #2c3e50;
+        margin: 0;
+    }
+    
+    .route-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+    
+    .tag {
+        background-color: #3498db;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 14px;
+    }
+    
+    .route-stats {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px solid #eee;
+    }
+    
+    .stat-item {
+        text-align: center;
+    }
+    
+    .stat-number {
+        font-size: 24px;
+        font-weight: 700;
+        color: #3498db;
+    }
+    
+    .stat-label {
+        font-size: 14px;
+        color: #7f8c8d;
+    }
+    
+    .calendar {
+        margin-top: 20px;
+        padding: 20px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+    }
+    
+    .calendar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    
+    .calendar-weekdays {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        text-align: center;
+        font-weight: 600;
+        color: #7f8c8d;
+        margin-bottom: 10px;
+    }
+    
+    .calendar-days {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 5px;
+    }
+    
+    .day {
+        aspect-ratio: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        cursor: pointer;
+    }
+    
+    .day.current-month {
+        background-color: #fff;
+    }
+    
+    .day.other-month {
+        color: #bdc3c7;
+    }
+    
+    .day.selected {
+        background-color: #3498db;
+        color: white;
+    }
+    
+    .day.today {
+        border: 2px solid #3498db;
+    }
+    
+    .route-detail {
+        margin-top: 40px;
+    }
+    
+    .timeline {
+        position: relative;
+        padding-left: 30px;
+        margin-top: 30px;
+    }
+    
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background-color: #ddd;
+    }
+    
+    .timeline-item {
+        position: relative;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+    }
+    
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: -35px;
+        top: 0;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background-color: #3498db;
+    }
+    
+    .timeline-time {
+        font-weight: 600;
+        color: #3498db;
+        margin-bottom: 5px;
+    }
+    
+    .timeline-location {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+    
+    /* 模态框样式 */
+    .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1001;
+    }
+    
+    .modal-content {
+        background-color: white;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 800px;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+    
+    .modal-header {
+        padding: 20px;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .modal-body {
+        padding: 20px;
+    }
+    
+    .modal-footer {
+        padding: 20px;
+        border-top: 1px solid #eee;
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+    
+    .close-modal {
+        font-size: 24px;
+        cursor: pointer;
+        color: #7f8c8d;
+    }
+    
+    .close-modal:hover {
+        color: #333;
+    }
+    
+    /* 标签选择样式 */
+    .tag-selection {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .checkbox-tag {
+        position: relative;
+        cursor: pointer;
+    }
+    
+    .checkbox-tag input[type="checkbox"] {
+        display: none;
+    }
+    
+    .checkbox-tag span {
+        display: inline-block;
+        padding: 8px 16px;
+        border-radius: 20px;
+        background-color: #ecf0f1;
+        transition: all 0.3s ease;
+    }
+    
+    .checkbox-tag input[type="checkbox"]:checked + span {
+        background-color: #3498db;
+        color: white;
+    }
+    
+    /* 拖拽调整行程的样式 */
+    .draggable {
+        cursor: move;
+        user-select: none;
+    }
+    
+    .dragging {
+        opacity: 0.5;
+        transform: scale(1.05);
+    }
+    
+    .dropzone {
+        min-height: 60px;
+        margin-bottom: 10px;
+        padding: 10px;
+        border: 2px dashed #ddd;
+        border-radius: 4px;
+        transition: all 0.3s ease;
+    }
+    
+    .dropzone.active {
+        border-color: #3498db;
+        background-color: #f0f8ff;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>旅游路线规划</h1>
+<p>输入您的出行条件，让AI为您生成个性化的旅游路线！</p>
+
+<div class="route-planner">
+    <div class="filters">
+        <h3>出行条件</h3>
+        <form id="route-form">
+            <div class="form-group">
+                <label for="destination">目的地</label>
+                <input type="text" id="destination" name="destination" class="form-control" placeholder="请输入目的地" required>
+            </div>
+            <div class="form-group">
+                <label for="start-date">开始日期</label>
+                <input type="date" id="start-date" name="start-date" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="end-date">结束日期</label>
+                <input type="date" id="end-date" name="end-date" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="budget">预算 (元)</label>
+                <input type="number" id="budget" name="budget" class="form-control" placeholder="请输入预算" required>
+            </div>
+            <div class="form-group">
+                <label for="people-count">人数</label>
+                <input type="number" id="people-count" name="people-count" class="form-control" min="1" value="1" required>
+            </div>
+            <div class="form-group">
+                <label>兴趣标签</label>
+                <div class="tag-selection">
+                    {% for tag in ['自然风光', '历史文化', '美食探索', '购物血拼', '亲子活动', '户外探险', '艺术展览', '休闲度假'] %}
+                        <label class="checkbox-tag">
+                            <input type="checkbox" name="interests" value="{{ tag }}">
+                            <span>{{ tag }}</span>
+                        </label>
+                    {% endfor %}
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">生成路线</button>
+        </form>
+    </div>
+    
+    <div class="route-results">
+        <h3>推荐路线</h3>
+        <div class="route-list">
+            <!-- 高性价比路线 -->
+            <div class="route-card">
+                <div class="route-header">
+                    <h4 class="route-title">高性价比三日游</h4>
+                    <span class="tag">推荐</span>
+                </div>
+                <p>这条路线涵盖了城市主要景点，同时兼顾预算控制，适合初次游览的游客。</p>
+                <div class="route-tags">
+                    <span class="tag">经济实惠</span>
+                    <span class="tag">经典景点</span>
+                    <span class="tag">美食体验</span>
+                </div>
+                <div class="route-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">3</div>
+                        <div class="stat-label">天数</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">8</div>
+                        <div class="stat-label">景点</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">¥1200</div>
+                        <div class="stat-label">人均预算</div>
+                    </div>
+                </div>
+                <button class="btn btn-secondary view-route" data-route-id="1">查看详情</button>
+            </div>
+            
+            <!-- 亲子游路线 -->
+            <div class="route-card">
+                <div class="route-header">
+                    <h4 class="route-title">亲子欢乐五日游</h4>
+                    <span class="tag">亲子</span>
+                </div>
+                <p>专为家庭设计的路线，包含多个适合儿童的景点和活动，让全家人都能享受旅行乐趣。</p>
+                <div class="route-tags">
+                    <span class="tag">亲子活动</span>
+                    <span class="tag">主题公园</span>
+                    <span class="tag">轻松休闲</span>
+                </div>
+                <div class="route-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">5</div>
+                        <div class="stat-label">天数</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">12</div>
+                        <div class="stat-label">景点</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">¥2500</div>
+                        <div class="stat-label">人均预算</div>
+                    </div>
+                </div>
+                <button class="btn btn-secondary view-route" data-route-id="2">查看详情</button>
+            </div>
+            
+            <!-- 深度文化路线 -->
+            <div class="route-card">
+                <div class="route-header">
+                    <h4 class="route-title">深度文化四日游</h4>
+                    <span class="tag">文化</span>
+                </div>
+                <p>深入了解当地历史文化，探访博物馆、古迹和传统街区，适合文化爱好者。</p>
+                <div class="route-tags">
+                    <span class="tag">历史文化</span>
+                    <span class="tag">博物馆</span>
+                    <span class="tag">深度体验</span>
+                </div>
+                <div class="route-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">4</div>
+                        <div class="stat-label">天数</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">10</div>
+                        <div class="stat-label">景点</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">¥1800</div>
+                        <div class="stat-label">人均预算</div>
+                    </div>
+                </div>
+                <button class="btn btn-secondary view-route" data-route-id="3">查看详情</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 路线详情模态框 -->
+<div id="route-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modal-title">路线详情</h2>
+            <span class="close-modal">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div id="modal-content">
+                <!-- 路线详情内容将通过JavaScript动态加载 -->
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary close-modal">关闭</button>
+            <button class="btn btn-primary save-route">保存路线</button>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 表单提交处理
+        const routeForm = document.getElementById('route-form');
+        routeForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            showLoading();
+            
+            // 模拟路线生成过程
+            setTimeout(() => {
+                hideLoading();
+                showAlert('路线生成成功！', 'success');
+                // 在实际应用中，这里会根据表单数据请求后端API获取路线
+            }, 2000);
+        });
+        
+        // 查看路线详情
+        const viewRouteButtons = document.querySelectorAll('.view-route');
+        viewRouteButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const routeId = this.getAttribute('data-route-id');
+                showRouteDetail(routeId);
+            });
+        });
+        
+        // 关闭模态框
+        const closeModalButtons = document.querySelectorAll('.close-modal');
+        closeModalButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                document.getElementById('route-modal').style.display = 'none';
+            });
+        });
+        
+        // 点击模态框外部关闭
+        window.addEventListener('click', function(e) {
+            const modal = document.getElementById('route-modal');
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+        
+        // 显示路线详情
+        function showRouteDetail(routeId) {
+            const modal = document.getElementById('route-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalContent = document.getElementById('modal-content');
+            
+            // 根据路线ID获取路线详情
+            let title = '';
+            let content = '';
+            
+            if (routeId === '1') {
+                title = '高性价比三日游';
+                content = `
+                    <div class="route-info">
+                        <p>这条路线涵盖了城市主要景点，同时兼顾预算控制，适合初次游览的游客。</p>
+                        <div class="route-stats">
+                            <div class="stat-item">
+                                <div class="stat-number">3</div>
+                                <div class="stat-label">天数</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">8</div>
+                                <div class="stat-label">景点</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">¥1200</div>
+                                <div class="stat-label">人均预算</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="calendar">
+                        <div class="calendar-header">
+                            <h4>行程日历</h4>
+                            <div class="calendar-controls">
+                                <button class="btn btn-sm">上一月</button>
+                                <button class="btn btn-sm">下一月</button>
+                            </div>
+                        </div>
+                        <!-- 简化的日历显示 -->
+                        <div class="calendar-month">2023年10月</div>
+                        <div class="calendar-weekdays">
+                            <div>日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div>
+                        </div>
+                        <div class="calendar-days">
+                            <!-- 日期显示 -->
+                        </div>
+                    </div>
+                    
+                    <div class="route-detail">
+                        <h4>第一天</h4>
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <div class="timeline-time">09:00 - 11:30</div>
+                                <div class="timeline-location">中央公园</div>
+                                <p>欣赏城市中心的绿色景观，适合拍照和休闲散步。</p>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-time">12:00 - 13:30</div>
+                                <div class="timeline-location">老街美食街</div>
+                                <p>品尝当地特色小吃，体验地道美食文化。</p>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-time">14:00 - 17:00</div>
+                                <div class="timeline-location">历史博物馆</div>
+                                <p>了解城市的发展历史和文化背景。</p>
+                            </div>
+                        </div>
+                        
+                        <h4>第二天</h4>
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <div class="timeline-time">08:30 - 12:00</div>
+                                <div class="timeline-location">山顶观景台</div>
+                                <p>乘坐缆车登上山顶，俯瞰整个城市美景。</p>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-time">13:00 - 15:00</div>
+                                <div class="timeline-location">湖畔餐厅</div>
+                                <p>在湖边享用午餐，欣赏湖光山色。</p>
+                            </div>
+                        </div>
+                        
+                        <h4>第三天</h4>
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <div class="timeline-time">10:00 - 14:00</div>
+                                <div class="timeline-location">购物中心</div>
+                                <p>购买当地特色纪念品，体验购物乐趣。</p>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-time">15:00 - 17:00</div>
+                                <div class="timeline-location">艺术区</div>
+                                <p>参观当地艺术家工作室，感受艺术氛围。</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (routeId === '2') {
+                title = '亲子欢乐五日游';
+                content = `<!-- 亲子游路线详情 -->`;
+            } else {
+                title = '深度文化四日游';
+                content = `<!-- 文化游路线详情 -->`;
+            }
+            
+            modalTitle.textContent = title;
+            modalContent.innerHTML = content;
+            modal.style.display = 'block';
+        }
+        
+        // 标签选择样式
+        const checkboxTags = document.querySelectorAll('.checkbox-tag');
+        checkboxTags.forEach(tag => {
+            tag.addEventListener('change', function() {
+                const checkbox = this.querySelector('input[type="checkbox"]');
+                const span = this.querySelector('span');
+                
+                if (checkbox.checked) {
+                    span.style.backgroundColor = '#3498db';
+                    span.style.color = 'white';
+                } else {
+                    span.style.backgroundColor = 'transparent';
+                    span.style.color = '#333';
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

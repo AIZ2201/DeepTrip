@@ -1,0 +1,360 @@
+{% extends "layout.html" %}
+
+{% block title %}商户登录 - 旅游小助手{% endblock %}
+
+{% block css %}
+<style>
+    /* 商户登录页面样式 */
+    .merchant-login-container {
+        max-width: 400px;
+        margin: 0 auto;
+        padding: 40px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        margin-top: 50px;
+        margin-bottom: 50px;
+    }
+    
+    .merchant-login-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    
+    .merchant-login-title {
+        font-size: 28px;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 10px;
+    }
+    
+    .merchant-login-subtitle {
+        color: #7f8c8d;
+    }
+    
+    .merchant-logo {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 20px;
+        background-color: #3498db;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 40px;
+    }
+    
+    /* 表单样式增强 */
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: #34495e;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 4px;
+        font-size: 16px;
+        transition: border-color 0.3s ease;
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: #3498db;
+    }
+    
+    /* 按钮样式 */
+    .btn-primary {
+        width: 100%;
+        padding: 12px;
+        font-size: 16px;
+        font-weight: 600;
+        border: none;
+        border-radius: 4px;
+        background-color: #3498db;
+        color: white;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+        background-color: #2980b9;
+    }
+    
+    .btn-primary:disabled {
+        background-color: #bdc3c7;
+        cursor: not-allowed;
+    }
+    
+    /* 链接样式 */
+    .login-links {
+        margin-top: 20px;
+        text-align: center;
+    }
+    
+    .login-links a {
+        color: #3498db;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+    
+    .login-links a:hover {
+        color: #2980b9;
+        text-decoration: underline;
+    }
+    
+    .login-links span {
+        color: #7f8c8d;
+        margin: 0 10px;
+    }
+    
+    /* 登录选项 */
+    .login-options {
+        margin-top: 25px;
+        padding-top: 25px;
+        border-top: 1px solid #eee;
+    }
+    
+    .login-option-title {
+        text-align: center;
+        color: #7f8c8d;
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
+    
+    .login-option-buttons {
+        display: flex;
+        gap: 15px;
+    }
+    
+    .login-option-btn {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background-color: #fff;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+    
+    .login-option-btn:hover {
+        background-color: #f8f9fa;
+        border-color: #3498db;
+    }
+    
+    .login-option-btn i {
+        font-size: 20px;
+    }
+    
+    /* 安全提示 */
+    .security-info {
+        margin-top: 20px;
+        text-align: center;
+        font-size: 14px;
+        color: #7f8c8d;
+    }
+    
+    .security-info i {
+        color: #27ae60;
+    }
+    
+    /* 响应式调整 */
+    @media (max-width: 576px) {
+        .merchant-login-container {
+            padding: 30px 20px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .merchant-logo {
+            width: 60px;
+            height: 60px;
+            font-size: 30px;
+        }
+        
+        .merchant-login-title {
+            font-size: 24px;
+        }
+        
+        .login-option-buttons {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="merchant-login-container">
+    <div class="merchant-login-header">
+        <div class="merchant-logo">🏪</div>
+        <h2 class="merchant-login-title">商户登录</h2>
+        <p class="merchant-login-subtitle">欢迎回到旅游小助手商户平台</p>
+    </div>
+    
+    <form id="merchant-login-form">
+        <div class="form-group">
+            <label for="merchant-email">电子邮箱</label>
+            <input type="email" id="merchant-email" class="form-control" placeholder="请输入您的邮箱地址" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="merchant-password">
+                密码
+                <a href="#" class="float-right" style="font-weight: normal; font-size: 14px;">忘记密码？</a>
+            </label>
+            <input type="password" id="merchant-password" class="form-control" placeholder="请输入您的密码" required>
+        </div>
+        
+        <div class="form-group form-check">
+            <label class="form-check-label">
+                <input type="checkbox" class="form-check-input">
+                记住我 30 天
+            </label>
+        </div>
+        
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary" id="login-button">
+                <span id="login-text">登录</span>
+                <span id="login-loading" style="display: none;">登录中...</span>
+            </button>
+        </div>
+    </form>
+    
+    <div class="login-links">
+        <span>还没有账号？</span>
+        <a href="merchant_register.html">立即注册</a>
+    </div>
+    
+    <div class="login-options">
+        <div class="login-option-title">其他登录方式</div>
+        <div class="login-option-buttons">
+            <button type="button" class="login-option-btn">
+                <i class="fab fa-weixin"></i>
+                <span>微信</span>
+            </button>
+            <button type="button" class="login-option-btn">
+                <i class="fab fa-alipay"></i>
+                <span>支付宝</span>
+            </button>
+        </div>
+    </div>
+    
+    <div class="security-info">
+        <i class="fas fa-shield-alt"></i>
+        <span>安全登录，保障您的信息安全</span>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const loginForm = document.getElementById('merchant-login-form');
+        const loginButton = document.getElementById('login-button');
+        const loginText = document.getElementById('login-text');
+        const loginLoading = document.getElementById('login-loading');
+        
+        // 表单提交处理
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // 获取表单数据
+            const email = document.getElementById('merchant-email').value;
+            const password = document.getElementById('merchant-password').value;
+            
+            // 简单的表单验证
+            if (!email || !password) {
+                showAlert('请填写所有必填字段', 'error');
+                return;
+            }
+            
+            // 显示加载状态
+            loginText.style.display = 'none';
+            loginLoading.style.display = 'inline';
+            loginButton.disabled = true;
+            
+            // 模拟登录请求
+            setTimeout(() => {
+                // 这里是模拟的登录逻辑，实际应用中需要调用后端API
+                if (email && password) {
+                    // 登录成功，跳转到商家中心页面
+                    showAlert('登录成功，即将跳转到商家中心', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'merchant_dashboard.html';
+                    }, 1500);
+                } else {
+                    // 登录失败
+                    showAlert('邮箱或密码错误，请重新输入', 'error');
+                    loginText.style.display = 'inline';
+                    loginLoading.style.display = 'none';
+                    loginButton.disabled = false;
+                }
+            }, 2000);
+        });
+        
+        // 其他登录方式处理
+        const wechatLogin = document.querySelector('.login-option-btn:nth-child(1)');
+        const alipayLogin = document.querySelector('.login-option-btn:nth-child(2)');
+        
+        wechatLogin.addEventListener('click', function() {
+            showAlert('微信登录功能即将上线', 'info');
+        });
+        
+        alipayLogin.addEventListener('click', function() {
+            showAlert('支付宝登录功能即将上线', 'info');
+        });
+        
+        // 密码显示/隐藏切换
+        const passwordInput = document.getElementById('merchant-password');
+        const togglePassword = document.createElement('button');
+        togglePassword.type = 'button';
+        togglePassword.className = 'toggle-password';
+        togglePassword.style.position = 'absolute';
+        togglePassword.style.right = '15px';
+        togglePassword.style.top = '50%';
+        togglePassword.style.transform = 'translateY(-50%)';
+        togglePassword.style.background = 'none';
+        togglePassword.style.border = 'none';
+        togglePassword.style.cursor = 'pointer';
+        togglePassword.innerHTML = '<i class="fas fa-eye"></i>';
+        
+        // 获取密码输入框的父元素
+        const passwordGroup = passwordInput.closest('.form-group');
+        passwordGroup.style.position = 'relative';
+        passwordGroup.appendChild(togglePassword);
+        
+        // 切换密码可见性
+        togglePassword.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            
+            // 切换图标
+            this.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+        });
+        
+        // 邮箱格式验证
+        const emailInput = document.getElementById('merchant-email');
+        
+        emailInput.addEventListener('blur', function() {
+            const email = this.value;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            
+            if (email && !emailRegex.test(email)) {
+                showAlert('请输入有效的邮箱地址', 'error');
+            }
+        });
+    });
+</script>
+{% endblock %}

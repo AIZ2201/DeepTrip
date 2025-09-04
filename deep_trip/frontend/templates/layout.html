@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}旅游小助手{% endblock %}</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    {% block css %}{% endblock %}
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="container">
+                <div class="logo">
+                    <a href="/">旅游小助手</a>
+                </div>
+                <ul class="nav-links">
+                    {% if current_user and current_user.role == 'traveller' %}
+                        <li><a href="/path/list">路线规划</a></li>
+                        <li><a href="/ai/chat">旅游问答</a></li>
+                        <li><a href="/booking/list">资源预定</a></li>
+                        <li><a href="/comment/list">服务反馈</a></li>
+                        <li><a href="/user/profile">个人中心</a></li>
+                        <li><a href="/user/logout">退出登录</a></li>
+                    {% elif current_user and current_user.role == 'merchant' %}
+                        <li><a href="/merchant/info">店铺信息</a></li>
+                        <li><a href="/merchant/comments">用户评价</a></li>
+                        <li><a href="/merchant/profile">商家中心</a></li>
+                        <li><a href="/user/logout">退出登录</a></li>
+                    {% elif current_user and current_user.role == 'admin' %}
+                        <li><a href="/admin/dashboard">数据看板</a></li>
+                        <li><a href="/admin/merchants">商户审核</a></li>
+                        <li><a href="/admin/reports">数据报表</a></li>
+                        <li><a href="/admin/profile">管理员中心</a></li>
+                        <li><a href="/user/logout">退出登录</a></li>
+                    {% else %}
+                        <li><a href="/user/login">用户登录</a></li>
+                        <li><a href="/user/register">用户注册</a></li>
+                        <li><a href="/merchant/login">商家登录</a></li>
+                        <li><a href="/merchant/register">商家注册</a></li>
+                        <li><a href="/admin/login">管理员登录</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>关于我们</h3>
+                    <p>旅游小助手，让您的旅行更便捷、更智能、更愉快。</p>
+                </div>
+                <div class="footer-section">
+                    <h3>联系方式</h3>
+                    <p>邮箱: contact@travelassistant.com</p>
+                    <p>电话: 400-123-4567</p>
+                </div>
+                <div class="footer-section">
+                    <h3>服务条款</h3>
+                    <a href="#">隐私政策</a>
+                    <a href="#">用户协议</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2023 旅游小助手 版权所有</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/static/js/scripts.js"></script>
+    {% block js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,404 @@
+{% extends "layout.html" %}
+
+{% block title %}管理员登录 - 旅游小助手{% endblock %}
+
+{% block css %}
+<style>
+    /* 管理员登录页面样式 */
+    .admin-login-container {
+        max-width: 450px;
+        margin: 0 auto;
+        padding: 40px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        margin-top: 80px;
+        margin-bottom: 80px;
+        position: relative;
+    }
+    
+    .admin-login-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    
+    .admin-logo {
+        width: 100px;
+        height: 100px;
+        margin: 0 auto 20px;
+        background-color: #2c3e50;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 48px;
+    }
+    
+    .admin-login-title {
+        font-size: 28px;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 10px;
+    }
+    
+    .admin-login-subtitle {
+        color: #7f8c8d;
+    }
+    
+    /* 表单样式 */
+    .form-group {
+        margin-bottom: 25px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: #34495e;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 4px;
+        font-size: 16px;
+        transition: border-color 0.3s ease;
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: #2c3e50;
+    }
+    
+    /* 密码输入框容器 */
+    .password-input-container {
+        position: relative;
+    }
+    
+    .toggle-password {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #7f8c8d;
+        font-size: 18px;
+    }
+    
+    /* 记住我和忘记密码 */
+    .login-options {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+    }
+    
+    .remember-me {
+        display: flex;
+        align-items: center;
+    }
+    
+    .remember-me input[type="checkbox"] {
+        margin-right: 8px;
+    }
+    
+    .remember-me label {
+        margin-bottom: 0;
+        font-weight: normal;
+        color: #7f8c8d;
+    }
+    
+    .forgot-password {
+        color: #3498db;
+        text-decoration: none;
+        font-size: 14px;
+        transition: color 0.3s ease;
+    }
+    
+    .forgot-password:hover {
+        color: #2980b9;
+        text-decoration: underline;
+    }
+    
+    /* 按钮样式 */
+    .btn-primary {
+        width: 100%;
+        padding: 12px;
+        font-size: 16px;
+        font-weight: 600;
+        border: none;
+        border-radius: 4px;
+        background-color: #2c3e50;
+        color: white;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+        background-color: #34495e;
+    }
+    
+    .btn-primary:disabled {
+        background-color: #bdc3c7;
+        cursor: not-allowed;
+    }
+    
+    /* 安全提示 */
+    .security-tip {
+        margin-top: 30px;
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-radius: 4px;
+        border-left: 4px solid #3498db;
+    }
+    
+    .security-tip-title {
+        font-weight: 600;
+        color: #34495e;
+        margin-bottom: 5px;
+    }
+    
+    .security-tip-content {
+        color: #7f8c8d;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    
+    /* 加载状态 */
+    .login-loading {
+        display: none;
+        text-align: center;
+        margin-top: 20px;
+    }
+    
+    .loading-spinner {
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #2c3e50;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    /* 错误提示 */
+    .error-message {
+        background-color: #fee;
+        border: 1px solid #fcc;
+        border-radius: 4px;
+        color: #c33;
+        padding: 10px 15px;
+        margin-bottom: 20px;
+        display: none;
+    }
+    
+    /* 响应式调整 */
+    @media (max-width: 768px) {
+        .admin-login-container {
+            padding: 30px 20px;
+            margin-top: 40px;
+            margin-bottom: 40px;
+        }
+        
+        .admin-logo {
+            width: 80px;
+            height: 80px;
+            font-size: 36px;
+        }
+        
+        .admin-login-title {
+            font-size: 24px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-login-container">
+    <div class="admin-login-header">
+        <div class="admin-logo">🛡️</div>
+        <h2 class="admin-login-title">管理系统登录</h2>
+        <p class="admin-login-subtitle">请输入您的管理员账号和密码</p>
+    </div>
+    
+    <!-- 错误提示 -->
+    <div id="error-message" class="error-message"></div>
+    
+    <form id="admin-login-form">
+        <div class="form-group">
+            <label for="admin-username">用户名</label>
+            <input type="text" id="admin-username" class="form-control" placeholder="请输入用户名" required autofocus>
+        </div>
+        
+        <div class="form-group">
+            <label for="admin-password">密码</label>
+            <div class="password-input-container">
+                <input type="password" id="admin-password" class="form-control" placeholder="请输入密码" required>
+                <button type="button" class="toggle-password" id="toggle-password">
+                    <i class="far fa-eye"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="login-options">
+            <div class="remember-me">
+                <input type="checkbox" id="remember-me" name="remember-me">
+                <label for="remember-me">记住我</label>
+            </div>
+            <a href="#" class="forgot-password">忘记密码？</a>
+        </div>
+        
+        <div class="form-group">
+            <button type="submit" class="btn-primary" id="login-button">
+                登录
+            </button>
+        </div>
+    </form>
+    
+    <!-- 加载状态 -->
+    <div id="login-loading" class="login-loading">
+        <div class="loading-spinner"></div>
+    </div>
+    
+    <div class="security-tip">
+        <div class="security-tip-title">安全提示</div>
+        <div class="security-tip-content">
+            • 请确保在安全环境下登录系统<br>
+            • 定期更改您的密码以保障账户安全<br>
+            • 如发现异常登录，请立即联系技术支持
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const loginForm = document.getElementById('admin-login-form');
+        const loginButton = document.getElementById('login-button');
+        const loginLoading = document.getElementById('login-loading');
+        const errorMessage = document.getElementById('error-message');
+        const togglePasswordBtn = document.getElementById('toggle-password');
+        const passwordInput = document.getElementById('admin-password');
+        const usernameInput = document.getElementById('admin-username');
+        const rememberMeCheckbox = document.getElementById('remember-me');
+        const forgotPasswordLink = document.querySelector('.forgot-password');
+        
+        // 检查是否有记住的用户名
+        const savedUsername = localStorage.getItem('adminUsername');
+        if (savedUsername) {
+            usernameInput.value = savedUsername;
+            rememberMeCheckbox.checked = true;
+            passwordInput.focus();
+        }
+        
+        // 切换密码可见性
+        togglePasswordBtn.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            
+            // 切换图标
+            const icon = this.querySelector('i');
+            if (type === 'password') {
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            } else {
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            }
+        });
+        
+        // 忘记密码链接
+        forgotPasswordLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            showAlert('请联系系统管理员重置密码', 'info');
+        });
+        
+        // 表单提交处理
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // 获取表单数据
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value;
+            const rememberMe = rememberMeCheckbox.checked;
+            
+            // 表单验证
+            if (!username) {
+                showError('请输入用户名');
+                usernameInput.focus();
+                return;
+            }
+            
+            if (!password) {
+                showError('请输入密码');
+                passwordInput.focus();
+                return;
+            }
+            
+            // 隐藏错误信息
+            errorMessage.style.display = 'none';
+            
+            // 显示加载状态
+            loginButton.disabled = true;
+            loginButton.textContent = '登录中...';
+            loginLoading.style.display = 'block';
+            
+            // 模拟登录请求
+            setTimeout(() => {
+                // 这里是模拟的登录逻辑，实际应用中需要调用后端API
+                // 假设用户名和密码为 'admin' 和 'admin123'
+                if (username === 'admin' && password === 'admin123') {
+                    // 记住用户名
+                    if (rememberMe) {
+                        localStorage.setItem('adminUsername', username);
+                    } else {
+                        localStorage.removeItem('adminUsername');
+                    }
+                    
+                    // 登录成功，跳转到数据查询页面
+                    window.location.href = 'admin_dashboard.html';
+                } else {
+                    // 登录失败，显示错误信息
+                    showError('用户名或密码错误，请重新输入');
+                    
+                    // 重置表单状态
+                    loginButton.disabled = false;
+                    loginButton.textContent = '登录';
+                    loginLoading.style.display = 'none';
+                    passwordInput.value = '';
+                    passwordInput.focus();
+                }
+            }, 2000);
+        });
+        
+        // 显示错误信息
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+        }
+        
+        // 添加键盘事件处理
+        usernameInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                passwordInput.focus();
+            }
+        });
+        
+        passwordInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                loginForm.dispatchEvent(new Event('submit'));
+            }
+        });
+    });
+</script>
+{% endblock %}

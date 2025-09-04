@@ -1,0 +1,869 @@
+{% extends "layout.html" %}
+
+{% block title %}服务反馈 - 旅游小助手{% endblock %}
+
+{% block css %}
+<style>
+    /* 服务反馈页面样式 */
+    .feedback-container {
+        margin-bottom: 40px;
+    }
+    
+    /* 评论表单样式 */
+    .feedback-form {
+        background-color: #fff;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 40px;
+    }
+    
+    .feedback-form h2 {
+        margin-top: 0;
+        margin-bottom: 20px;
+        color: #2c3e50;
+    }
+    
+    .form-section {
+        margin-bottom: 25px;
+    }
+    
+    .form-section-title {
+        font-size: 18px;
+        font-weight: 500;
+        margin-bottom: 15px;
+        color: #34495e;
+    }
+    
+    /* 评分组件样式 */
+    .rating-container {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    
+    .rating-label {
+        margin-right: 20px;
+        font-weight: 500;
+        min-width: 100px;
+    }
+    
+    .stars {
+        display: flex;
+    }
+    
+    .star {
+        font-size: 32px;
+        color: #ddd;
+        cursor: pointer;
+        transition: color 0.3s ease;
+    }
+    
+    .star:hover,
+    .star.active,
+    .star.active ~ .star {
+        color: #f39c12;
+    }
+    
+    /* 评论图片上传样式 */
+    .image-upload-container {
+        margin-top: 20px;
+    }
+    
+    .upload-label {
+        display: block;
+        padding: 20px;
+        text-align: center;
+        border: 2px dashed #ddd;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 15px;
+    }
+    
+    .upload-label:hover {
+        border-color: #3498db;
+        background-color: #f8f9fa;
+    }
+    
+    .upload-icon {
+        font-size: 48px;
+        color: #ddd;
+        margin-bottom: 10px;
+    }
+    
+    .upload-label:hover .upload-icon {
+        color: #3498db;
+    }
+    
+    .upload-input {
+        display: none;
+    }
+    
+    .image-preview-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-top: 15px;
+    }
+    
+    .image-preview {
+        position: relative;
+        width: 120px;
+        height: 120px;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .image-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .remove-image {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        background-color: rgba(255, 255, 255, 0.8);
+        border: none;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 16px;
+        color: #e74c3c;
+    }
+    
+    /* 评论历史记录样式 */
+    .feedback-history {
+        margin-top: 40px;
+    }
+    
+    .feedback-item {
+        background-color: #fff;
+        padding: 25px;
+        margin-bottom: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .feedback-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 15px;
+    }
+    
+    .feedback-meta {
+        display: flex;
+        align-items: center;
+    }
+    
+    .feedback-user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        overflow: hidden;
+        margin-right: 15px;
+        background-color: #f1f1f1;
+    }
+    
+    .feedback-user-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .feedback-user-info {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .feedback-username {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    
+    .feedback-time {
+        font-size: 14px;
+        color: #7f8c8d;
+    }
+    
+    .feedback-rating {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    
+    .feedback-rating-score {
+        font-weight: 600;
+        color: #e74c3c;
+        margin-left: 10px;
+    }
+    
+    .feedback-content {
+        line-height: 1.6;
+        margin-bottom: 15px;
+        color: #34495e;
+    }
+    
+    .feedback-images {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+    
+    .feedback-image {
+        width: 100px;
+        height: 100px;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+    
+    .feedback-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+    }
+    
+    .feedback-image img:hover {
+        transform: scale(1.05);
+    }
+    
+    .feedback-target {
+        display: flex;
+        align-items: center;
+        padding: 10px 15px;
+        background-color: #f8f9fa;
+        border-radius: 4px;
+        margin-top: 15px;
+    }
+    
+    .feedback-target-icon {
+        margin-right: 10px;
+        color: #3498db;
+    }
+    
+    .feedback-target-info {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .feedback-target-name {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    
+    .feedback-target-type {
+        font-size: 14px;
+        color: #7f8c8d;
+    }
+    
+    /* 分页样式 */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin-top: 40px;
+    }
+    
+    /* 模态框图片预览 */
+    .image-viewer-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.9);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1002;
+    }
+    
+    .image-viewer-modal.active {
+        display: flex;
+    }
+    
+    .modal-image-container {
+        max-width: 90%;
+        max-height: 90%;
+    }
+    
+    .modal-image {
+        max-width: 100%;
+        max-height: 100vh;
+    }
+    
+    .close-image-viewer {
+        position: absolute;
+        top: 20px;
+        right: 30px;
+        color: #fff;
+        font-size: 40px;
+        cursor: pointer;
+    }
+    
+    /* 响应式调整 */
+    @media (max-width: 768px) {
+        .feedback-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .feedback-rating {
+            margin-top: 10px;
+        }
+        
+        .image-preview {
+            width: 100px;
+            height: 100px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>服务反馈</h1>
+<p>分享您的旅行体验，帮助我们和其他旅行者做出更好的选择。</p>
+
+<!-- 评论表单 -->
+<div class="feedback-form">
+    <h2>写评论</h2>
+    
+    <form id="feedback-form">
+        <!-- 选择服务 -->
+        <div class="form-section">
+            <div class="form-section-title">选择要评价的服务</div>
+            <div class="form-group">
+                <select id="feedback-target" name="feedback_target" class="form-control" required>
+                    <option value="">请选择服务</option>
+                    <option value="hotel-1">豪华海景酒店（三亚）</option>
+                    <option value="attraction-101">故宫博物院（北京）</option>
+                    <option value="restaurant-201">江南风味馆（上海）</option>
+                    <option value="restaurant-202">长安食府（西安）</option>
+                </select>
+            </div>
+        </div>
+        
+        <!-- 总体评分 -->
+        <div class="form-section">
+            <div class="form-section-title">总体评分</div>
+            <div class="rating-container">
+                <div class="rating-label">服务评分：</div>
+                <div class="stars" id="overall-rating">
+                    <div class="star" data-rating="5">&#9733;</div>
+                    <div class="star" data-rating="4">&#9733;</div>
+                    <div class="star" data-rating="3">&#9733;</div>
+                    <div class="star" data-rating="2">&#9733;</div>
+                    <div class="star" data-rating="1">&#9733;</div>
+                </div>
+                <input type="hidden" id="overall-rating-value" name="overall_rating" required>
+            </div>
+        </div>
+        
+        <!-- 分项评分 -->
+        <div class="form-section">
+            <div class="form-section-title">分项评分</div>
+            <div class="rating-container">
+                <div class="rating-label">环境：</div>
+                <div class="stars" id="environment-rating">
+                    <div class="star" data-rating="5">&#9733;</div>
+                    <div class="star" data-rating="4">&#9733;</div>
+                    <div class="star" data-rating="3">&#9733;</div>
+                    <div class="star" data-rating="2">&#9733;</div>
+                    <div class="star" data-rating="1">&#9733;</div>
+                </div>
+                <input type="hidden" id="environment-rating-value" name="environment_rating">
+            </div>
+            <div class="rating-container">
+                <div class="rating-label">服务：</div>
+                <div class="stars" id="service-rating">
+                    <div class="star" data-rating="5">&#9733;</div>
+                    <div class="star" data-rating="4">&#9733;</div>
+                    <div class="star" data-rating="3">&#9733;</div>
+                    <div class="star" data-rating="2">&#9733;</div>
+                    <div class="star" data-rating="1">&#9733;</div>
+                </div>
+                <input type="hidden" id="service-rating-value" name="service_rating">
+            </div>
+            <div class="rating-container">
+                <div class="rating-label">性价比：</div>
+                <div class="stars" id="value-rating">
+                    <div class="star" data-rating="5">&#9733;</div>
+                    <div class="star" data-rating="4">&#9733;</div>
+                    <div class="star" data-rating="3">&#9733;</div>
+                    <div class="star" data-rating="2">&#9733;</div>
+                    <div class="star" data-rating="1">&#9733;</div>
+                </div>
+                <input type="hidden" id="value-rating-value" name="value_rating">
+            </div>
+        </div>
+        
+        <!-- 评论内容 -->
+        <div class="form-section">
+            <div class="form-section-title">评论内容</div>
+            <div class="form-group">
+                <textarea id="feedback-content" name="feedback_content" rows="5" class="form-control" placeholder="分享您的真实体验和感受，帮助其他旅行者做出更好的选择..." required></textarea>
+                <div class="form-text">请用客观、真实的语言描述您的体验，有助于我们改进服务质量。</div>
+            </div>
+            
+            <!-- 评论标签 -->
+            <div class="form-group">
+                <label>添加标签（可选）</label>
+                <div class="tag-container">
+                    <label class="tag-checkbox">
+                        <input type="checkbox" name="tags" value="环境优美">环境优美
+                    </label>
+                    <label class="tag-checkbox">
+                        <input type="checkbox" name="tags" value="服务周到">服务周到
+                    </label>
+                    <label class="tag-checkbox">
+                        <input type="checkbox" name="tags" value="性价比高">性价比高
+                    </label>
+                    <label class="tag-checkbox">
+                        <input type="checkbox" name="tags" value="值得推荐">值得推荐
+                    </label>
+                    <label class="tag-checkbox">
+                        <input type="checkbox" name="tags" value="位置便利">位置便利
+                    </label>
+                    <label class="tag-checkbox">
+                        <input type="checkbox" name="tags" value="干净整洁">干净整洁
+                    </label>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 图片上传 -->
+        <div class="form-section">
+            <div class="form-section-title">上传图片（可选，最多9张）</div>
+            <div class="image-upload-container">
+                <label class="upload-label" for="image-upload">
+                    <div class="upload-icon">&#128464;</div>
+                    <div>点击或拖拽图片到此处上传</div>
+                    <div class="form-text">支持 JPG、PNG 格式，单张不超过5MB</div>
+                </label>
+                <input type="file" id="image-upload" class="upload-input" accept="image/*" multiple>
+                
+                <div class="image-preview-container" id="image-preview-container"></div>
+            </div>
+        </div>
+        
+        <!-- 提交按钮 -->
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary btn-lg">提交评论</button>
+        </div>
+    </form>
+</div>
+
+<!-- 历史评论记录 -->
+<div class="feedback-history">
+    <h2>我的评论</h2>
+    
+    <!-- 评论1 -->
+    <div class="feedback-item">
+        <div class="feedback-header">
+            <div class="feedback-meta">
+                <div class="feedback-user-avatar">
+                    <img src="https://picsum.photos/id/64/200/200" alt="用户头像">
+                </div>
+                <div class="feedback-user-info">
+                    <div class="feedback-username">张小明</div>
+                    <div class="feedback-time">2023-05-20 15:30</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="feedback-rating">
+            <div class="star-rating">★★★★★</div>
+            <div class="feedback-rating-score">5.0</div>
+        </div>
+        
+        <div class="feedback-content">
+            这家酒店真的太棒了！无敌海景房的视野超级赞，服务人员态度非常热情，早餐品种丰富美味。酒店位置便利，步行几分钟就能到海边。强烈推荐给想要享受海滨度假的朋友们！
+        </div>
+        
+        <div class="feedback-images">
+            <div class="feedback-image">
+                <img src="https://picsum.photos/id/1039/500/300" alt="酒店景色1">
+            </div>
+            <div class="feedback-image">
+                <img src="https://picsum.photos/id/1059/500/300" alt="酒店景色2">
+            </div>
+            <div class="feedback-image">
+                <img src="https://picsum.photos/id/1067/500/300" alt="酒店景色3">
+            </div>
+        </div>
+        
+        <div class="feedback-target">
+            <div class="feedback-target-icon">🏨</div>
+            <div class="feedback-target-info">
+                <div class="feedback-target-name">豪华海景酒店</div>
+                <div class="feedback-target-type">酒店住宿</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 评论2 -->
+    <div class="feedback-item">
+        <div class="feedback-header">
+            <div class="feedback-meta">
+                <div class="feedback-user-avatar">
+                    <img src="https://picsum.photos/id/64/200/200" alt="用户头像">
+                </div>
+                <div class="feedback-user-info">
+                    <div class="feedback-username">张小明</div>
+                    <div class="feedback-time">2023-04-15 19:45</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="feedback-rating">
+            <div class="star-rating">★★★★☆</div>
+            <div class="feedback-rating-score">4.5</div>
+        </div>
+        
+        <div class="feedback-content">
+            故宫博物院真的很震撼，建筑宏伟壮观，展品丰富。不过人实在是太多了，建议早上去或者选择工作日参观。门票价格很合理，讲解器租赁也很方便。总体来说是来北京必去的景点！
+        </div>
+        
+        <div class="feedback-images">
+            <div class="feedback-image">
+                <img src="https://picsum.photos/id/252/500/300" alt="故宫景色1">
+            </div>
+            <div class="feedback-image">
+                <img src="https://picsum.photos/id/255/500/300" alt="故宫景色2">
+            </div>
+        </div>
+        
+        <div class="feedback-target">
+            <div class="feedback-target-icon">🏯</div>
+            <div class="feedback-target-info">
+                <div class="feedback-target-name">故宫博物院</div>
+                <div class="feedback-target-type">旅游景点</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 评论3 -->
+    <div class="feedback-item">
+        <div class="feedback-header">
+            <div class="feedback-meta">
+                <div class="feedback-user-avatar">
+                    <img src="https://picsum.photos/id/64/200/200" alt="用户头像">
+                </div>
+                <div class="feedback-user-info">
+                    <div class="feedback-username">张小明</div>
+                    <div class="feedback-time">2023-03-10 12:15</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="feedback-rating">
+            <div class="star-rating">★★★☆☆</div>
+            <div class="feedback-rating-score">3.0</div>
+        </div>
+        
+        <div class="feedback-content">
+            江南风味馆的菜品口味还不错，环境也很好，但是价格偏高，性价比一般。服务态度还行，但是上菜速度有点慢。推荐西湖醋鱼，味道很正宗。
+        </div>
+        
+        <div class="feedback-images">
+            <div class="feedback-image">
+                <img src="https://picsum.photos/id/292/500/300" alt="餐厅环境">
+            </div>
+        </div>
+        
+        <div class="feedback-target">
+            <div class="feedback-target-icon">🍽️</div>
+            <div class="feedback-target-info">
+                <div class="feedback-target-name">江南风味馆</div>
+                <div class="feedback-target-type">餐饮美食</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 分页 -->
+<div class="pagination">
+    <a href="#" class="page-item">上一页</a>
+    <a href="#" class="page-item active">1</a>
+    <a href="#" class="page-item">2</a>
+    <a href="#" class="page-item">3</a>
+    <span class="page-item">...</span>
+    <a href="#" class="page-item">10</a>
+    <a href="#" class="page-item">下一页</a>
+</div>
+
+<!-- 图片预览模态框 -->
+<div class="image-viewer-modal" id="image-viewer-modal">
+    <div class="modal-image-container">
+        <img src="" alt="预览图片" class="modal-image" id="modal-image">
+    </div>
+    <div class="close-image-viewer">&times;</div>
+</div>
+
+{% endblock %}
+
+{% block js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 评分组件初始化
+        initRatingStars('overall-rating', 'overall-rating-value');
+        initRatingStars('environment-rating', 'environment-rating-value');
+        initRatingStars('service-rating', 'service-rating-value');
+        initRatingStars('value-rating', 'value-rating-value');
+        
+        // 图片上传预览
+        const imageUpload = document.getElementById('image-upload');
+        const imagePreviewContainer = document.getElementById('image-preview-container');
+        const maxImages = 9;
+        let uploadedImages = 0;
+        
+        // 初始化标签样式
+        initTagCheckboxes();
+        
+        // 图片上传功能
+        imageUpload.addEventListener('change', function(e) {
+            const files = e.target.files;
+            
+            // 检查上传图片数量
+            if (uploadedImages + files.length > maxImages) {
+                showAlert(`最多只能上传${maxImages}张图片`, 'error');
+                return;
+            }
+            
+            // 预览上传的图片
+            for (let i = 0; i < files.length && uploadedImages < maxImages; i++) {
+                const file = files[i];
+                
+                // 检查文件类型
+                if (!file.type.match('image/jpeg') && !file.type.match('image/png')) {
+                    showAlert('请上传JPG或PNG格式的图片', 'error');
+                    continue;
+                }
+                
+                // 检查文件大小
+                if (file.size > 5 * 1024 * 1024) {
+                    showAlert('图片大小不能超过5MB', 'error');
+                    continue;
+                }
+                
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    const imagePreview = document.createElement('div');
+                    imagePreview.className = 'image-preview';
+                    
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.alt = '预览图片';
+                    
+                    const removeButton = document.createElement('button');
+                    removeButton.className = 'remove-image';
+                    removeButton.innerHTML = '&times;';
+                    removeButton.addEventListener('click', function() {
+                        imagePreview.remove();
+                        uploadedImages--;
+                    });
+                    
+                    imagePreview.appendChild(img);
+                    imagePreview.appendChild(removeButton);
+                    imagePreviewContainer.appendChild(imagePreview);
+                    uploadedImages++;
+                };
+                
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        // 拖拽上传
+        const uploadLabel = document.querySelector('.upload-label');
+        
+        uploadLabel.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.style.backgroundColor = '#f0f8ff';
+        });
+        
+        uploadLabel.addEventListener('dragleave', function() {
+            this.style.backgroundColor = '';
+        });
+        
+        uploadLabel.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.style.backgroundColor = '';
+            
+            if (e.dataTransfer.files.length) {
+                imageUpload.files = e.dataTransfer.files;
+                const event = new Event('change');
+                imageUpload.dispatchEvent(event);
+            }
+        });
+        
+        // 表单提交处理
+        const feedbackForm = document.getElementById('feedback-form');
+        
+        feedbackForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // 表单验证
+            const feedbackTarget = document.getElementById('feedback-target').value;
+            const overallRating = document.getElementById('overall-rating-value').value;
+            const feedbackContent = document.getElementById('feedback-content').value;
+            
+            if (!feedbackTarget) {
+                showAlert('请选择要评价的服务', 'error');
+                return;
+            }
+            
+            if (!overallRating) {
+                showAlert('请给出总体评分', 'error');
+                return;
+            }
+            
+            if (!feedbackContent.trim()) {
+                showAlert('请输入评论内容', 'error');
+                return;
+            }
+            
+            // 显示加载状态
+            showLoading();
+            
+            // 模拟提交请求
+            setTimeout(() => {
+                hideLoading();
+                
+                // 显示成功提示
+                showAlert('评论提交成功！感谢您的反馈。', 'success');
+                
+                // 重置表单
+                feedbackForm.reset();
+                imagePreviewContainer.innerHTML = '';
+                uploadedImages = 0;
+                
+                // 重置评分
+                resetRating('overall-rating', 'overall-rating-value');
+                resetRating('environment-rating', 'environment-rating-value');
+                resetRating('service-rating', 'service-rating-value');
+                resetRating('value-rating', 'value-rating-value');
+            }, 2000);
+        });
+        
+        // 图片预览模态框
+        const imageViewerModal = document.getElementById('image-viewer-modal');
+        const modalImage = document.getElementById('modal-image');
+        const closeImageViewer = document.querySelector('.close-image-viewer');
+        const feedbackImages = document.querySelectorAll('.feedback-image img');
+        
+        // 点击图片打开预览
+        feedbackImages.forEach(img => {
+            img.addEventListener('click', function() {
+                modalImage.src = this.src;
+                imageViewerModal.classList.add('active');
+                document.body.style.overflow = 'hidden'; // 防止背景滚动
+            });
+        });
+        
+        // 关闭预览
+        closeImageViewer.addEventListener('click', function() {
+            imageViewerModal.classList.remove('active');
+            document.body.style.overflow = '';
+        });
+        
+        // 点击模态框背景关闭
+        imageViewerModal.addEventListener('click', function(e) {
+            if (e.target === imageViewerModal) {
+                imageViewerModal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+        
+        // 评分组件初始化函数
+        function initRatingStars(ratingId, inputId) {
+            const stars = document.querySelectorAll(`#${ratingId} .star`);
+            const ratingInput = document.getElementById(inputId);
+            
+            stars.forEach(star => {
+                star.addEventListener('mouseover', function() {
+                    const rating = parseInt(this.getAttribute('data-rating'));
+                    updateStarRating(stars, rating);
+                });
+                
+                star.addEventListener('mouseout', function() {
+                    const currentRating = parseInt(ratingInput.value) || 0;
+                    updateStarRating(stars, currentRating);
+                });
+                
+                star.addEventListener('click', function() {
+                    const rating = parseInt(this.getAttribute('data-rating'));
+                    ratingInput.value = rating;
+                    updateStarRating(stars, rating);
+                });
+            });
+        }
+        
+        // 更新星级显示
+        function updateStarRating(stars, rating) {
+            stars.forEach(star => {
+                const starRating = parseInt(star.getAttribute('data-rating'));
+                star.classList.toggle('active', starRating >= rating);
+            });
+        }
+        
+        // 重置评分
+        function resetRating(ratingId, inputId) {
+            const stars = document.querySelectorAll(`#${ratingId} .star`);
+            const ratingInput = document.getElementById(inputId);
+            
+            ratingInput.value = '';
+            stars.forEach(star => star.classList.remove('active'));
+        }
+        
+        // 初始化标签样式
+        function initTagCheckboxes() {
+            const tagCheckboxes = document.querySelectorAll('.tag-checkbox');
+            
+            tagCheckboxes.forEach(checkbox => {
+                checkbox.style.display = 'inline-block';
+                checkbox.style.marginRight = '15px';
+                checkbox.style.marginBottom = '10px';
+                checkbox.style.padding = '5px 10px';
+                checkbox.style.border = '1px solid #ddd';
+                checkbox.style.borderRadius = '20px';
+                checkbox.style.cursor = 'pointer';
+                checkbox.style.transition = 'all 0.3s ease';
+                
+                checkbox.addEventListener('click', function(e) {
+                    if (e.target.type !== 'checkbox') {
+                        const input = this.querySelector('input[type="checkbox"]');
+                        input.checked = !input.checked;
+                    }
+                });
+                
+                const input = checkbox.querySelector('input[type="checkbox"]');
+                input.style.marginRight = '5px';
+                
+                // 添加选中样式变化
+                input.addEventListener('change', function() {
+                    if (this.checked) {
+                        checkbox.style.backgroundColor = '#3498db';
+                        checkbox.style.color = 'white';
+                        checkbox.style.borderColor = '#3498db';
+                    } else {
+                        checkbox.style.backgroundColor = '';
+                        checkbox.style.color = '';
+                        checkbox.style.borderColor = '#ddd';
+                    }
+                });
+            });
+        }
+    });
+</script>
+{% endblock %}

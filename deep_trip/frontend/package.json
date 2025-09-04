@@ -1,0 +1,16 @@
+{
+  "name": "travel-assistant-frontend",
+  "version": "1.0.0",
+  "description": "旅游小助手系统前端",
+  "main": "index.js",
+  "scripts": {
+    "build": "npm run lint && echo 'Building frontend...'",
+    "lint": "echo 'Linting code...'",
+    "dev": "echo 'Starting development server...'"
+  },
+  "keywords": ["travel", "assistant", "frontend"],
+  "author": "Travel Assistant Team",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {}
+}
