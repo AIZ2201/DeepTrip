@@ -71,6 +71,10 @@
         border-color: #3498db;
     }
     
+    .form-control.error {
+        border-color: #e74c3c;
+    }
+    
     .password-input-container {
         position: relative;
     }
@@ -104,8 +108,9 @@
     
     .remember-me label {
         font-weight: normal;
-        color: #34495e;
+        color: #3498db;
         margin-bottom: 0;
+        cursor: pointer;
     }
     
     /* 按钮样式 */
@@ -195,6 +200,11 @@
         font-size: 20px;
     }
     
+    .login-option-btn:disabled {
+        background-color: #f5f5f5;
+        cursor: not-allowed;
+    }
+    
     /* 安全提示 */
     .security-info {
         margin-top: 20px;
@@ -205,6 +215,60 @@
     
     .security-info i {
         color: #27ae60;
+    }
+    
+    /* 提示框样式 */
+    .alert {
+        padding: 12px 15px;
+        margin-bottom: 20px;
+        border-radius: 4px;
+        color: white;
+        font-weight: 500;
+        transition: opacity 0.3s ease;
+    }
+    
+    .alert-success {
+        background-color: #27ae60;
+    }
+    
+    .alert-error {
+        background-color: #e74c3c;
+    }
+    
+    .alert-info {
+        background-color: #3498db;
+    }
+    
+    .fade-out {
+        opacity: 0;
+    }
+    
+    /* 加载状态样式 */
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+    
+    .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #3498db;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
     }
     
     /* 响应式调整 */
@@ -270,20 +334,6 @@
         </div>
     </form>
     
-    <div class="login-options">
-        <div class="login-option-title">其他登录方式</div>
-        <div class="login-option-buttons">
-            <button type="button" class="login-option-btn" data-provider="wechat">
-                <i class="fab fa-weixin" style="color: #27ae60;"></i>
-                <span>微信</span>
-            </button>
-            <button type="button" class="login-option-btn" data-provider="alipay">
-                <i class="fab fa-alipay" style="color: #1677FF;"></i>
-                <span>支付宝</span>
-            </button>
-        </div>
-    </div>
-    
     <div class="security-info">
         <i class="fas fa-shield-alt"></i> 旅游小助手保障您的账号安全
     </div>
@@ -299,95 +349,149 @@
         const togglePasswordBtn = document.getElementById('toggle-password');
         const loginButton = document.getElementById('login-button');
         
-        // 表单验证
+        // 1. 显示提示框（完整实现，无外部依赖）
+        function showAlert(message, type) {
+            // 移除已存在的提示框，避免重复
+            const existingAlerts = document.querySelectorAll('.alert');
+            existingAlerts.forEach(alert => alert.remove());
+            
+            // 创建新提示框
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            
+            // 插入到登录容器顶部
+            const container = document.querySelector('.user-login-container');
+            container.insertBefore(alertDiv, container.firstChild);
+            
+            // 3秒后自动消失（带动画）
+            setTimeout(() => {
+                alertDiv.classList.add('fade-out');
+                setTimeout(() => alertDiv.remove(), 300);
+            }, 3000);
+        }
+        
+        // 2. 显示加载状态（完整实现，对应CSS中的.loading-overlay）
+        function showLoading() {
+            // 先移除已有的加载层
+            hideLoading();
+            
+            // 创建加载层元素
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'loading-overlay';
+            loadingDiv.innerHTML = '<div class="spinner"></div>'; // 加载动画
+            
+            // 添加到页面body，确保全屏覆盖
+            document.body.appendChild(loadingDiv);
+        }
+        
+        // 3. 隐藏加载状态
+        function hideLoading() {
+            const loadingDiv = document.querySelector('.loading-overlay');
+            if (loadingDiv) {
+                loadingDiv.remove();
+            }
+        }
+        
+        // 4. 表单验证（仅非空检查，无额外限制）
         function validateForm() {
-            const emailValid = emailInput.value.trim() !== '';
-            const passwordValid = passwordInput.value.trim() !== '';
+            let isValid = true;
+            const email = emailInput.value.trim();
+            const password = passwordInput.value.trim();
             
-            // 简单的邮箱格式验证
-            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            const emailFormatValid = emailPattern.test(emailInput.value.trim());
-            
-            if (emailInput.value.trim() && !emailFormatValid) {
+            // 邮箱非空检查
+            if (!email) {
                 emailInput.classList.add('error');
-                showAlert('请输入有效的邮箱地址', 'error');
-                return false;
+                showAlert('请输入邮箱', 'error');
+                isValid = false;
             } else {
                 emailInput.classList.remove('error');
             }
             
-            return emailValid && passwordValid && emailFormatValid;
+            // 密码非空检查（避免重复弹框）
+            if (!password) {
+                passwordInput.classList.add('error');
+                if (isValid) showAlert('请输入密码', 'error');
+                isValid = false;
+            } else {
+                passwordInput.classList.remove('error');
+            }
+            
+            return isValid;
         }
         
-        // 密码可见性切换
+        // 5. 密码可见性切换（点击眼睛图标切换）
         togglePasswordBtn.addEventListener('click', function() {
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
+            // 切换输入框类型（password/text）
+            const inputType = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', inputType);
             
-            // 切换图标
+            // 切换图标（fa-eye-slash/fa-eye）
             togglePasswordBtn.classList.toggle('fa-eye');
             togglePasswordBtn.classList.toggle('fa-eye-slash');
         });
         
-        // 表单提交处理
+        // 6. 表单提交核心逻辑（向后端发请求，处理登录结果）
         loginForm.addEventListener('submit', function(e) {
-            e.preventDefault();
+            e.preventDefault(); // 阻止默认表单提交
             
+            // 先做前端非空验证
             if (!validateForm()) {
                 return;
             }
             
-            // 显示加载状态
+            // 显示加载状态+禁用按钮（防止重复点击）
             loginButton.disabled = true;
             loginButton.textContent = '登录中...';
             showLoading();
             
-            // 模拟表单提交
-            setTimeout(() => {
-                // 这里可以添加实际的表单提交代码
-                // 例如: loginForm.submit();
-                
-                // 模拟登录成功
+            // 准备表单数据（收集email、password、remember）
+            const formData = new FormData(loginForm);
+            
+            // 向后端发送登录请求（对接你的/user/login接口）
+            fetch('/user/login', {
+                method: 'POST',
+                body: formData // 自动携带表单数据
+            })
+            .then(response => {
+                // 处理后端响应（确保返回JSON格式）
+                if (!response.ok) {
+                    throw new Error('网络请求失败');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // 隐藏加载状态+恢复按钮
                 hideLoading();
-                showAlert('登录成功！正在跳转到首页...', 'success');
+                loginButton.disabled = false;
+                loginButton.textContent = '登录';
                 
-                // 模拟跳转到首页
-                setTimeout(() => {
-                    window.location.href = '/';
-                }, 1500);
-            }, 2000);
-        });
-        
-        // 其他登录方式处理
-        document.querySelectorAll('.login-option-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const provider = this.getAttribute('data-provider');
-                
-                // 显示加载状态
-                this.disabled = true;
-                showLoading();
-                
-                // 模拟第三方登录请求
-                setTimeout(() => {
-                    hideLoading();
-                    showAlert(`正在跳转到${provider === 'wechat' ? '微信' : '支付宝'}授权页面...`, 'info');
-                    
-                    // 实际项目中，这里应该跳转到相应的授权页面
-                    // 例如: window.location.href = `/auth/${provider}`;
-                    
-                    // 模拟跳转
+                // 处理登录结果
+                if (data.success) {
+                    showAlert('登录成功！正在跳转到首页...', 'success');
+                    // 1.5秒后跳转到首页（给用户看提示的时间）
                     setTimeout(() => {
-                        window.location.href = '/';
-                    }, 2000);
-                }, 1500);
+                        window.location.href = '/route_planner'; // 目标页面地址
+                    }, 1500);
+                } else {
+                    // 后端返回错误信息（如“邮箱或密码错误”）
+                    showAlert(data.message || '登录失败，请重试', 'error');
+                }
+            })
+            .catch(error => {
+                // 捕获网络错误（如断网、接口异常）
+                hideLoading();
+                loginButton.disabled = false;
+                loginButton.textContent = '登录';
+                showAlert('网络错误，请稍后重试', 'error');
+                console.error('登录请求异常：', error); // 便于开发调试
             });
         });
         
-        // 输入时移除错误样式
+        // 8. 输入时自动移除错误样式（提升用户体验）
         emailInput.addEventListener('input', function() {
             this.classList.remove('error');
         });
-        
         passwordInput.addEventListener('input', function() {
             this.classList.remove('error');
         });
