@@ -105,8 +105,8 @@
     <div class="welcome-section">
         <h1>
           欢迎回来，
-          {% if current_user and current_user.get('email') %}
-            {{ current_user.get('email') }}
+          {% if current_user and current_user.get('username') %}
+            {{ current_user.get('username') }}
           {% else %}
             游客
           {% endif %}！

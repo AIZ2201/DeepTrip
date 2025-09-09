@@ -35,17 +35,20 @@ def user_login():
 
         db = UserLogin()
         if db.check_user_login(email, password):
-            # 清理其他身份，避免混用
             session.pop('merchant', None)
             session.pop('admin', None)
-            session['user'] = email
+            user_info = db.get_user_info(email)
+            session['user'] = user_info
             if remember:
                 session.permanent = True
                 app.permanent_session_lifetime = timedelta(days=30)
-            return jsonify({'success': True, 'message': '登录成功'})
+
+            # ✅ 登录成功后跳转用户主页
+            return redirect(url_for('user_home'))
         else:
             return jsonify({'success': False, 'message': '邮箱或密码错误'})
 
+    # GET 请求返回登录页
     return render_template('user_login.html')
 
 # ============ 注册 ============
@@ -73,6 +76,16 @@ def user_register():
         return jsonify({'success': success, 'message': message})
 
     return render_template('user_register.html')
+
+@app.route('/user/home')
+def user_home():
+    if 'user' not in session:
+        return redirect(url_for('user_login'))
+    recent_activities = [
+        {"icon": "🗺️", "title": "规划了新路线", "time": "2025-09-09 10:23"},
+        {"icon": "💬", "title": "咨询了AI助手", "time": "2025-09-08 16:45"},
+    ]
+    return render_template('user_home.html', recent_activities=recent_activities)
 
 # ============ 忘记密码 ============
 @app.route('/user/forgot-password', methods=['GET'])
@@ -127,8 +140,13 @@ def forgot_password_reset():
 @app.context_processor
 def inject_current_user():
     cu = None
-    if session.get('user'):
-        cu = {'email': session.get('user'), 'role': 'traveller'}
+    user = session.get('user')
+    if isinstance(user, dict):
+        cu = {
+            'email': user.get('email', ''),
+            'username': user.get('username', ''),
+            'role': 'traveller'
+        }
     elif session.get('merchant'):
         cu = {'email': session.get('merchant'), 'role': 'merchant'}
     elif session.get('admin'):
