@@ -414,31 +414,6 @@
                 <textarea id="feedback-content" name="feedback_content" rows="5" class="form-control" placeholder="分享您的真实体验和感受，帮助其他旅行者做出更好的选择..." required></textarea>
                 <div class="form-text">请用客观、真实的语言描述您的体验，有助于我们改进服务质量。</div>
             </div>
-            
-            <!-- 评论标签 -->
-            <div class="form-group">
-                <label>添加标签（可选）</label>
-                <div class="tag-container">
-                    <label class="tag-checkbox">
-                        <input type="checkbox" name="tags" value="环境优美">环境优美
-                    </label>
-                    <label class="tag-checkbox">
-                        <input type="checkbox" name="tags" value="服务周到">服务周到
-                    </label>
-                    <label class="tag-checkbox">
-                        <input type="checkbox" name="tags" value="性价比高">性价比高
-                    </label>
-                    <label class="tag-checkbox">
-                        <input type="checkbox" name="tags" value="值得推荐">值得推荐
-                    </label>
-                    <label class="tag-checkbox">
-                        <input type="checkbox" name="tags" value="位置便利">位置便利
-                    </label>
-                    <label class="tag-checkbox">
-                        <input type="checkbox" name="tags" value="干净整洁">干净整洁
-                    </label>
-                </div>
-            </div>
         </div>
         
         <!-- 图片上传 -->
@@ -626,9 +601,6 @@
         const imagePreviewContainer = document.getElementById('image-preview-container');
         const maxImages = 9;
         let uploadedImages = 0;
-        
-        // 初始化标签样式
-        initTagCheckboxes();
         
         // 图片上传功能
         imageUpload.addEventListener('change', function(e) {
@@ -824,45 +796,6 @@
             
             ratingInput.value = '';
             stars.forEach(star => star.classList.remove('active'));
-        }
-        
-        // 初始化标签样式
-        function initTagCheckboxes() {
-            const tagCheckboxes = document.querySelectorAll('.tag-checkbox');
-            
-            tagCheckboxes.forEach(checkbox => {
-                checkbox.style.display = 'inline-block';
-                checkbox.style.marginRight = '15px';
-                checkbox.style.marginBottom = '10px';
-                checkbox.style.padding = '5px 10px';
-                checkbox.style.border = '1px solid #ddd';
-                checkbox.style.borderRadius = '20px';
-                checkbox.style.cursor = 'pointer';
-                checkbox.style.transition = 'all 0.3s ease';
-                
-                checkbox.addEventListener('click', function(e) {
-                    if (e.target.type !== 'checkbox') {
-                        const input = this.querySelector('input[type="checkbox"]');
-                        input.checked = !input.checked;
-                    }
-                });
-                
-                const input = checkbox.querySelector('input[type="checkbox"]');
-                input.style.marginRight = '5px';
-                
-                // 添加选中样式变化
-                input.addEventListener('change', function() {
-                    if (this.checked) {
-                        checkbox.style.backgroundColor = '#3498db';
-                        checkbox.style.color = 'white';
-                        checkbox.style.borderColor = '#3498db';
-                    } else {
-                        checkbox.style.backgroundColor = '';
-                        checkbox.style.color = '';
-                        checkbox.style.borderColor = '#ddd';
-                    }
-                });
-            });
         }
     });
 </script>

@@ -7,6 +7,8 @@ from datetime import timedelta
 import re
 import os
 from merchant_login import MerchantAuth   # <- 如果你的文件叫 merchant_login.py，就改成 from merchant_login import MerchantAuth
+from feedback_views import feedback_bp
+from models import db
 
 app = Flask(
     __name__,
@@ -14,10 +16,19 @@ app = Flask(
     static_folder='../frontend/static'
 )
 
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:123456@localhost/deeptrip?charset=utf8mb4'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
 app.secret_key = os.getenv('FLASK_SECRET_KEY', 'dev_only_change_me')
+
+# 绑定 SQLAlchemy 实例到 Flask app
+db.init_app(app)
 
 # 开发期可为 True；上线必须 False
 DEV_EXPOSE_RESET_CODE = True
+
+# 注册蓝图
+app.register_blueprint(feedback_bp)
 
 # ============ 登录 ============
 @app.route('/')
