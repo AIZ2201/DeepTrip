@@ -4,530 +4,384 @@
 
 {% block css %}
 <style>
-    /* 用户登录页面样式 */
+  /* 用户登录页面样式 */
+  .user-login-container {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 40px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 50px;
+    margin-bottom: 50px;
+  }
+
+  .user-login-header {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  .user-login-title {
+    font-size: 28px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 10px;
+  }
+
+  .user-login-subtitle {
+    color: #7f8c8d;
+  }
+
+  .user-logo {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 20px;
+    background-color: #3498db;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 40px;
+  }
+
+  /* 表单样式增强 */
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #34495e;
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 4px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+  }
+
+  .form-control:focus {
+    outline: none;
+    border-color: #3498db;
+  }
+
+  .form-control.error {
+    border-color: #e74c3c;
+  }
+
+  .password-input-container {
+    position: relative;
+  }
+
+  .toggle-password {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #7f8c8d;
+    transition: color 0.3s ease;
+  }
+
+  .toggle-password:hover {
+    color: #3498db;
+  }
+
+  /* 记住我选项 */
+  .remember-me {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .remember-me input[type="checkbox"] {
+    margin-right: 10px;
+    width: 18px;
+    height: 18px;
+  }
+
+  .remember-me label {
+    font-weight: normal;
+    color: #3498db;
+    margin-bottom: 0;
+    cursor: pointer;
+  }
+
+  /* 按钮样式 */
+  .btn-primary {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    border-radius: 4px;
+    background-color: #3498db;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .btn-primary:hover {
+    background-color: #2980b9;
+  }
+
+  .btn-primary:disabled {
+    background-color: #bdc3c7;
+    cursor: not-allowed;
+  }
+
+  /* 链接样式 */
+  .login-links {
+    margin-top: 20px;
+    text-align: center;
+  }
+
+  .login-links a {
+    color: #3498db;
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+
+  .login-links a:hover {
+    color: #2980b9;
+    text-decoration: underline;
+  }
+
+  .login-links span {
+    color: #7f8c8d;
+    margin: 0 10px;
+  }
+
+  /* 登录选项 */
+  .login-options {
+    margin-top: 25px;
+    padding-top: 25px;
+    border-top: 1px solid #eee;
+  }
+
+  .login-option-title {
+    text-align: center;
+    color: #7f8c8d;
+    margin-bottom: 20px;
+    font-size: 14px;
+  }
+
+  .login-option-buttons {
+    display: flex;
+    gap: 15px;
+  }
+
+  .login-option-btn {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .login-option-btn:hover {
+    background-color: #f8f9fa;
+    border-color: #3498db;
+  }
+
+  .login-option-btn i {
+    font-size: 20px;
+  }
+
+  .login-option-btn:disabled {
+    background-color: #f5f5f5;
+    cursor: not-allowed;
+  }
+
+  /* 安全提示 */
+  .security-info {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 14px;
+    color: #7f8c8d;
+  }
+
+  .security-info i {
+    color: #27ae60;
+  }
+
+  /* 提示框样式 */
+  .alert {
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+    color: white;
+    font-weight: 500;
+    transition: opacity 0.3s ease;
+  }
+
+  .alert-success {
+    background-color: #27ae60;
+  }
+
+  .alert-error {
+    background-color: #e74c3c;
+  }
+
+  .alert-info {
+    background-color: #3498db;
+  }
+
+  .fade-out {
+    opacity: 0;
+  }
+
+  /* 加载状态样式 */
+  .loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* 响应式调整 */
+  @media (max-width: 576px) {
     .user-login-container {
-        max-width: 400px;
-        margin: 0 auto;
-        padding: 40px;
-        background-color: #fff;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        margin-top: 50px;
-        margin-bottom: 50px;
+      padding: 30px 20px;
+      margin-top: 20px;
+      margin-bottom: 20px;
     }
-    
-    .user-login-header {
-        text-align: center;
-        margin-bottom: 30px;
-    }
-    
-    .user-login-title {
-        font-size: 28px;
-        font-weight: 600;
-        color: #2c3e50;
-        margin-bottom: 10px;
-    }
-    
-    .user-login-subtitle {
-        color: #7f8c8d;
-    }
-    
+
     .user-logo {
-        width: 80px;
-        height: 80px;
-        margin: 0 auto 20px;
-        background-color: #3498db;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 40px;
+      width: 60px;
+      height: 60px;
+      font-size: 30px;
     }
-    
-    /* 表单样式增强 */
-    .form-group {
-        margin-bottom: 20px;
+
+    .user-login-title {
+      font-size: 24px;
     }
-    
-    .form-group label {
-        display: block;
-        margin-bottom: 8px;
-        font-weight: 500;
-        color: #34495e;
-    }
-    
-    .form-control {
-        width: 100%;
-        padding: 12px 15px;
-        border: 2px solid #e0e0e0;
-        border-radius: 4px;
-        font-size: 16px;
-        transition: border-color 0.3s ease;
-    }
-    
-    .form-control:focus {
-        outline: none;
-        border-color: #3498db;
-    }
-    
-    .form-control.error {
-        border-color: #e74c3c;
-    }
-    
-    .password-input-container {
-        position: relative;
-    }
-    
-    .toggle-password {
-        position: absolute;
-        right: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        cursor: pointer;
-        color: #7f8c8d;
-        transition: color 0.3s ease;
-    }
-    
-    .toggle-password:hover {
-        color: #3498db;
-    }
-    
-    /* 记住我选项 */
-    .remember-me {
-        display: flex;
-        align-items: center;
-        margin-bottom: 20px;
-    }
-    
-    .remember-me input[type="checkbox"] {
-        margin-right: 10px;
-        width: 18px;
-        height: 18px;
-    }
-    
-    .remember-me label {
-        font-weight: normal;
-        color: #3498db;
-        margin-bottom: 0;
-        cursor: pointer;
-    }
-    
-    /* 按钮样式 */
-    .btn-primary {
-        width: 100%;
-        padding: 12px;
-        font-size: 16px;
-        font-weight: 600;
-        border: none;
-        border-radius: 4px;
-        background-color: #3498db;
-        color: white;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-    }
-    
-    .btn-primary:hover {
-        background-color: #2980b9;
-    }
-    
-    .btn-primary:disabled {
-        background-color: #bdc3c7;
-        cursor: not-allowed;
-    }
-    
-    /* 链接样式 */
-    .login-links {
-        margin-top: 20px;
-        text-align: center;
-    }
-    
-    .login-links a {
-        color: #3498db;
-        text-decoration: none;
-        transition: color 0.3s ease;
-    }
-    
-    .login-links a:hover {
-        color: #2980b9;
-        text-decoration: underline;
-    }
-    
-    .login-links span {
-        color: #7f8c8d;
-        margin: 0 10px;
-    }
-    
-    /* 登录选项 */
-    .login-options {
-        margin-top: 25px;
-        padding-top: 25px;
-        border-top: 1px solid #eee;
-    }
-    
-    .login-option-title {
-        text-align: center;
-        color: #7f8c8d;
-        margin-bottom: 20px;
-        font-size: 14px;
-    }
-    
+
     .login-option-buttons {
-        display: flex;
-        gap: 15px;
+      flex-direction: column;
     }
-    
-    .login-option-btn {
-        flex: 1;
-        padding: 10px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        background-color: #fff;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-    }
-    
-    .login-option-btn:hover {
-        background-color: #f8f9fa;
-        border-color: #3498db;
-    }
-    
-    .login-option-btn i {
-        font-size: 20px;
-    }
-    
-    .login-option-btn:disabled {
-        background-color: #f5f5f5;
-        cursor: not-allowed;
-    }
-    
-    /* 安全提示 */
-    .security-info {
-        margin-top: 20px;
-        text-align: center;
-        font-size: 14px;
-        color: #7f8c8d;
-    }
-    
-    .security-info i {
-        color: #27ae60;
-    }
-    
-    /* 提示框样式 */
-    .alert {
-        padding: 12px 15px;
-        margin-bottom: 20px;
-        border-radius: 4px;
-        color: white;
-        font-weight: 500;
-        transition: opacity 0.3s ease;
-    }
-    
-    .alert-success {
-        background-color: #27ae60;
-    }
-    
-    .alert-error {
-        background-color: #e74c3c;
-    }
-    
-    .alert-info {
-        background-color: #3498db;
-    }
-    
-    .fade-out {
-        opacity: 0;
-    }
-    
-    /* 加载状态样式 */
-    .loading-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(255, 255, 255, 0.8);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 1000;
-    }
-    
-    .spinner {
-        width: 40px;
-        height: 40px;
-        border: 4px solid #f3f3f3;
-        border-top: 4px solid #3498db;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-    }
-    
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-    
-    /* 响应式调整 */
-    @media (max-width: 576px) {
-        .user-login-container {
-            padding: 30px 20px;
-            margin-top: 20px;
-            margin-bottom: 20px;
-        }
-        
-        .user-logo {
-            width: 60px;
-            height: 60px;
-            font-size: 30px;
-        }
-        
-        .user-login-title {
-            font-size: 24px;
-        }
-        
-        .login-option-buttons {
-            flex-direction: column;
-        }
-    }
+  }
 </style>
 {% endblock %}
 
 {% block content %}
 <!-- 添加flash消息显示 -->
 {% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-    <div class="flashes">
-      {% for category, message in messages %}
-        <div class="alert alert-{{ category }}">{{ message }}</div>
-      {% endfor %}
-    </div>
-  {% endif %}
+{% if messages %}
+<div class="flashes">
+  {% for category, message in messages %}
+  <div class="alert alert-{{ category }}">{{ message }}</div>
+  {% endfor %}
+</div>
+{% endif %}
 {% endwith %}
 <div class="user-login-container">
-    <div class="user-login-header">
-        <div class="user-logo">
-            <i class="fas fa-user"></i>
-        </div>
-        <h1 class="user-login-title">用户登录</h1>
-        <p class="user-login-subtitle">登录您的旅游小助手账号</p>
+  <div class="user-login-header">
+    <div class="user-logo">
+      <i class="fas fa-user"></i>
     </div>
-    
-    <form method="POST" action="{{ url_for('user.user_login') }}" id="login-form">
-        <div class="form-group">
-            <label for="email">邮箱</label>
-            <input type="email" id="email" name="email" class="form-control" placeholder="请输入您的邮箱" required>
-        </div>
-        
-        <div class="form-group">
-            <label for="password">密码</label>
-            <div class="password-input-container">
-                <input type="password" id="password" name="password" class="form-control" placeholder="请输入您的密码" required>
-                <i class="fas fa-eye-slash toggle-password" id="toggle-password"></i>
-            </div>
-        </div>
-        
-        <div class="remember-me">
-            <input type="checkbox" id="remember" name="remember" class="form-check-input">
-            <label for="remember">记住我</label>
-        </div>
-        
-        <button type="submit" class="btn btn-primary" id="login-button">登录</button>
-        
-        <div class="login-links">
-            <a href="{{ url_for('user.user_register') }}">立即注册</a>
-            <span>|</span>
-            <a href="#">忘记密码？</a>
-        </div>
-    </form>
-    
-    <div class="security-info">
-        <i class="fas fa-shield-alt"></i> 旅游小助手保障您的账号安全
+    <h1 class="user-login-title">用户登录</h1>
+    <p class="user-login-subtitle">登录您的旅游小助手账号</p>
+  </div>
+
+  <form method="POST" action="{{ url_for('user_login') }}" id="login-form">
+    <div class="form-group">
+      <label for="email">邮箱</label>
+      <input type="email" id="email" name="email" class="form-control" placeholder="请输入您的邮箱" required>
     </div>
+
+    <div class="form-group">
+      <label for="password">密码</label>
+      <div class="password-input-container">
+        <input type="password" id="password" name="password" class="form-control" placeholder="请输入您的密码" required>
+        <i class="fas fa-eye-slash toggle-password" id="toggle-password"></i>
+      </div>
+    </div>
+
+    <div class="remember-me">
+      <input type="checkbox" id="remember" name="remember" class="form-check-input">
+      <label for="remember">记住我</label>
+    </div>
+
+    <button type="submit" class="btn btn-primary" id="login-button">登录</button>
+
+    <div class="login-links">
+      <a href="{{ url_for('user_register') }}">立即注册</a>
+      <span>|</span>
+      <a href="#">忘记密码？</a>
+    </div>
+  </form>
+
+  <div class="security-info">
+    <i class="fas fa-shield-alt"></i> 旅游小助手保障您的账号安全
+  </div>
 </div>
 {% endblock %}
 
 {% block js %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const passwordInput = document.getElementById('password');
-        const togglePasswordBtn = document.getElementById('toggle-password');
-<<<<<<< HEAD
-        const loginButton = document.getElementById('login-button');
-        
-        // 1. 显示提示框（完整实现，无外部依赖）
-        function showAlert(message, type) {
-            // 移除已存在的提示框，避免重复
-            const existingAlerts = document.querySelectorAll('.alert');
-            existingAlerts.forEach(alert => alert.remove());
-            
-            // 创建新提示框
-            const alertDiv = document.createElement('div');
-            alertDiv.className = `alert alert-${type}`;
-            alertDiv.textContent = message;
-            
-            // 插入到登录容器顶部
-            const container = document.querySelector('.user-login-container');
-            container.insertBefore(alertDiv, container.firstChild);
-            
-            // 3秒后自动消失（带动画）
-            setTimeout(() => {
-                alertDiv.classList.add('fade-out');
-                setTimeout(() => alertDiv.remove(), 300);
-            }, 3000);
-        }
-        
-        // 2. 显示加载状态（完整实现，对应CSS中的.loading-overlay）
-        function showLoading() {
-            // 先移除已有的加载层
-            hideLoading();
-            
-            // 创建加载层元素
-            const loadingDiv = document.createElement('div');
-            loadingDiv.className = 'loading-overlay';
-            loadingDiv.innerHTML = '<div class="spinner"></div>'; // 加载动画
-            
-            // 添加到页面body，确保全屏覆盖
-            document.body.appendChild(loadingDiv);
-        }
-        
-        // 3. 隐藏加载状态
-        function hideLoading() {
-            const loadingDiv = document.querySelector('.loading-overlay');
-            if (loadingDiv) {
-                loadingDiv.remove();
-            }
-        }
-        
-        // 4. 表单验证（仅非空检查，无额外限制）
-        function validateForm() {
-            let isValid = true;
-            const email = emailInput.value.trim();
-            const password = passwordInput.value.trim();
-            
-            // 邮箱非空检查
-            if (!email) {
-                emailInput.classList.add('error');
-                showAlert('请输入邮箱', 'error');
-                isValid = false;
-            } else {
-                emailInput.classList.remove('error');
-            }
-            
-            // 密码非空检查（避免重复弹框）
-            if (!password) {
-                passwordInput.classList.add('error');
-                if (isValid) showAlert('请输入密码', 'error');
-                isValid = false;
-            } else {
-                passwordInput.classList.remove('error');
-            }
-            
-            return isValid;
-        }
-        
-        // 5. 密码可见性切换（点击眼睛图标切换）
-        togglePasswordBtn.addEventListener('click', function() {
-            // 切换输入框类型（password/text）
-            const inputType = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', inputType);
-            
-            // 切换图标（fa-eye-slash/fa-eye）
-            togglePasswordBtn.classList.toggle('fa-eye');
-            togglePasswordBtn.classList.toggle('fa-eye-slash');
-        });
-        
-        // 6. 表单提交核心逻辑（向后端发请求，处理登录结果）
-        loginForm.addEventListener('submit', function(e) {
-            e.preventDefault(); // 阻止默认表单提交
-            
-            // 先做前端非空验证
-            if (!validateForm()) {
-                return;
-            }
-            
-            // 显示加载状态+禁用按钮（防止重复点击）
-            loginButton.disabled = true;
-            loginButton.textContent = '登录中...';
-            showLoading();
-            
-            // 准备表单数据（收集email、password、remember）
-            const formData = new FormData(loginForm);
-            
-            // 向后端发送登录请求（对接你的/user/login接口）
-            fetch('/user/login', {
-                method: 'POST',
-                body: formData // 自动携带表单数据
-            })
-            .then(response => {
-                // 处理后端响应（确保返回JSON格式）
-                if (!response.ok) {
-                    throw new Error('网络请求失败');
-                }
-                return response.json();
-            })
-            .then(data => {
-                // 隐藏加载状态+恢复按钮
-                hideLoading();
-                loginButton.disabled = false;
-                loginButton.textContent = '登录';
-                
-                // 处理登录结果
-                if (data.success) {
-                    showAlert('登录成功！正在跳转到首页...', 'success');
-                    // 1.5秒后跳转到首页（给用户看提示的时间）
-                    setTimeout(() => {
-                        window.location.href = '/route_planner'; // 目标页面地址
-                    }, 1500);
-                } else {
-                    // 后端返回错误信息（如“邮箱或密码错误”）
-                    showAlert(data.message || '登录失败，请重试', 'error');
-                }
-            })
-            .catch(error => {
-                // 捕获网络错误（如断网、接口异常）
-                hideLoading();
-                loginButton.disabled = false;
-                loginButton.textContent = '登录';
-                showAlert('网络错误，请稍后重试', 'error');
-                console.error('登录请求异常：', error); // 便于开发调试
-            });
-        });
-        
-        // 8. 输入时自动移除错误样式（提升用户体验）
-        emailInput.addEventListener('input', function() {
-            this.classList.remove('error');
-        });
-        passwordInput.addEventListener('input', function() {
-            this.classList.remove('error');
-        });
-=======
-        // 密码可见性切换
-        togglePasswordBtn.addEventListener('click', function() {
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
-            togglePasswordBtn.classList.toggle('fa-eye');
-            togglePasswordBtn.classList.toggle('fa-eye-slash');
-        });
-        // 输入时移除错误样式（如有）
-        document.getElementById('email').addEventListener('input', function() {
-            this.classList.remove('error');
-        });
-        passwordInput.addEventListener('input', function() {
-            this.classList.remove('error');
-        });
-        // 其他登录方式按钮可保留
-        document.querySelectorAll('.login-option-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const provider = this.getAttribute('data-provider');
-                // 这里可以跳转到第三方登录
-                window.location.href = `/auth/${provider}`;
-            });
-        });
->>>>>>> a5aa8bbd31ff41694dfe7ce21d1b21e4b88afa1a
+  document.addEventListener('DOMContentLoaded', function () {
+    const passwordInput = document.getElementById('password');
+    const togglePasswordBtn = document.getElementById('toggle-password');
+    // 密码可见性切换
+    togglePasswordBtn.addEventListener('click', function () {
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+      togglePasswordBtn.classList.toggle('fa-eye');
+      togglePasswordBtn.classList.toggle('fa-eye-slash');
     });
+    // 输入时移除错误样式（如有）
+    document.getElementById('email').addEventListener('input', function () {
+      this.classList.remove('error');
+    });
+    passwordInput.addEventListener('input', function () {
+      this.classList.remove('error');
+    });
+    // 其他登录方式按钮可保留
+    document.querySelectorAll('.login-option-btn').forEach(btn => {
+      btn.addEventListener('click', function () {
+        const provider = this.getAttribute('data-provider');
+        // 这里可以跳转到第三方登录
+        window.location.href = `/auth/${provider}`;
+      });
+    });
+  });
 </script>
 {% endblock %}
