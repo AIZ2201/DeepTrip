@@ -8,6 +8,7 @@ import re
 import os
 from merchant_login import MerchantAuth   # <- 如果你的文件叫 merchant_login.py，就改成 from merchant_login import MerchantAuth
 from feedback_views import feedback_bp
+from merchant_feedback import merchant_feedback_bp
 from models import db
 
 app = Flask(
@@ -29,6 +30,7 @@ DEV_EXPOSE_RESET_CODE = True
 
 # 注册蓝图
 app.register_blueprint(feedback_bp)
+app.register_blueprint(merchant_feedback_bp)
 
 # ============ 登录 ============
 @app.route('/')

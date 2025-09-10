@@ -483,68 +483,39 @@
         <h2 class="feedback-title">用户反馈管理</h2>
         <p class="feedback-subtitle">查看和回复用户对您店铺的评价</p>
     </div>
-    
     <!-- 评分统计 -->
     <div class="rating-stats">
         <div class="rating-stat-card">
-            <div class="rating-stat-value">4.8</div>
+            <div class="rating-stat-value">{{ avg_rating }}</div>
             <div class="rating-stat-label">总体评分</div>
         </div>
         <div class="rating-stat-card">
-            <div class="rating-stat-value">256</div>
+            <div class="rating-stat-value">{{ total_count }}</div>
             <div class="rating-stat-label">评价数量</div>
         </div>
         <div class="rating-stat-card">
-            <div class="rating-stat-value">98%</div>
+            <div class="rating-stat-value">{{ good_rate }}%</div>
             <div class="rating-stat-label">好评率</div>
         </div>
         <div class="rating-stat-card">
-            <div class="rating-stat-value">95%</div>
+            <div class="rating-stat-value">{{ reply_rate }}%</div>
             <div class="rating-stat-label">回复率</div>
         </div>
     </div>
-    
     <!-- 评分分布 -->
     <div class="rating-distribution">
         <h3 class="rating-distribution-title">评分分布</h3>
+        {% for i in range(5, 0, -1) %}
         <div class="rating-bar-container">
-            <div class="rating-bar-label">5分</div>
+            <div class="rating-bar-label">{{ i }}分</div>
             <div class="rating-bar">
-                <div class="rating-bar-fill" style="width: 75%;"></div>
+                <div class="rating-bar-fill" style="width: {{ rating_dist[i]|default(0)|int }}%;"></div>
             </div>
-            <div class="rating-bar-percentage">75%</div>
+            <div class="rating-bar-percentage">{{ rating_dist[i] }}%</div>
         </div>
-        <div class="rating-bar-container">
-            <div class="rating-bar-label">4分</div>
-            <div class="rating-bar">
-                <div class="rating-bar-fill" style="width: 15%;"></div>
-            </div>
-            <div class="rating-bar-percentage">15%</div>
-        </div>
-        <div class="rating-bar-container">
-            <div class="rating-bar-label">3分</div>
-            <div class="rating-bar">
-                <div class="rating-bar-fill" style="width: 5%;"></div>
-            </div>
-            <div class="rating-bar-percentage">5%</div>
-        </div>
-        <div class="rating-bar-container">
-            <div class="rating-bar-label">2分</div>
-            <div class="rating-bar">
-                <div class="rating-bar-fill" style="width: 3%;"></div>
-            </div>
-            <div class="rating-bar-percentage">3%</div>
-        </div>
-        <div class="rating-bar-container">
-            <div class="rating-bar-label">1分</div>
-            <div class="rating-bar">
-                <div class="rating-bar-fill" style="width: 2%;"></div>
-            </div>
-            <div class="rating-bar-percentage">2%</div>
-        </div>
+        {% endfor %}
     </div>
-    
-    <!-- 筛选和搜索 -->
+    <!-- 筛选和搜索（保留原样） -->
     <div class="feedback-filter">
         <div class="filter-group">
             <label class="filter-label">评分筛选:</label>
@@ -584,101 +555,53 @@
         </div>
         <button class="filter-btn" id="apply-filter-btn">应用筛选</button>
     </div>
-    
     <!-- 反馈列表 -->
     <div class="feedback-list">
-        <!-- 反馈项1 - 已回复 -->
+        {% for fb in feedbacks %}
         <div class="feedback-item">
             <div class="feedback-header-row">
                 <div class="feedback-user-info">
-                    <div class="feedback-user-avatar">张</div>
+                    <div class="feedback-user-avatar">{{ fb.user.username[0] if fb.user and fb.user.username else '?' }}</div>
                     <div class="feedback-user-details">
-                        <div class="feedback-username">张先生</div>
-                        <div class="feedback-date">2023-10-15</div>
+                        <div class="feedback-username">{{ fb.user.username if fb.user else '用户' }}</div>
+                        <div class="feedback-date">{{ fb.created_at.strftime('%Y-%m-%d') }}</div>
                     </div>
                 </div>
                 <div class="feedback-rating">
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
+                    {% for i in range(1,6) %}
+                        {% if i <= fb.overall_rating %}<i class="fas fa-star"></i>{% else %}<i class="far fa-star"></i>{% endif %}
+                    {% endfor %}
                 </div>
             </div>
-            <div class="feedback-content">这家餐厅的菜品非常美味，服务也很周到。我们一家在这里度过了一个愉快的周末晚餐。特别推荐他们的招牌菜红烧肉，口感非常棒！环境也很舒适，很适合家庭聚餐。</div>
+            <div class="feedback-content">{{ fb.feedback_content }}</div>
+            {% if fb.images %}
             <div class="feedback-images">
-                <div class="feedback-image"><img src="https://picsum.photos/seed/food1/300/200" alt="菜品图片1"></div>
-                <div class="feedback-image"><img src="https://picsum.photos/seed/food2/300/200" alt="菜品图片2"></div>
-                <div class="feedback-image"><img src="https://picsum.photos/seed/food3/300/200" alt="餐厅环境"></div>
+                {% set imgs = fb.images | safe | loads %}
+                {% for img in imgs %}
+                <div class="feedback-image"><img src="{{ img }}" alt="评论图片"></div>
+                {% endfor %}
             </div>
+            {% endif %}
+            {% if fb.merchant_feedback %}
             <div class="merchant-reply">
                 <div class="merchant-reply-header">
                     <div class="merchant-reply-label">商家回复</div>
-                    <div class="merchant-reply-date">2023-10-16</div>
+                    <div class="merchant-reply-date">{{ fb.merchant_reply_time.strftime('%Y-%m-%d') if fb.merchant_reply_time else '' }}</div>
                 </div>
-                <div class="merchant-reply-content">感谢您的好评和支持！我们会继续努力为顾客提供更好的菜品和服务。期待您的再次光临！</div>
+                <div class="merchant-reply-content">{{ fb.merchant_feedback }}</div>
             </div>
             <div class="reply-action-buttons">
-                <button class="toggle-reply-btn" data-feedback-id="1">编辑回复</button>
+                <button class="toggle-reply-btn" data-feedback-id="{{ fb.id }}">编辑回复</button>
             </div>
-        </div>
-        
-        <!-- 反馈项2 - 未回复 -->
-        <div class="feedback-item">
-            <div class="feedback-header-row">
-                <div class="feedback-user-info">
-                    <div class="feedback-user-avatar">李</div>
-                    <div class="feedback-user-details">
-                        <div class="feedback-username">李女士</div>
-                        <div class="feedback-date">2023-10-12</div>
-                    </div>
-                </div>
-                <div class="feedback-rating">
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="far fa-star"></i>
-                </div>
-            </div>
-            <div class="feedback-content">酒店位置很好，离地铁站很近，出行非常方便。房间干净整洁，床很舒适。唯一的小缺点是早餐品种有点少，希望可以改进一下。总体来说还是很满意的一次入住体验。</div>
-            <div class="feedback-images">
-                <div class="feedback-image"><img src="https://picsum.photos/seed/room1/300/200" alt="房间图片"></div>
-                <div class="feedback-image"><img src="https://picsum.photos/seed/room2/300/200" alt="酒店大堂"></div>
-            </div>
+            {% else %}
             <div class="reply-action-buttons">
-                <button class="toggle-reply-btn" data-feedback-id="2">回复</button>
+                <button class="toggle-reply-btn" data-feedback-id="{{ fb.id }}">回复</button>
             </div>
+            {% endif %}
         </div>
-        
-        <!-- 反馈项3 - 差评 -->
-        <div class="feedback-item">
-            <div class="feedback-header-row">
-                <div class="feedback-user-info">
-                    <div class="feedback-user-avatar">王</div>
-                    <div class="feedback-user-details">
-                        <div class="feedback-username">王先生</div>
-                        <div class="feedback-date">2023-10-08</div>
-                    </div>
-                </div>
-                <div class="feedback-rating">
-                    <i class="fas fa-star"></i>
-                    <i class="far fa-star"></i>
-                    <i class="far fa-star"></i>
-                    <i class="far fa-star"></i>
-                    <i class="far fa-star"></i>
-                </div>
-            </div>
-            <div class="feedback-content">这次体验很不满意。我们预约了下午3点的景区门票，但是到达后被告知系统出了问题，等了将近一个小时才得以进入。景区内人很多，服务人员态度也不好。希望景区能够改进管理，提升游客体验。</div>
-            <div class="reply-action-buttons">
-                <button class="toggle-reply-btn" data-feedback-id="3">回复</button>
-            </div>
-        </div>
-        
-        <!-- 更多反馈项可以在这里添加 -->
+        {% endfor %}
     </div>
-    
-    <!-- 分页 -->
+    <!-- 分页（保留原样） -->
     <div class="pagination">
         <button class="pagination-btn" disabled>上一页</button>
         <button class="pagination-btn active">1</button>

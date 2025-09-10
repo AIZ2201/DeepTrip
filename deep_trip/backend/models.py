@@ -25,4 +25,6 @@ class Feedback(db.Model):
     feedback_content = db.Column(db.Text, nullable=False)
     images = db.Column(db.Text, nullable=True)  # 建议存json字符串
     created_at = db.Column(db.DateTime, nullable=False)
+    merchant_feedback = db.Column(db.Text, nullable=True)
+    merchant_reply_time = db.Column(db.DateTime, nullable=True)
     # ...existing code...
