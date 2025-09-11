@@ -10,6 +10,7 @@ from merchant_login import MerchantAuth   # <- 如果你的文件叫 merchant_lo
 from feedback_views import feedback_bp
 from merchant_feedback import merchant_feedback_bp
 from merchant_info_upload import merchant_info_bp
+from merchant_booking import merchant_booking_bp
 from models import db
 
 app = Flask(
@@ -33,6 +34,7 @@ DEV_EXPOSE_RESET_CODE = True
 app.register_blueprint(feedback_bp)
 app.register_blueprint(merchant_feedback_bp)
 app.register_blueprint(merchant_info_bp)
+app.register_blueprint(merchant_booking_bp)
 
 # ============ 登录 ============
 @app.route('/')
