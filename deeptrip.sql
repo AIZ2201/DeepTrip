@@ -11,7 +11,7 @@
  Target Server Version : 80402 (8.4.2)
  File Encoding         : 65001
 
- Date: 11/09/2025 09:54:13
+ Date: 11/09/2025 15:25:16
 */
 
 SET NAMES utf8mb4;
@@ -127,7 +127,7 @@ CREATE TABLE `password_reset_codes`  (
   `used` tinyint(1) NOT NULL DEFAULT 0,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of password_reset_codes
@@ -159,7 +159,7 @@ CREATE TABLE `shop_info`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `shop_info_merchant_login_id_fk`(`merchant_id` ASC) USING BTREE,
   CONSTRAINT `shop_info_merchant_login_id_fk` FOREIGN KEY (`merchant_id`) REFERENCES `merchant_login` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of shop_info

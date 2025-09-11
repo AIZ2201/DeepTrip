@@ -6,7 +6,7 @@
 <style>
     /* 用户首页样式 */
     .dashboard-container {
-        max-width: 1200px;
+        max-width: 800px;
         margin: 0 auto;
         padding: 20px;
     }
@@ -20,31 +20,32 @@
         margin-bottom: 30px;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     }
-    .welcome-section h1 { font-size: 2.5rem; margin-bottom: 10px; }
+    .welcome-section h1 { font-size: 2.2rem; margin-bottom: 10px; }
     .welcome-section p { font-size: 1.1rem; opacity: 0.9; }
 
     /* 功能卡片 */
     .feature-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 20px;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
         margin-bottom: 30px;
     }
     .feature-card {
         background: white;
         border-radius: 8px;
-        padding: 25px;
+        padding: 28px 20px;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         transition: transform 0.3s ease, box-shadow 0.3s ease;
         display: flex;
         flex-direction: column;
+        align-items: flex-start;
         height: 100%;
         opacity: 0; /* 初始隐藏，等待动画 */
     }
     .feature-card:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); }
     .feature-icon { font-size: 2.5rem; margin-bottom: 15px; color: #667eea; }
-    .feature-card h3 { font-size: 1.3rem; margin-bottom: 10px; color: #333; }
-    .feature-card p { color: #666; margin-bottom: 20px; flex-grow: 1; }
+    .feature-card h3 { font-size: 1.2rem; margin-bottom: 10px; color: #333; }
+    .feature-card p { color: #666; margin-bottom: 18px; flex-grow: 1; }
     .feature-card .btn {
         background-color: #667eea;
         color: white;
@@ -57,44 +58,11 @@
     }
     .feature-card .btn:hover { background-color: #5a67d8; }
 
-    /* 最近活动 */
-    .recent-activities {
-        background: white;
-        border-radius: 8px;
-        padding: 25px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    }
-    .recent-activities h2 { font-size: 1.5rem; margin-bottom: 20px; color: #333; }
-    .activity-list { list-style: none; padding: 0; opacity: 0; transform: translateY(20px); }
-    .activity-item {
-        padding: 15px 0;
-        border-bottom: 1px solid #eee;
-        display: flex;
-        align-items: center;
-    }
-    .activity-item:last-child { border-bottom: none; }
-    .activity-icon {
-        width: 40px;
-        height: 40px;
-        background: #f0f4ff;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-right: 15px;
-        color: #667eea;
-        font-size: 1.2rem;
-    }
-    .activity-content { flex-grow: 1; }
-    .activity-title { font-weight: 600; color: #333; margin-bottom: 5px; }
-    .activity-time { font-size: 0.9rem; color: #999; }
-    .no-activities { text-align: center; padding: 40px 0; color: #999; }
-
     /* 响应式 */
     @media (max-width: 768px) {
         .feature-grid { grid-template-columns: 1fr; }
         .welcome-section { padding: 30px 20px; }
-        .welcome-section h1 { font-size: 2rem; }
+        .welcome-section h1 { font-size: 1.5rem; }
     }
 </style>
 {% endblock %}
@@ -120,13 +88,13 @@
             <div class="feature-icon">🗺️</div>
             <h3>路线规划</h3>
             <p>根据您的喜好和时间，智能规划最佳旅行路线。</p>
-            <a href="/route_planner" class="btn">开始规划</a>
+            <a href="/route/planner" class="btn">开始规划</a>
         </div>
         <div class="feature-card">
             <div class="feature-icon">💬</div>
             <h3>旅游问答</h3>
             <p>有任何旅行问题？我们的AI助手随时为您解答。</p>
-            <a href="/ai_chat" class="btn">立即咨询</a>
+            <a href="/ai/chat" class="btn">立即咨询</a>
         </div>
         <div class="feature-card">
             <div class="feature-icon">🏨</div>
@@ -140,26 +108,6 @@
             <p>分享您的旅行体验，帮助我们不断提升服务质量。</p>
             <a href="/feedback" class="btn">提交反馈</a>
         </div>
-    </div>
-
-    <!-- 最近活动 -->
-    <div class="recent-activities">
-        <h2>最近活动</h2>
-        {% if recent_activities %}
-            <ul class="activity-list">
-                {% for activity in recent_activities %}
-                <li class="activity-item">
-                    <span class="activity-icon">{{ activity.icon }}</span>
-                    <div class="activity-content">
-                        <div class="activity-title">{{ activity.title }}</div>
-                        <div class="activity-time">{{ activity.time }}</div>
-                    </div>
-                </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <div class="no-activities">暂无活动记录</div>
-        {% endif %}
     </div>
 </div>
 {% endblock %}
@@ -175,16 +123,6 @@
                 card.style.transform = 'translateY(0)';
             }, index * 200);
         });
-
-        // 最近活动动画
-        const activityList = document.querySelector('.activity-list');
-        if (activityList) {
-            setTimeout(() => {
-                activityList.style.opacity = '1';
-                activityList.style.transform = 'translateY(0)';
-                activityList.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-            }, 500);
-        }
     });
 </script>
 {% endblock %}

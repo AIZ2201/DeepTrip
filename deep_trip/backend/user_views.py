@@ -7,6 +7,15 @@ user_bp = Blueprint('user', __name__)
 def index():
     return redirect(url_for('user.user_login'))
 
+@user_bp.route('/user/home')
+def user_home():
+    # 示例：可根据实际需求返回 recent_activities
+    recent_activities = [
+        {"icon": "🗺️", "title": "规划了新路线", "time": "2025-09-09 10:23"},
+        {"icon": "💬", "title": "咨询了AI助手", "time": "2025-09-08 16:45"},
+    ]
+    return render_template('user_home.html', recent_activities=recent_activities)
+
 @user_bp.route('/user/login', methods=['GET', 'POST'])
 def user_login():
     if request.method == 'POST':
@@ -14,10 +23,15 @@ def user_login():
         password = request.form['password'].strip()
         user = User.query.filter_by(email=email, password=password).first()
         if user:
-            session['user_id'] = user.id
-            session['username'] = user.username
+            session['user'] = {
+                'id': user.id,
+                'username': user.username,
+                'email': user.email,
+                'phonenumber': user.phonenumber,
+                'password': user.password
+            }
             flash('登录成功', 'success')
-            return redirect(url_for('route.route_planner'))
+            return redirect(url_for('user.user_home'))
         else:
             flash('邮箱或密码错误', 'error')
             return redirect(url_for('user.user_login'))
@@ -42,4 +56,15 @@ def user_register():
         flash('注册成功，请登录', 'success')
         return redirect(url_for('user.user_login'))
     return render_template('user_register.html')
-    return render_template('user_register.html')
+
+@user_bp.app_context_processor
+def inject_current_user():
+    cu = None
+    user = session.get('user')
+    if isinstance(user, dict):
+        cu = user
+    elif isinstance(session.get('merchant'), dict):
+        cu = session.get('merchant')
+    elif session.get('admin'):
+        cu = {'email': session.get('admin'), 'role': 'admin'}
+    return dict(current_user=cu)

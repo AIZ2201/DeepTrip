@@ -7,7 +7,7 @@ merchant_booking_bp = Blueprint('merchant_booking', __name__)
 
 @merchant_booking_bp.route('/merchant/orders')
 def merchant_orders():
-    merchant_email = session.get('merchant')
+    merchant_email = session.get('merchant', {}).get('email')
     if not merchant_email:
         return redirect(url_for('merchant_login'))
     # 获取商家id

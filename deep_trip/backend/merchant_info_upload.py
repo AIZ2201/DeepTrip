@@ -7,7 +7,7 @@ merchant_info_bp = Blueprint('merchant_info', __name__)
 
 @merchant_info_bp.route('/merchant/info', methods=['GET', 'POST'])
 def merchant_info():
-    merchant_email = session.get('merchant')
+    merchant_email = session.get('merchant', {}).get('email')
     if not merchant_email:
         return redirect(url_for('merchant_login'))
     # 查询店铺信息
