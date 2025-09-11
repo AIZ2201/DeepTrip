@@ -385,181 +385,220 @@
         <h2 class="shop-info-title">店铺信息上传</h2>
         <p class="shop-info-subtitle">完善您的店铺信息，吸引更多游客</p>
     </div>
-    
-    <form id="shop-info-form">
-        <!-- 基本信息 -->
-        <div class="form-section">
-            <h3 class="form-section-title">基本信息</h3>
-            
-            <div class="form-group">
-                <label for="shop-name">店铺名称 <span style="color: red;">*</span></label>
-                <input type="text" id="shop-name" class="form-control" placeholder="请输入店铺名称" required>
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="shop-category">商家类别 <span style="color: red;">*</span></label>
-                    <select id="shop-category" class="form-control" required>
-                        <option value="">请选择商家类别</option>
-                        <option value="hotel">酒店住宿</option>
-                        <option value="restaurant">餐饮美食</option>
-                        <option value="attraction">旅游景区</option>
-                        <option value="transportation">交通服务</option>
-                        <option value="entertainment">娱乐休闲</option>
-                        <option value="other">其他服务</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="shop-price-range">价格区间 <span style="color: red;">*</span></label>
-                    <select id="shop-price-range" class="form-control" required>
-                        <option value="">请选择价格区间</option>
-                        <option value="budget">经济型 (¥0-¥100)</option>
-                        <option value="standard">标准型 (¥101-¥300)</option>
-                        <option value="mid_range">中档型 (¥301-¥800)</option>
-                        <option value="luxury">高档型 (¥801以上)</option>
-                    </select>
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <label for="shop-description">店铺描述 <span style="color: red;">*</span></label>
-                <textarea id="shop-description" class="form-control" placeholder="详细描述您的店铺特色、服务内容等" required></textarea>
-            </div>
-        </div>
-        
-        <!-- 位置信息 -->
-        <div class="form-section">
-            <h3 class="form-section-title">位置信息</h3>
-            
-            <div class="form-group">
-                <label for="shop-address">详细地址 <span style="color: red;">*</span></label>
-                <input type="text" id="shop-address" class="form-control" placeholder="请输入详细地址" required>
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="shop-city">所在城市 <span style="color: red;">*</span></label>
-                    <input type="text" id="shop-city" class="form-control" placeholder="请输入所在城市" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="shop-district">所在区域 <span style="color: red;">*</span></label>
-                    <input type="text" id="shop-district" class="form-control" placeholder="请输入所在区域" required>
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <label for="shop-map">地图位置</label>
-                <div id="map-placeholder" style="width: 100%; height: 300px; background-color: #f0f0f0; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
-                    <p style="color: #7f8c8d;">地图加载中...</p>
-                </div>
-            </div>
-        </div>
-        
-        <!-- 联系方式 -->
-        <div class="form-section">
-            <h3 class="form-section-title">联系方式</h3>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="shop-phone">联系电话 <span style="color: red;">*</span></label>
-                    <input type="tel" id="shop-phone" class="form-control" placeholder="请输入联系电话" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="shop-email">电子邮箱</label>
-                    <input type="email" id="shop-email" class="form-control" placeholder="请输入电子邮箱">
-                </div>
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="shop-website">官方网站</label>
-                    <input type="url" id="shop-website" class="form-control" placeholder="请输入官方网站地址">
-                </div>
-                
-                <div class="form-group">
-                    <label for="shop-wechat">微信公众号</label>
-                    <input type="text" id="shop-wechat" class="form-control" placeholder="请输入微信公众号名称">
-                </div>
-            </div>
-        </div>
-        
-        <!-- 营业时间 -->
-        <div class="form-section">
-            <h3 class="form-section-title">营业时间</h3>
-            
-            <div class="business-hours-container">
-                {% for day in ['周一', '周二', '周三', '周四', '周五', '周六', '周日'] %}
-                <div class="business-hour-item">
-                    <div class="business-hour-day">{{ day }}</div>
-                    <div class="business-hour-toggle">
-                        <label class="switch">
-                            <input type="checkbox" class="day-toggle" data-day="{{ loop.index }}" checked>
-                            <span class="slider round"></span>
-                        </label>
-                    </div>
-                    <div class="business-hour-time">
-                        <input type="time" class="business-hour-start" data-day="{{ loop.index }}" value="09:00">
-                        <span>-</span>
-                        <input type="time" class="business-hour-end" data-day="{{ loop.index }}" value="18:00">
-                    </div>
-                </div>
+    {% if filled and shop_info %}
+    <div class="form-section">
+        <h3 class="form-section-title">已上传店铺信息</h3>
+        <ul>
+            <li><strong>店铺名称：</strong>{{ shop_info.name }}</li>
+            <li><strong>类别：</strong>{{ shop_info.category }}</li>
+            <li><strong>价格区间：</strong>{{ shop_info.price_range }}</li>
+            <li><strong>描述：</strong>{{ shop_info.description }}</li>
+            <li><strong>地址：</strong>{{ shop_info.address }}</li>
+            <li><strong>城市：</strong>{{ shop_info.city }}</li>
+            <li><strong>区域：</strong>{{ shop_info.district }}</li>
+            <li><strong>电话：</strong>{{ shop_info.phone }}</li>
+            <li><strong>邮箱：</strong>{{ shop_info.email }}</li>
+            <li><strong>网站：</strong>{{ shop_info.website }}</li>
+            <li><strong>微信：</strong>{{ shop_info.wechat }}</li>
+            <li><strong>节假日说明：</strong>{{ shop_info.holiday_info }}</li>
+            <li><strong>营业时间：</strong>
+                <ul>
+                {% for bh in shop_info.business_hours %}
+                    <li>{{ bh.day }}: {% if bh.isOpen %}{{ bh.startTime }}-{{ bh.endTime }}{% else %}休息{% endif %}</li>
                 {% endfor %}
+                </ul>
+            </li>
+            <li><strong>服务项目：</strong>
+                <ul>
+                {% for s in shop_info.service_items %}
+                    <li>{{ s.name }} - {{ s.price }}元</li>
+                {% endfor %}
+                </ul>
+            </li>
+            <li><strong>店铺图片：</strong>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                {% for img in shop_info.images %}
+                    <img src="{{ img }}" style="width:100px;height:100px;border-radius:8px;object-fit:cover;">
+                {% endfor %}
+                </div>
+            </li>
+        </ul>
+        <div style="color:#e74c3c;margin-top:20px;">如需修改请联系管理员</div>
+    </div>
+    {% else %}
+    <!-- 基本信息 -->
+    <div class="form-section">
+        <h3 class="form-section-title">基本信息</h3>
+        
+        <div class="form-group">
+            <label for="shop-name">店铺名称 <span style="color: red;">*</span></label>
+            <input type="text" id="shop-name" class="form-control" placeholder="请输入店铺名称" required>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label for="shop-category">商家类别 <span style="color: red;">*</span></label>
+                <select id="shop-category" class="form-control" required>
+                    <option value="">请选择商家类别</option>
+                    <option value="hotel">酒店住宿</option>
+                    <option value="restaurant">餐饮美食</option>
+                    <option value="attraction">旅游景区</option>
+                    <option value="transportation">交通服务</option>
+                    <option value="entertainment">娱乐休闲</option>
+                    <option value="other">其他服务</option>
+                </select>
             </div>
             
             <div class="form-group">
-                <label for="shop-holiday-info">节假日营业时间说明</label>
-                <textarea id="shop-holiday-info" class="form-control" placeholder="请说明节假日是否有特殊营业时间安排"></textarea>
+                <label for="shop-price-range">价格区间 <span style="color: red;">*</span></label>
+                <select id="shop-price-range" class="form-control" required>
+                    <option value="">请选择价格区间</option>
+                    <option value="budget">经济型 (¥0-¥100)</option>
+                    <option value="standard">标准型 (¥101-¥300)</option>
+                    <option value="mid_range">中档型 (¥301-¥800)</option>
+                    <option value="luxury">高档型 (¥801以上)</option>
+                </select>
             </div>
         </div>
         
-        <!-- 服务项目 -->
-        <div class="form-section">
-            <h3 class="form-section-title">服务项目</h3>
-            
-            <div id="service-items-container" class="service-items-container">
-                <!-- 服务项目将通过JavaScript动态添加 -->
-                <div class="service-item">
-                    <input type="text" placeholder="服务名称" class="service-name">
-                    <input type="number" placeholder="价格（元）" class="service-price" min="0" step="0.01">
-                    <button type="button" class="remove-service-item">删除</button>
-                </div>
-            </div>
-            
-            <button type="button" class="add-service-item" id="add-service-item-btn">添加服务项目</button>
+        <div class="form-group">
+            <label for="shop-description">店铺描述 <span style="color: red;">*</span></label>
+            <textarea id="shop-description" class="form-control" placeholder="详细描述您的店铺特色、服务内容等" required></textarea>
+        </div>
+    </div>
+    
+    <!-- 位置信息 -->
+    <div class="form-section">
+        <h3 class="form-section-title">位置信息</h3>
+        
+        <div class="form-group">
+            <label for="shop-address">详细地址 <span style="color: red;">*</span></label>
+            <input type="text" id="shop-address" class="form-control" placeholder="请输入详细地址" required>
         </div>
         
-        <!-- 店铺图片 -->
-        <div class="form-section">
-            <h3 class="form-section-title">店铺图片</h3>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="shop-city">所在城市 <span style="color: red;">*</span></label>
+                <input type="text" id="shop-city" class="form-control" placeholder="请输入所在城市" required>
+            </div>
             
-            <div class="image-upload-section">
-                <div class="image-upload-area" id="image-upload-area">
-                    <i class="fas fa-cloud-upload-alt image-upload-icon"></i>
-                    <div class="image-upload-text">
-                        点击或拖拽图片到此处上传<br>
-                        <strong>支持jpg、png、gif格式，单张不超过5MB</strong>
-                    </div>
-                    <input type="file" id="image-upload-input" class="image-upload-input" accept="image/*" multiple>
-                </div>
-                
-                <div id="image-preview-container" class="image-preview-container">
-                    <!-- 图片预览将通过JavaScript动态添加 -->
-                </div>
+            <div class="form-group">
+                <label for="shop-district">所在区域 <span style="color: red;">*</span></label>
+                <input type="text" id="shop-district" class="form-control" placeholder="请输入所在区域" required>
             </div>
         </div>
         
-        <!-- 提交按钮 -->
-        <div class="form-actions">
-            <button type="button" class="btn-secondary" id="save-draft-btn">保存草稿</button>
-            <button type="submit" class="btn-primary" id="submit-btn">
-                <span id="submit-text">提交审核</span>
-                <span id="submit-loading" style="display: none;">提交中...</span>
-            </button>
+        <div class="form-group">
+            <label for="shop-map">地图位置</label>
+            <div id="map-placeholder" style="width: 100%; height: 300px; background-color: #f0f0f0; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                <p style="color: #7f8c8d;">地图加载中...</p>
+            </div>
         </div>
-    </form>
+    </div>
+    
+    <!-- 联系方式 -->
+    <div class="form-section">
+        <h3 class="form-section-title">联系方式</h3>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label for="shop-phone">联系电话 <span style="color: red;">*</span></label>
+                <input type="tel" id="shop-phone" class="form-control" placeholder="请输入联系电话" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="shop-email">电子邮箱</label>
+                <input type="email" id="shop-email" class="form-control" placeholder="请输入电子邮箱">
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label for="shop-website">官方网站</label>
+                <input type="url" id="shop-website" class="form-control" placeholder="请输入官方网站地址">
+            </div>
+            
+            <div class="form-group">
+                <label for="shop-wechat">微信公众号</label>
+                <input type="text" id="shop-wechat" class="form-control" placeholder="请输入微信公众号名称">
+            </div>
+        </div>
+    </div>
+    
+    <!-- 营业时间 -->
+    <div class="form-section">
+        <h3 class="form-section-title">营业时间</h3>
+        
+        <div class="business-hours-container">
+            {% for day in ['周一', '周二', '周三', '周四', '周五', '周六', '周日'] %}
+            <div class="business-hour-item">
+                <div class="business-hour-day">{{ day }}</div>
+                <div class="business-hour-toggle">
+                    <label class="switch">
+                        <input type="checkbox" class="day-toggle" data-day="{{ loop.index }}" checked>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div class="business-hour-time">
+                    <input type="time" class="business-hour-start" data-day="{{ loop.index }}" value="09:00">
+                    <span>-</span>
+                    <input type="time" class="business-hour-end" data-day="{{ loop.index }}" value="18:00">
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="form-group">
+            <label for="shop-holiday-info">节假日营业时间说明</label>
+            <textarea id="shop-holiday-info" class="form-control" placeholder="请说明节假日是否有特殊营业时间安排"></textarea>
+        </div>
+    </div>
+    
+    <!-- 服务项目 -->
+    <div class="form-section">
+        <h3 class="form-section-title">服务项目</h3>
+        
+        <div id="service-items-container" class="service-items-container">
+            <!-- 服务项目将通过JavaScript动态添加 -->
+            <div class="service-item">
+                <input type="text" placeholder="服务名称" class="service-name">
+                <input type="number" placeholder="价格（元）" class="service-price" min="0" step="0.01">
+                <button type="button" class="remove-service-item">删除</button>
+            </div>
+        </div>
+        
+        <button type="button" class="add-service-item" id="add-service-item-btn">添加服务项目</button>
+    </div>
+    
+    <!-- 店铺图片 -->
+    <div class="form-section">
+        <h3 class="form-section-title">店铺图片</h3>
+        
+        <div class="image-upload-section">
+            <div class="image-upload-area" id="image-upload-area">
+                <i class="fas fa-cloud-upload-alt image-upload-icon"></i>
+                <div class="image-upload-text">
+                    点击或拖拽图片到此处上传<br>
+                    <strong>支持jpg、png、gif格式，单张不超过5MB</strong>
+                </div>
+                <input type="file" id="image-upload-input" class="image-upload-input" accept="image/*" multiple>
+            </div>
+            
+            <div id="image-preview-container" class="image-preview-container">
+                <!-- 图片预览将通过JavaScript动态添加 -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- 提交按钮 -->
+    <div class="form-actions">
+        <button type="button" class="btn-secondary" id="save-draft-btn">保存草稿</button>
+        <button type="submit" class="btn-primary" id="submit-btn">
+            <span id="submit-text">提交审核</span>
+            <span id="submit-loading" style="display: none;">提交中...</span>
+        </button>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}
 
