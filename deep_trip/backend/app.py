@@ -8,6 +8,7 @@ from feedback_views import feedback_bp
 from merchant_feedback import merchant_feedback_bp
 from merchant_info_upload import merchant_info_bp
 from merchant_booking import merchant_booking_bp
+from admin_views import admin_bp
 from models import db
 from sqlalchemy import text
 from datetime import datetime, timedelta, date
@@ -43,6 +44,7 @@ app.register_blueprint(user_bp)
 app.register_blueprint(booking_bp)
 app.register_blueprint(ai_bp)
 app.register_blueprint(route_bp)
+app.register_blueprint(admin_bp)
 
 # ============ 统一退出 ============
 @app.route('/user/logout')

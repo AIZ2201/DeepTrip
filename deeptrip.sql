@@ -184,3 +184,27 @@ CREATE TABLE `user_login`  (
 INSERT INTO `user_login` VALUES (1, '11', 'a1111111', '112@111.com', '18172645645');
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+
+
+-- ----------------------------
+-- Table structure for admin_login
+-- ----------------------------
+CREATE TABLE `admin_login` (
+  `admin_id` int NOT NULL AUTO_INCREMENT COMMENT '管理员主键',
+  `username` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '登录账号',
+  `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '密码',
+  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '邮箱',
+  PRIMARY KEY (`admin_id`) USING BTREE,
+  UNIQUE KEY `uk_username` (`username`) USING BTREE,
+  UNIQUE KEY `uk_email` (`email`) USING BTREE
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_0900_ai_ci
+  ROW_FORMAT=DYNAMIC
+  COMMENT='管理员登录表';
+
+-- ----------------------------
+-- Records of user_login
+-- ----------------------------
+INSERT INTO admin_login (admin_id, username, password, email) VALUES (1,'admin','111','111@admin.com');

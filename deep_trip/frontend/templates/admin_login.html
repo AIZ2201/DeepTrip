@@ -233,36 +233,38 @@
     <!-- 错误提示 -->
     <div id="error-message" class="error-message"></div>
     
-    <form id="admin-login-form">
-        <div class="form-group">
-            <label for="admin-username">用户名</label>
-            <input type="text" id="admin-username" class="form-control" placeholder="请输入用户名" required autofocus>
-        </div>
-        
-        <div class="form-group">
-            <label for="admin-password">密码</label>
-            <div class="password-input-container">
-                <input type="password" id="admin-password" class="form-control" placeholder="请输入密码" required>
-                <button type="button" class="toggle-password" id="toggle-password">
-                    <i class="far fa-eye"></i>
-                </button>
-            </div>
-        </div>
-        
-        <div class="login-options">
-            <div class="remember-me">
-                <input type="checkbox" id="remember-me" name="remember-me">
-                <label for="remember-me">记住我</label>
-            </div>
-            <a href="#" class="forgot-password">忘记密码？</a>
-        </div>
-        
-        <div class="form-group">
-            <button type="submit" class="btn-primary" id="login-button">
-                登录
+<form id="admin-login-form">
+    <div class="form-group">
+        <label for="admin-username">用户名</label>
+        <!-- 添加 name="email" -->
+        <input type="text" id="admin-username" name="email" class="form-control" placeholder="请输入用户名" required autofocus>
+    </div>
+    
+    <div class="form-group">
+        <label for="admin-password">密码</label>
+        <div class="password-input-container">
+            <!-- 添加 name="password" -->
+            <input type="password" id="admin-password" name="password" class="form-control" placeholder="请输入密码" required>
+            <button type="button" class="toggle-password" id="toggle-password">
+                <i class="far fa-eye"></i>
             </button>
         </div>
-    </form>
+    </div>
+    
+    <div class="login-options">
+        <div class="remember-me">
+            <input type="checkbox" id="remember-me" name="remember-me">
+            <label for="remember-me">记住我</label>
+        </div>
+        <a href="#" class="forgot-password">忘记密码？</a>
+    </div>
+    
+    <div class="form-group">
+        <button type="submit" class="btn-primary" id="login-button">
+            登录
+        </button>
+    </div>
+</form>
     
     <!-- 加载状态 -->
     <div id="login-loading" class="login-loading">
@@ -302,103 +304,121 @@
         }
         
         // 切换密码可见性
-        togglePasswordBtn.addEventListener('click', function() {
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
-            
-            // 切换图标
-            const icon = this.querySelector('i');
-            if (type === 'password') {
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
-            } else {
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-            }
-        });
+        if (togglePasswordBtn) {
+            togglePasswordBtn.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                
+                // 切换图标
+                const icon = this.querySelector('i');
+                if (type === 'password') {
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                } else {
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                }
+            });
+        }
         
         // 忘记密码链接
-        forgotPasswordLink.addEventListener('click', function(e) {
-            e.preventDefault();
-            showAlert('请联系系统管理员重置密码', 'info');
-        });
+        if (forgotPasswordLink) {
+            forgotPasswordLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                showAlert('请联系系统管理员重置密码', 'info');
+            });
+        }
+        
+        // 简单校验
+        function validEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+        
+        // 显示提示信息
+        function showAlert(message, type) {
+            // 这里需要实现一个显示提示信息的方法
+            // 可以使用alert或自定义的提示框
+            alert(message);
+        }
         
         // 表单提交处理
-        loginForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // 获取表单数据
-            const username = usernameInput.value.trim();
-            const password = passwordInput.value;
-            const rememberMe = rememberMeCheckbox.checked;
-            
-            // 表单验证
-            if (!username) {
-                showError('请输入用户名');
-                usernameInput.focus();
-                return;
-            }
-            
-            if (!password) {
-                showError('请输入密码');
-                passwordInput.focus();
-                return;
-            }
-            
-            // 隐藏错误信息
-            errorMessage.style.display = 'none';
-            
-            // 显示加载状态
-            loginButton.disabled = true;
-            loginButton.textContent = '登录中...';
-            loginLoading.style.display = 'block';
-            
-            // 模拟登录请求
-            setTimeout(() => {
-                // 这里是模拟的登录逻辑，实际应用中需要调用后端API
-                // 假设用户名和密码为 'admin' 和 'admin123'
-                if (username === 'admin' && password === 'admin123') {
-                    // 记住用户名
-                    if (rememberMe) {
-                        localStorage.setItem('adminUsername', username);
-                    } else {
-                        localStorage.removeItem('adminUsername');
-                    }
-                    
-                    // 登录成功，跳转到数据查询页面
-                    window.location.href = 'admin_dashboard.html';
-                } else {
-                    // 登录失败，显示错误信息
-                    showError('用户名或密码错误，请重新输入');
-                    
-                    // 重置表单状态
-                    loginButton.disabled = false;
-                    loginButton.textContent = '登录';
-                    loginLoading.style.display = 'none';
-                    passwordInput.value = '';
-                    passwordInput.focus();
+        if (loginForm) {
+            loginForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                const email = usernameInput.value.trim();
+                const pwd = passwordInput.value.trim();
+
+                if (!email || !pwd) {
+                    showAlert('请填写邮箱和密码', 'error');
+                    return;
                 }
-            }, 2000);
-        });
-        
-        // 显示错误信息
-        function showError(message) {
-            errorMessage.textContent = message;
-            errorMessage.style.display = 'block';
+                if (!validEmail(email)) {
+                    showAlert('请输入有效的邮箱地址', 'error');
+                    return;
+                }
+
+                // UI: loading 状态
+                if (togglePasswordBtn) togglePasswordBtn.disabled = true;
+                if (loginButton) {
+                    const txt = loginButton.querySelector('.button-text');
+                    const loading = loginButton.querySelector('.button-loading');
+                    if (txt) txt.style.display = 'none';
+                    if (loading) loading.style.display = 'inline-block';
+                }
+
+                // 使用 FormData 提交
+                const fd = new FormData(loginForm);
+                fetch('/admin/login', {method: 'POST', body: fd})
+                .then(r => r.json())
+                .then(data => {
+                    // 恢复按钮状态
+                    if (togglePasswordBtn) togglePasswordBtn.disabled = false;
+                    if (loginButton) {
+                        const txt = loginButton.querySelector('.button-text');
+                        const loading = loginButton.querySelector('.button-loading');
+                        if (txt) txt.style.display = 'inline-block';
+                        if (loading) loading.style.display = 'none';
+                    }
+
+                    if (data.success) {
+                        // ✅ admin登录成功，固定跳转 admin_dashboard.html
+                        // showAlert('登录成功，正在跳转...', 'success');
+                        setTimeout(() => {
+                            window.location.href = data.redirect || '/admin/dashboard';
+                        }, 800);
+                    } else {
+                        showAlert(data.message || '登录失败', 'error');
+                    }
+                })
+                .catch(err => {
+                    if (togglePasswordBtn) togglePasswordBtn.disabled = false;
+                    if (loginButton) {
+                        const txt = loginButton.querySelector('.button-text');
+                        const loading = loginButton.querySelector('.button-loading');
+                        if (txt) txt.style.display = 'inline-block';
+                        if (loading) loading.style.display = 'none';
+                    }
+                    console.error(err);
+                    showAlert('网络错误，请稍后再试', 'error');
+                });
+            });
         }
         
         // 添加键盘事件处理
-        usernameInput.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                passwordInput.focus();
-            }
-        });
+        if (usernameInput) {
+            usernameInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    passwordInput.focus();
+                }
+            });
+        }
         
-        passwordInput.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                loginForm.dispatchEvent(new Event('submit'));
-            }
-        });
+        if (passwordInput) {
+            passwordInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    loginForm.dispatchEvent(new Event('submit'));
+                }
+            });
+        }
     });
 </script>
 {% endblock %}
