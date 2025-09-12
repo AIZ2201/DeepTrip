@@ -11,11 +11,30 @@
  Target Server Version : 80402 (8.4.2)
  File Encoding         : 65001
 
- Date: 11/09/2025 15:25:16
+ Date: 12/09/2025 15:25:51
 */
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
+
+-- ----------------------------
+-- Table structure for admin_login
+-- ----------------------------
+DROP TABLE IF EXISTS `admin_login`;
+CREATE TABLE `admin_login`  (
+  `admin_id` int NOT NULL AUTO_INCREMENT COMMENT '管理员主键',
+  `username` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '登录账号',
+  `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '密码',
+  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '邮箱',
+  PRIMARY KEY (`admin_id`) USING BTREE,
+  UNIQUE INDEX `uk_username`(`username` ASC) USING BTREE,
+  UNIQUE INDEX `uk_email`(`email` ASC) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '管理员登录表' ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of admin_login
+-- ----------------------------
+INSERT INTO `admin_login` VALUES (1, 'admin', '111', '111@admin.com');
 
 -- ----------------------------
 -- Table structure for feedback
@@ -41,7 +60,7 @@ CREATE TABLE `feedback`  (
   INDEX `feedback_user_login_id_fk`(`user_id` ASC) USING BTREE,
   CONSTRAINT `feedback_merchant_login_id_fk` FOREIGN KEY (`service_id`) REFERENCES `merchant_login` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `feedback_user_login_id_fk` FOREIGN KEY (`user_id`) REFERENCES `user_login` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of feedback
@@ -62,7 +81,7 @@ CREATE TABLE `merchant_login`  (
   `status` enum('pending','active','suspended') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT 'pending',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of merchant_login
@@ -89,7 +108,7 @@ CREATE TABLE `merchant_order`  (
   INDEX `merchant_order_user_login_id_fk`(`user_id` ASC) USING BTREE,
   CONSTRAINT `merchant_order_merchant_login_id_fk` FOREIGN KEY (`merchant_id`) REFERENCES `merchant_login` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `merchant_order_user_login_id_fk` FOREIGN KEY (`user_id`) REFERENCES `user_login` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of merchant_order
@@ -108,7 +127,7 @@ CREATE TABLE `merchant_register_codes`  (
   `expires_at` datetime NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of merchant_register_codes
@@ -127,7 +146,7 @@ CREATE TABLE `password_reset_codes`  (
   `used` tinyint(1) NOT NULL DEFAULT 0,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of password_reset_codes
@@ -156,14 +175,16 @@ CREATE TABLE `shop_info`  (
   `business_hours` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
   `service_items` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
   `created_at` datetime NULL DEFAULT CURRENT_TIMESTAMP,
+  `status` enum('save_npush','save_push','formal','nsave') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'nsave',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `shop_info_merchant_login_id_fk`(`merchant_id` ASC) USING BTREE,
   CONSTRAINT `shop_info_merchant_login_id_fk` FOREIGN KEY (`merchant_id`) REFERENCES `merchant_login` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of shop_info
 -- ----------------------------
+INSERT INTO `shop_info` VALUES (1, 1, '1', 'hotel', 'standard', '1', '1', '1', '1', '1', '', '', '', '', '[]', '[{\"day\": \"周一\", \"isOpen\": true, \"startTime\": \"09:00\", \"endTime\": \"18:00\"}, {\"day\": \"周二\", \"isOpen\": true, \"startTime\": \"09:00\", \"endTime\": \"18:00\"}, {\"day\": \"周三\", \"isOpen\": true, \"startTime\": \"09:00\", \"endTime\": \"18:00\"}, {\"day\": \"周四\", \"isOpen\": true, \"startTime\": \"09:00\", \"endTime\": \"18:00\"}, {\"day\": \"周五\", \"isOpen\": true, \"startTime\": \"09:00\", \"endTime\": \"18:00\"}, {\"day\": \"周六\", \"isOpen\": false, \"startTime\": \"09:00\", \"endTime\": \"18:00\"}, {\"day\": \"周日\", \"isOpen\": false, \"startTime\": \"09:00\", \"endTime\": \"18:00\"}]', '[]', '2025-09-12 15:24:21', 'save_push');
 
 -- ----------------------------
 -- Table structure for user_login
@@ -176,7 +197,7 @@ CREATE TABLE `user_login`  (
   `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `phonenumber` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of user_login
@@ -184,27 +205,3 @@ CREATE TABLE `user_login`  (
 INSERT INTO `user_login` VALUES (1, '11', 'a1111111', '112@111.com', '18172645645');
 
 SET FOREIGN_KEY_CHECKS = 1;
-
-
-
--- ----------------------------
--- Table structure for admin_login
--- ----------------------------
-CREATE TABLE `admin_login` (
-  `admin_id` int NOT NULL AUTO_INCREMENT COMMENT '管理员主键',
-  `username` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '登录账号',
-  `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '密码',
-  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '邮箱',
-  PRIMARY KEY (`admin_id`) USING BTREE,
-  UNIQUE KEY `uk_username` (`username`) USING BTREE,
-  UNIQUE KEY `uk_email` (`email`) USING BTREE
-) ENGINE=InnoDB
-  DEFAULT CHARSET=utf8mb4
-  COLLATE=utf8mb4_0900_ai_ci
-  ROW_FORMAT=DYNAMIC
-  COMMENT='管理员登录表';
-
--- ----------------------------
--- Records of user_login
--- ----------------------------
-INSERT INTO admin_login (admin_id, username, password, email) VALUES (1,'admin','111','111@admin.com');

@@ -42,15 +42,15 @@ def user_register():
     if request.method == 'POST':
         username = request.form['username'].strip()
         email = request.form['email'].strip()
-        phone = request.form['phone'].strip()
+        phone = request.form['phonenumber'].strip()
         password = request.form['password'].strip()
         if not username or not email or not phone or not password:
             flash('请填写完整信息', 'error')
             return redirect(url_for('user.user_register'))
-        if User.query.filter((User.username == username) | (User.email == email) | (User.phone == phone)).first():
+        if User.query.filter((User.username == username) | (User.email == email) | (User.phonenumber == phone)).first():
             flash('用户名、邮箱或手机号已被注册', 'error')
             return redirect(url_for('user.user_register'))
-        user = User(username=username, email=email, phone=phone, password=password)
+        user = User(username=username, email=email, phonenumber=phone, password=password)
         db.session.add(user)
         db.session.commit()
         flash('注册成功，请登录', 'success')
