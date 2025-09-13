@@ -15,8 +15,7 @@ class Feedback(db.Model):
     __tablename__ = 'feedback'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user_login.id'), nullable=False)
-    service_type = db.Column(db.String(32), nullable=False)
-    service_id = db.Column(db.String(64), nullable=False)
+    merchant_id = db.Column(db.Integer, nullable=False)  # 添加merchant_id字段
     service_name = db.Column(db.String(128), nullable=True)
     overall_rating = db.Column(db.Integer, nullable=False)
     environment_rating = db.Column(db.Integer, nullable=True)

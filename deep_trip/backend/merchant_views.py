@@ -86,8 +86,9 @@ def merchant_home():
     sales_yesterday = db.session.execute(text('SELECT COALESCE(SUM(amount),0) FROM merchant_order WHERE merchant_id=:mid AND DATE(order_time)=:dt'), {'mid': merchant_id, 'dt': yesterday}).scalar()
     orders_today = db.session.execute(text('SELECT COUNT(*) FROM merchant_order WHERE merchant_id=:mid AND DATE(order_time)=:dt'), {'mid': merchant_id, 'dt': today}).scalar()
     orders_yesterday = db.session.execute(text('SELECT COUNT(*) FROM merchant_order WHERE merchant_id=:mid AND DATE(order_time)=:dt'), {'mid': merchant_id, 'dt': yesterday}).scalar()
-    avg_rating = db.session.execute(text('SELECT AVG(overall_rating) FROM feedback WHERE service_id=:mid AND created_at>=:start AND created_at<=:end'), {'mid': str(merchant_id), 'start': week_start, 'end': today}).scalar() or 0
-    avg_rating_last = db.session.execute(text('SELECT AVG(overall_rating) FROM feedback WHERE service_id=:mid AND created_at>=:start AND created_at<=:end'), {'mid': str(merchant_id), 'start': last_week_start, 'end': last_week_end}).scalar() or 0
+    # 将service_id改为merchant_id
+    avg_rating = db.session.execute(text('SELECT AVG(overall_rating) FROM feedback WHERE merchant_id=:mid AND created_at>=:start AND created_at<=:end'), {'mid': str(merchant_id), 'start': week_start, 'end': today}).scalar() or 0
+    avg_rating_last = db.session.execute(text('SELECT AVG(overall_rating) FROM feedback WHERE merchant_id=:mid AND created_at>=:start AND created_at<=:end'), {'mid': str(merchant_id), 'start': last_week_start, 'end': last_week_end}).scalar() or 0
     sales_change = f"{int(sales_today-sales_yesterday)/max(1,sales_yesterday)*100:.0f}%" if sales_yesterday else "N/A"
     orders_change = f"{int(orders_today-orders_yesterday)}" if orders_yesterday else "N/A"
     rating_change = f"{avg_rating-avg_rating_last:.1f}" if avg_rating_last else "N/A"

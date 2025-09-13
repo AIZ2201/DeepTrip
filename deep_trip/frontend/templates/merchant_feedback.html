@@ -574,9 +574,14 @@
                 </div>
             </div>
             <div class="feedback-content">{{ fb.feedback_content }}</div>
+            {% if fb.service_name %}
+            <div class="feedback-service-name" style="color: #7f8c8d; font-size: 14px; margin-bottom: 10px;">
+                服务: {{ fb.service_name }}
+            </div>
+            {% endif %}
             {% if fb.images %}
             <div class="feedback-images">
-                {% set imgs = fb.images | safe | loads %}
+                {% set imgs = fb.images_list %}
                 {% for img in imgs %}
                 <div class="feedback-image"><img src="{{ img }}" alt="评论图片"></div>
                 {% endfor %}
@@ -697,43 +702,68 @@
             replyBtn.disabled = true;
             replyBtn.textContent = '提交中...';
             
-            // 模拟提交请求
-            setTimeout(() => {
-                // 获取反馈项
-                const feedbackItem = replyForm.closest('.feedback-item');
-                
-                // 检查是否已存在商家回复
-                let merchantReply = feedbackItem.querySelector('.merchant-reply');
-                
-                if (merchantReply) {
-                    // 更新现有回复
-                    merchantReply.querySelector('.merchant-reply-content').textContent = replyText;
-                    merchantReply.querySelector('.merchant-reply-date').textContent = new Date().toLocaleDateString('zh-CN');
-                } else {
-                    // 创建新回复
-                    merchantReply = document.createElement('div');
-                    merchantReply.className = 'merchant-reply';
-                    merchantReply.innerHTML = `
-                        <div class="merchant-reply-header">
-                            <div class="merchant-reply-label">商家回复</div>
-                            <div class="merchant-reply-date">${new Date().toLocaleDateString('zh-CN')}</div>
-                        </div>
-                        <div class="merchant-reply-content">${replyText}</div>
-                    `;
+            // 创建表单数据
+            const formData = new FormData();
+            formData.append('feedback_id', feedbackId);
+            formData.append('reply_content', replyText);
+            
+            // 实际调用后端API提交回复
+            fetch('/merchant/feedback/reply', {
+                method: 'POST',
+                body: formData,
+                credentials: 'same-origin'  // 确保携带cookie
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // 获取反馈项
+                    const feedbackItem = replyForm.closest('.feedback-item');
                     
-                    // 插入到回复表单之前
-                    feedbackItem.insertBefore(merchantReply, replyForm);
+                    // 检查是否已存在商家回复
+                    let merchantReply = feedbackItem.querySelector('.merchant-reply');
+                    
+                    if (merchantReply) {
+                        // 更新现有回复
+                        merchantReply.querySelector('.merchant-reply-content').textContent = replyText;
+                        merchantReply.querySelector('.merchant-reply-date').textContent = new Date().toLocaleDateString('zh-CN');
+                    } else {
+                        // 创建新回复
+                        merchantReply = document.createElement('div');
+                        merchantReply.className = 'merchant-reply';
+                        merchantReply.innerHTML = `
+                            <div class="merchant-reply-header">
+                                <div class="merchant-reply-label">商家回复</div>
+                                <div class="merchant-reply-date">${new Date().toLocaleDateString('zh-CN')}</div>
+                            </div>
+                            <div class="merchant-reply-content">${replyText}</div>
+                        `;
+                        
+                        // 插入到回复表单之前
+                        feedbackItem.insertBefore(merchantReply, replyForm);
+                    }
+                    
+                    // 移除回复表单
+                    replyForm.remove();
+                    
+                    // 更新按钮文本
+                    toggleBtn.textContent = '编辑回复';
+                    
+                    // 显示成功提示
+                    showAlert('回复提交成功', 'success');
+                } else {
+                    // 显示错误提示
+                    showAlert(data.message || '回复提交失败', 'error');
                 }
-                
-                // 移除回复表单
-                replyForm.remove();
-                
-                // 更新按钮文本
-                toggleBtn.textContent = '编辑回复';
-                
-                // 显示成功提示
-                showAlert('回复提交成功', 'success');
-            }, 1000);
+            })
+            .catch(error => {
+                console.error('提交回复时出错:', error);
+                showAlert('网络错误，请稍后重试', 'error');
+            })
+            .finally(() => {
+                // 恢复按钮状态
+                replyBtn.disabled = false;
+                replyBtn.textContent = originalText;
+            });
         }
         
         // 图片查看器
@@ -766,19 +796,137 @@
             const timeFilter = document.getElementById('time-filter').value;
             const searchTerm = document.getElementById('feedback-search').value.trim();
             
-            // 这里是模拟的筛选逻辑，实际应用中需要调用后端API
-            showAlert(`筛选条件已应用: 评分=${ratingFilter}, 回复状态=${replyStatusFilter}, 时间范围=${timeFilter}, 搜索=${searchTerm}`, 'success');
-            
             // 显示加载状态
             this.disabled = true;
             this.textContent = '筛选中...';
             
-            setTimeout(() => {
+            // 调用后端筛选API
+            fetch('/merchant/feedback/filter', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    rating_filter: ratingFilter,
+                    reply_status_filter: replyStatusFilter,
+                    time_filter: timeFilter,
+                    search_term: searchTerm
+                }),
+                credentials: 'same-origin'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // 更新反馈列表
+                    updateFeedbackList(data.feedbacks);
+                    // 更新统计信息
+                    updateStats(data.stats);
+                    showAlert('筛选应用成功', 'success');
+                } else {
+                    showAlert(data.message || '筛选失败', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('筛选时出错:', error);
+                showAlert('网络错误，请稍后重试', 'error');
+            })
+            .finally(() => {
                 this.disabled = false;
                 this.textContent = '应用筛选';
-                // 这里可以添加筛选后的反馈列表更新逻辑
-            }, 1000);
+            });
         });
+        
+        // 更新反馈列表函数
+        function updateFeedbackList(feedbacks) {
+            const feedbackList = document.querySelector('.feedback-list');
+            feedbackList.innerHTML = ''; // 清空当前列表
+            
+            if (feedbacks.length === 0) {
+                feedbackList.innerHTML = '<div class="no-feedback">暂无符合条件的反馈</div>';
+                return;
+            }
+            
+            feedbacks.forEach(fb => {
+                const feedbackItem = document.createElement('div');
+                feedbackItem.className = 'feedback-item';
+                feedbackItem.innerHTML = `
+                    <div class="feedback-header-row">
+                        <div class="feedback-user-info">
+                            <div class="feedback-user-avatar">${fb.user.username ? fb.user.username.charAt(0).toUpperCase() : 'U'}</div>
+                            <div class="feedback-user-details">
+                                <div class="feedback-username">${fb.user.username || '匿名用户'}</div>
+                                <div class="feedback-service">${fb.service_name || '未知服务'}</div>
+                            </div>
+                        </div>
+                        <div class="feedback-rating-time">
+                            <div class="feedback-rating">${'★'.repeat(fb.overall_rating)}${'☆'.repeat(5 - fb.overall_rating)}</div>
+                            <div class="feedback-time">${new Date(fb.created_at).toLocaleDateString('zh-CN')}</div>
+                        </div>
+                    </div>
+                    <div class="feedback-content">${fb.feedback_content || '暂无内容'}</div>
+                    ${fb.images_list && fb.images_list.length > 0 ? `
+                    <div class="feedback-images">
+                        ${fb.images_list.map(img => `<img src="${img}" alt="反馈图片" class="feedback-image" loading="lazy">`).join('')}
+                    </div>
+                    ` : ''}
+                    ${fb.merchant_feedback ? `
+                    <div class="merchant-reply">
+                        <div class="merchant-reply-header">
+                            <div class="merchant-reply-label">商家回复</div>
+                            <div class="merchant-reply-date">${new Date(fb.merchant_reply_time).toLocaleDateString('zh-CN')}</div>
+                        </div>
+                        <div class="merchant-reply-content">${fb.merchant_feedback}</div>
+                    </div>
+                    ` : `
+                    <div class="reply-action-buttons">
+                        <button class="toggle-reply-btn" data-feedback-id="${fb.id}">回复</button>
+                    </div>
+                    `}
+                `;
+                feedbackList.appendChild(feedbackItem);
+            });
+            
+            // 重新绑定事件
+            bindFeedbackEvents();
+        }
+        
+        // 更新统计信息函数
+        function updateStats(stats) {
+            // 更新平均评分
+            document.querySelector('.rating-stat-value').textContent = stats.avg_rating;
+            // 更新总数量
+            document.querySelectorAll('.rating-stat-value')[1].textContent = stats.total_count;
+            // 更新好评率
+            document.querySelectorAll('.rating-stat-value')[2].textContent = stats.good_rate + '%';
+            // 更新回复率
+            document.querySelectorAll('.rating-stat-value')[3].textContent = stats.reply_rate + '%';
+            
+            // 更新评分分布
+            Object.entries(stats.rating_dist).forEach(([rating, percentage]) => {
+                const bar = document.querySelector(`.rating-bar[data-rating="${rating}"]`);
+                if (bar) {
+                    bar.querySelector('.rating-bar-fill').style.width = percentage + '%';
+                    bar.querySelector('.rating-bar-percentage').textContent = percentage + '%';
+                }
+            });
+        }
+        
+        // 重新绑定反馈项事件
+        function bindFeedbackEvents() {
+            // 重新绑定回复按钮事件
+            document.querySelectorAll('.toggle-reply-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // 原有的回复按钮点击处理逻辑
+                });
+            });
+            
+            // 重新绑定图片点击事件
+            document.querySelectorAll('.feedback-image').forEach(img => {
+                img.addEventListener('click', function() {
+                    // 原有的图片查看逻辑
+                });
+            });
+        }
         
         // 分页按钮点击事件
         paginationBtns.forEach(btn => {
