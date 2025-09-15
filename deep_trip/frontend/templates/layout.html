@@ -24,14 +24,13 @@
                         <li><a href="/user/logout">退出登录</a></li>
                     {% elif current_user and current_user.role == 'merchant' %}
                         <li><a href="/merchant/info">店铺信息</a></li>
-                        <li><a href="/merchant/comments">用户评价</a></li>
+                        <li><a href="/merchant/feedback">用户评价</a></li>
                         <li><a href="/merchant/home">商家中心</a></li>
                         <li><a href="/user/logout">退出登录</a></li>
                     {% elif current_user and current_user.role == 'admin' %}
                         <li><a href="/admin/dashboard">数据看板</a></li>
-                        <li><a href="/admin/merchants">商户审核</a></li>
-                        <li><a href="/admin/reports">数据报表</a></li>
-                        <li><a href="/admin/profile">管理员中心</a></li>
+                        <li><a href="/admin/merchant/review">商户审核</a></li>
+                        <li><a href="/admin/data/report">数据报表</a></li>
                         <li><a href="/user/logout">退出登录</a></li>
                     {% else %}
                         <li><a href="/user/login">用户登录</a></li>
