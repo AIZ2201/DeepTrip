@@ -132,16 +132,17 @@
         </div>
 
         <!-- 验证码 -->
-        <div class="form-row">
-            <div class="form-group">
-                <label for="verification-code">验证码</label>
-                <input type="text" id="verification-code" name="code" class="form-control" placeholder="请输入验证码" required>
+        <div class="form-group">
+            <label for="captcha">验证码</label>
+            <div class="captcha-container">
+                <input type="text" id="captcha" name="captcha" class="form-control captcha-input"
+                       placeholder="请输入验证码" required>
+                <div class="captcha-image" id="captcha-image" onclick="refreshCaptcha()">
+                    <span id="captcha-text">ABCD</span>
+                </div>
             </div>
-            <div class="form-group" style="display: flex; align-items: flex-end;">
-                <button type="button" class="btn btn-secondary" id="send-code-btn" style="width: 100%; padding: 12px;">
-                    获取验证码
-                </button>
-            </div>
+            <div class="error-message" id="captcha-error">请输入正确的验证码</div>
+            <div class="form-hint">点击验证码图片可刷新</div>
         </div>
 
         <!-- 用户协议 -->
@@ -163,7 +164,7 @@
 
     <div class="register-links">
         <span>已有账号？</span>
-        <a href="{{ url_for('merchant_login') }}">立即登录</a>
+        <a href="{{ url_for('merchant.merchant_login') }}">立即登录</a>
     </div>
 </div>
 {% endblock %}
@@ -251,53 +252,31 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // -------- 发送验证码（真实请求后端） --------
-    sendCodeBtn.addEventListener('click', function () {
-        const email = document.getElementById('merchant-email').value.trim();
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!email || !emailRegex.test(email)) {
-            showAlert('请输入有效的邮箱地址', 'error');
-            return;
+    // 刷新验证码
+    window.refreshCaptcha = function() {
+        const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        let captcha = '';
+        for (let i = 0; i < 4; i++) {
+            captcha += chars[Math.floor(Math.random() * chars.length)];
         }
+        document.getElementById('captcha-text').textContent = captcha;
+        document.getElementById('captcha-image').style.transform = `rotate(${Math.random() * 6 - 3}deg)`;
+    };
+    refreshCaptcha(); // 初始加载
 
-        // 倒计时
-        let countdown = 60;
-        sendCodeBtn.disabled = true;
-        sendCodeBtn.textContent = `${countdown}秒后重试`;
-        const timer = setInterval(() => {
-            countdown--;
-            sendCodeBtn.textContent = `${countdown}秒后重试`;
-            if (countdown <= 0) {
-                clearInterval(timer);
-                sendCodeBtn.disabled = false;
-                sendCodeBtn.textContent = '获取验证码';
-            }
-        }, 1000);
+    // 在表单提交时验证验证码
+    function validateMerchantCaptcha() {
+        const captchaInput = document.getElementById('merchant-captcha');
+        const realCaptcha = document.getElementById('merchant-captcha-text').textContent;
 
-        const fd = new FormData();
-        fd.append('email', email);
-
-        fetch('{{ url_for("merchant_register_send_code") }}', {
-            method: 'POST',
-            body: fd
-        })
-        .then(r => { if (!r.ok) throw new Error('网络错误'); return r.json(); })
-        .then(d => {
-            if (d.success) {
-                showAlert('验证码已发送至您的邮箱，请查收', 'success');
-                // 开发模式：自动填充 dev_code 方便联调
-                if (d.dev_code) {
-                    document.getElementById('verification-code').value = d.dev_code;
-                }
-            } else {
-                showAlert(d.message || '发送失败，请稍后重试', 'error');
-            }
-        })
-        .catch(err => {
-            console.error('发送验证码失败：', err);
-            showAlert('发送失败，请检查网络或稍后重试', 'error');
-        });
-    });
+        if (captchaInput.value.trim().toLowerCase() !== realCaptcha.toLowerCase()) {
+            showError(captchaInput, 'merchant-captcha-error', '验证码不正确');
+            return false;
+        } else {
+            hideError(captchaInput, 'merchant-captcha-error');
+            return true;
+        }
+    }
 
     // -------- 提交注册（真实请求后端） --------
     registerForm.addEventListener('submit', function(e) {
@@ -318,7 +297,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showAlert('请输入有效的邮箱地址', 'error');
         if (password.length < 8) return showAlert('密码长度至少需要8个字符', 'error');
         if (password !== confirmPassword) return showAlert('两次输入的密码不一致', 'error');
-        if (!verificationCode) return showAlert('请输入验证码', 'error');
+        if (validateMerchantCaptcha()) return showAlert('验证码不正确', 'error');
         if (!agreeTerms) return showAlert('请阅读并同意用户协议和隐私政策', 'error');
 
         registerText.style.display = 'none';
@@ -333,7 +312,7 @@ document.addEventListener('DOMContentLoaded', function() {
         fd.append('password', password);
         fd.append('code', verificationCode);
 
-        fetch('{{ url_for("merchant_register") }}', {
+        fetch('{{ url_for("merchant.merchant_register") }}', {
             method: 'POST',
             body: fd
         })
@@ -346,7 +325,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (d.success) {
                 showAlert('注册成功！待审核通过后即可登录', 'success');
                 setTimeout(() => {
-                    window.location.href = '{{ url_for("merchant_login") }}';
+                    window.location.href = '{{ url_for("merchant.merchant_login") }}';
                 }, 1200);
             } else {
                 showAlert(d.message || '注册失败，请稍后重试', 'error');

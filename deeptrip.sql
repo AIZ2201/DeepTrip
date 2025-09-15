@@ -49,7 +49,7 @@ CREATE TABLE `feedback`  (
   `environment_rating` int NOT NULL,
   `service_rating` int NOT NULL,
   `value_rating` int NOT NULL,
-  `feedback_content` text CHARACTER SET utf8mb4 COLLATE utf8mb4F_0900_ai_ci NULL,
+  `feedback_content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
   `images` json NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `merchant_feedback` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
