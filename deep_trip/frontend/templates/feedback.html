@@ -762,10 +762,17 @@
             formData.append('value_rating', document.getElementById('value-rating-value').value);
             formData.append('feedback_content', feedbackContent);
             
-            // 这里可以处理图片上传，假设你有相关的上传图片逻辑
-            // 如果有图片，可以将图片数据转换为JSON字符串
-            // 注意：实际图片上传可能需要额外处理
-            formData.append('images_json', '[]'); // 暂时为空数组
+            // 收集所有上传的图片数据
+            const imagePreviews = document.querySelectorAll('.image-preview img');
+            const imageDataList = [];
+            
+            // 将图片数据转换为base64格式
+            imagePreviews.forEach(img => {
+                imageDataList.push(img.src); // base64格式的图片数据
+            });
+            
+            // 将图片数据作为JSON字符串发送
+            formData.append('images_json', JSON.stringify(imageDataList));
             
             // 实际发送请求到后端
             fetch('/feedback', {
