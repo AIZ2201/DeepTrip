@@ -118,11 +118,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const fd = new FormData(form);
     fetch('/merchant/login', { method: 'POST', body: fd })
       .then(r => r.json())
-      .then data => {
+      .then(function(data) { // 修正这里，原来是 .then data => {...}
         btn.disabled = false; txt.style.display = 'inline'; loading.style.display = 'none';
 
         if (data.success) {
-          // 后端 app.py 已返回 redirect:url_for('merchant_home')
           const target = data.redirect || '/merchant/home';
           showAlert('登录成功，正在跳转...', 'success');
           setTimeout(() => { window.location.href = target; }, 800);

@@ -29,6 +29,7 @@ def merchant_login():
             if remember:
                 session.permanent = True
                 merchant_bp.permanent_session_lifetime = timedelta(days=30)
+            # 登录成功后跳转到商家首页
             return jsonify({
                 'success': True,
                 'message': '登录成功',
@@ -54,19 +55,20 @@ def merchant_home():
     sales_yesterday = db.session.execute(text('SELECT COALESCE(SUM(amount),0) FROM merchant_order WHERE merchant_id=:mid AND DATE(order_time)=:dt'), {'mid': merchant_id, 'dt': yesterday}).scalar()
     orders_today = db.session.execute(text('SELECT COUNT(*) FROM merchant_order WHERE merchant_id=:mid AND DATE(order_time)=:dt'), {'mid': merchant_id, 'dt': today}).scalar()
     orders_yesterday = db.session.execute(text('SELECT COUNT(*) FROM merchant_order WHERE merchant_id=:mid AND DATE(order_time)=:dt'), {'mid': merchant_id, 'dt': yesterday}).scalar()
-    # 将service_id改为merchant_id
     avg_rating = db.session.execute(text('SELECT AVG(overall_rating) FROM feedback WHERE merchant_id=:mid AND created_at>=:start AND created_at<=:end'), {'mid': str(merchant_id), 'start': week_start, 'end': today}).scalar() or 0
     avg_rating_last = db.session.execute(text('SELECT AVG(overall_rating) FROM feedback WHERE merchant_id=:mid AND created_at>=:start AND created_at<=:end'), {'mid': str(merchant_id), 'start': last_week_start, 'end': last_week_end}).scalar() or 0
     sales_change = f"{int(sales_today-sales_yesterday)/max(1,sales_yesterday)*100:.0f}%" if sales_yesterday else "N/A"
     orders_change = f"{int(orders_today-orders_yesterday)}" if orders_yesterday else "N/A"
     rating_change = f"{avg_rating-avg_rating_last:.1f}" if avg_rating_last else "N/A"
+    # 传递当前商家信息到模板
     return render_template('merchant_home.html',
         sales_today=sales_today,
         sales_change=sales_change,
         orders_today=orders_today,
         orders_change=orders_change,
         avg_rating=round(avg_rating,1),
-        rating_change=rating_change
+        rating_change=rating_change,
+        current_user=merchant  # 新增
     )
 
 @merchant_bp.route('/merchant/info/upload')

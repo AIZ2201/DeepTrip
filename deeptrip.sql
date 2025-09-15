@@ -11,7 +11,7 @@
  Target Server Version : 80402 (8.4.2)
  File Encoding         : 65001
 
- Date: 15/09/2025 14:46:49
+ Date: 15/09/2025 16:05:41
 */
 
 SET NAMES utf8mb4;
@@ -59,11 +59,12 @@ CREATE TABLE `feedback`  (
   INDEX `feedback_merchant_id_fk`(`merchant_id` ASC) USING BTREE,
   CONSTRAINT `feedback_merchant_id_fk` FOREIGN KEY (`merchant_id`) REFERENCES `merchant_login` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `feedback_user_login_id_fk` FOREIGN KEY (`user_id`) REFERENCES `user_login` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of feedback
 -- ----------------------------
+INSERT INTO `feedback` VALUES (1, 1, 1, '九龙湖宾馆 - 豪华大床房', 4, 5, 3, 5, '123', '[]', '2025-09-15 15:16:24', '11', '2025-09-15 15:21:54');
 
 -- ----------------------------
 -- Table structure for merchant_login
@@ -84,7 +85,7 @@ CREATE TABLE `merchant_login`  (
 -- ----------------------------
 -- Records of merchant_login
 -- ----------------------------
-INSERT INTO `merchant_login` VALUES (1, '12', '111@111.com', '12345679801', '11111111', 'hotel', 'pending', '2025-09-09 10:09:53');
+INSERT INTO `merchant_login` VALUES (1, '12', '111@111.com', '12345679801', '11111111', 'hotel', 'active', '2025-09-09 10:09:53');
 INSERT INTO `merchant_login` VALUES (2, '1143', '113@111.com', '15345678901', '111', 'hotel', 'pending', '2025-09-15 14:45:07');
 
 -- ----------------------------
