@@ -60,15 +60,14 @@ def merchant_home():
     sales_change = f"{int(sales_today-sales_yesterday)/max(1,sales_yesterday)*100:.0f}%" if sales_yesterday else "N/A"
     orders_change = f"{int(orders_today-orders_yesterday)}" if orders_yesterday else "N/A"
     rating_change = f"{avg_rating-avg_rating_last:.1f}" if avg_rating_last else "N/A"
-    # 传递当前商家信息到模板
+    # 不要直接传递merchant对象，让inject_current_user处理current_user
     return render_template('merchant_home.html',
         sales_today=sales_today,
         sales_change=sales_change,
         orders_today=orders_today,
         orders_change=orders_change,
         avg_rating=round(avg_rating,1),
-        rating_change=rating_change,
-        current_user=merchant  # 新增
+        rating_change=rating_change
     )
 
 @merchant_bp.route('/merchant/info/upload')

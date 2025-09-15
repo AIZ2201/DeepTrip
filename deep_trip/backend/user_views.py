@@ -62,9 +62,11 @@ def inject_current_user():
     cu = None
     user = session.get('user')
     if isinstance(user, dict):
-        cu = user
+        cu = user.copy()
+        cu['role'] = 'traveller'  # 为普通用户设置角色
     elif isinstance(session.get('merchant'), dict):
-        cu = session.get('merchant')
+        cu = session.get('merchant').copy()
+        cu['role'] = 'merchant'  # 为商家用户设置角色
     elif session.get('admin'):
         cu = {'email': session.get('admin'), 'role': 'admin'}
     return dict(current_user=cu)
