@@ -19,6 +19,7 @@ from route_views import route_bp
 from merchant_center import merchant_center_bp
 from merchant_register import merchant_register_bp
 from admin_dashboard import admin_dashboard_bp
+from admin_merchant_review import admin_merchant_review_bp
 
 app = Flask(
     __name__,
@@ -51,6 +52,7 @@ app.register_blueprint(admin_bp)
 app.register_blueprint(merchant_center_bp)
 app.register_blueprint(merchant_register_bp)
 app.register_blueprint(admin_dashboard_bp)
+app.register_blueprint(admin_merchant_review_bp)
 
 # ============ 统一退出 ============
 @app.route('/user/logout')
