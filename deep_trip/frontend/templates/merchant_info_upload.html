@@ -64,13 +64,15 @@
         <h2 class="shop-info-title">店铺信息上传</h2>
         <p class="shop-info-subtitle">完善您的店铺信息，吸引更多游客</p>
     </div>
+    {% set type_map = {'hotel':'酒店住宿','attraction':'旅游景区','restaurant':'餐饮美食','other':'其他服务'} %}
+    {% set price_map = {'budget':'经济型','standard':'标准型','mid_range':'中档型','luxury':'高档型'} %}
     {% if not editable and shop_info %}
     <div class="form-section">
         <h3 class="form-section-title">已上传店铺信息</h3>
         <ul>
             <li><strong>店铺名称：</strong>{{ shop_info.name }}</li>
-            <li><strong>类别：</strong>{{ shop_info.category }}</li>
-            <li><strong>价格区间：</strong>{{ shop_info.price_range }}</li>
+            <li><strong>类别：</strong>{{ type_map.get(shop_info.category, shop_info.category) }}</li>
+            <li><strong>价格区间：</strong>{{ price_map.get(shop_info.price_range, shop_info.price_range) }}</li>
             <li><strong>描述：</strong>{{ shop_info.description }}</li>
             <li><strong>地址：</strong>{{ shop_info.address }}</li>
             <li><strong>城市：</strong>{{ shop_info.city }}</li>
@@ -120,8 +122,6 @@
                     <option value="hotel" {% if shop_info and shop_info.category == 'hotel' %}selected{% endif %}>酒店住宿</option>
                     <option value="restaurant" {% if shop_info and shop_info.category == 'restaurant' %}selected{% endif %}>餐饮美食</option>
                     <option value="attraction" {% if shop_info and shop_info.category == 'attraction' %}selected{% endif %}>旅游景区</option>
-                    <option value="transportation" {% if shop_info and shop_info.category == 'transportation' %}selected{% endif %}>交通服务</option>
-                    <option value="entertainment" {% if shop_info and shop_info.category == 'entertainment' %}selected{% endif %}>娱乐休闲</option>
                     <option value="other" {% if shop_info and shop_info.category == 'other' %}selected{% endif %}>其他服务</option>
                 </select>
             </div>
