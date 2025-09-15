@@ -17,6 +17,7 @@ from booking_views import booking_bp
 from ai_views import ai_bp
 from route_views import route_bp
 from merchant_center import merchant_center_bp
+from merchant_register import merchant_register_bp
 
 app = Flask(
     __name__,
@@ -47,6 +48,7 @@ app.register_blueprint(ai_bp)
 app.register_blueprint(route_bp)
 app.register_blueprint(admin_bp)
 app.register_blueprint(merchant_center_bp)
+app.register_blueprint(merchant_register_bp)
 
 # ============ 统一退出 ============
 @app.route('/user/logout')

@@ -118,7 +118,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const fd = new FormData(form);
     fetch('/merchant/login', { method: 'POST', body: fd })
       .then(r => r.json())
-      .then(data => {
+      .then data => {
         btn.disabled = false; txt.style.display = 'inline'; loading.style.display = 'none';
 
         if (data.success) {

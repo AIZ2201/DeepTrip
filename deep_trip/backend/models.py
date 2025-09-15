@@ -35,3 +35,15 @@ class Admin(db.Model):
     email = db.Column(db.String(64), unique=True, nullable=False)
     password = db.Column(db.String(64), nullable=False)
     # ...existing code...
+
+class Merchant(db.Model):
+    __tablename__ = 'merchant_login'
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(32), unique=True, nullable=False)
+    name = db.Column(db.String(64), nullable=True)
+    email = db.Column(db.String(64), unique=True, nullable=False)
+    phone = db.Column(db.String(16), unique=True, nullable=False)
+    password = db.Column(db.String(64), nullable=False)
+    business_type = db.Column(db.String(32), nullable=False)
+    status = db.Column(db.String(16), nullable=False, default='pending')
+    # 可根据实际表结构补充其它字段

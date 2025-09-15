@@ -39,38 +39,6 @@ def merchant_login():
             return jsonify({'success': False, 'message': '邮箱或密码错误，或账号未激活'})
     return render_template('merchant_login.html')
 
-@merchant_bp.route('/merchant/register', methods=['GET', 'POST'])
-def merchant_register():
-    if request.method == 'POST':
-        business_type = request.form.get('business_type', '').strip()
-        username = request.form.get('username', '').strip()
-        phone = request.form.get('phone', '').strip()
-        email = request.form.get('email', '').strip()
-        password = request.form.get('password', '').strip()
-        code = request.form.get('code', '').strip()
-        name = request.form.get('name', '').strip() or username
-        if not all([business_type, username, phone, email, password, code]):
-            return jsonify({'success': False, 'message': '请完整填写信息'})
-        if business_type not in ['hotel','attraction','restaurant','other']:
-            return jsonify({'success': False, 'message': '请选择有效的商家类型'})
-        if not re.match(r'^[a-zA-Z0-9_\u4e00-\u9fa5]{2,30}$', username):
-            return jsonify({'success': False, 'message': '用户名需为2-30位，可含中英文/数字/下划线'})
-        if not re.match(r'^1[3-9]\d{9}$', phone):
-            return jsonify({'success': False, 'message': '请输入有效的11位手机号'})
-        if not re.match(r'^[^\s@]+@[^\s@]+\.[^\s@]+$', email):
-            return jsonify({'success': False, 'message': '请输入有效的邮箱地址'})
-        if len(password) < 8 or len(password) > 20:
-            return jsonify({'success': False, 'message': '密码长度需为8-20位'})
-        svc = MerchantAuth()
-        if not svc.verify_register_code(email, code):
-            return jsonify({'success': False, 'message': '验证码无效或已过期'})
-        ok, msg = svc.register(username=username, name=name, email=email,
-                               phone=phone, password=password, business_type=business_type)
-        if ok:
-            svc.mark_register_code_used(email, code)
-        return jsonify({'success': ok, 'message': msg})
-    return render_template('merchant_register.html')
-
 @merchant_bp.route('/merchant/home')
 def merchant_home():
     merchant = session.get('merchant')
@@ -108,3 +76,7 @@ def merchant_info_upload():
 @merchant_bp.route('/merchant/feedback')
 def merchant_feedback():
     return render_template('merchant_feedback.html')
+
+@merchant_bp.route('/merchant/register', methods=['GET'])
+def merchant_register_page():
+    return render_template('merchant_register.html')
