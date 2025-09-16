@@ -435,7 +435,7 @@ class ChatAgent:
         try:
             # 4. 调用LLM（完全按照你的参数风格）
             completion = self.llm_client.chat.completions.create(
-                model="gpt-4o-2024-08-06",  # 使用你指定的模型
+                model="deepseek-r1",  # 使用你指定的模型
                 messages=messages,
                 temperature=0.3,  # 低随机性，保持规划严谨
                 max_tokens=2000,  # 足够生成详细规划
