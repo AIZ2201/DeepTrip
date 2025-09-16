@@ -41,18 +41,3 @@ def admin_login():
 @admin_bp.route('/admin/merchant/review')
 def admin_merchant_review():
     return render_template('admin_merchant_review.html')
-
-@admin_bp.route('/admin/data/report')
-def admin_data_report():
-    return render_template('admin_data_report.html')
-    # 查询活跃商户数
-    active_merchants = db.session.query(Merchant).filter(Merchant.status == 'active').count()
-    # 订单和交易额暂未实现
-    orders_today = 0
-    total_amount = 0
-    return render_template('admin_dashboard.html',
-        total_users=total_users,
-        active_merchants=active_merchants,
-        orders_today=orders_today,
-        total_amount=total_amount
-    )
