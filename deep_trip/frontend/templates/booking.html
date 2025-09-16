@@ -303,122 +303,98 @@
 
 <!-- 酒店内容 -->
 <div class="booking-content active" id="hotels-content">
-    <div class="filter-bar">
-        <div class="form-group">
-            <label for="hotel-destination">目的地</label>
-            <input type="text" id="hotel-destination" class="form-control" placeholder="请输入城市或地区">
-        </div>
-        <div class="form-group">
-            <label for="hotel-checkin">入住日期</label>
-            <input type="date" id="hotel-checkin" class="form-control">
-        </div>
-        <div class="form-group">
-            <label for="hotel-checkout">离店日期</label>
-            <input type="date" id="hotel-checkout" class="form-control">
-        </div>
-        <div class="form-group">
-            <label for="hotel-guests">客人数量</label>
-            <select id="hotel-guests" class="form-control">
-                <option value="1">1位成人</option>
-                <option value="2" selected>2位成人</option>
-                <option value="3">3位成人</option>
-                <option value="4">4位成人</option>
-                <option value="5+">5位及以上</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="hotel-rating">星级</label>
-            <select id="hotel-rating" class="form-control">
-                <option value="all" selected>不限</option>
-                <option value="5">五星级</option>
-                <option value="4">四星级</option>
-                <option value="3">三星级</option>
-                <option value="2+">二星级及以上</option>
-            </select>
-        </div>
-        <div class="form-group" style="display: flex; align-items: flex-end;">
-            <button id="hotel-search" class="btn btn-primary">搜索</button>
-        </div>
-    </div>
-    
+    <!-- 资源网格部分保持不变 -->
     <div class="resource-grid">
-        <!-- 酒店1 -->
-        <div class="resource-card" data-id="1" data-type="hotel">
-            <div class="resource-image">
-                <img src="https://picsum.photos/id/1031/800/500" alt="豪华海景酒店">
-            </div>
-            <div class="resource-content">
-                <h3 class="resource-title">豪华海景酒店</h3>
-                <div class="resource-location">
-                    <i class="icon-map-marker">&#x1F4CD;</i>
-                    <span>三亚湾海滨路123号</span>
-                </div>
-                <div class="resource-rating">
-                    <div class="star-rating">★★★★★</div>
-                    <div class="rating-score">4.9 (238条评价)</div>
-                </div>
-                <p>位于三亚湾核心位置，拥有无敌海景房和私人沙滩，提供高端SPA服务和多国美食。</p>
-                <div class="resource-price">
-                    <div>
-                        <span class="price-value">¥888</span>
-                        <span class="price-unit">/晚起</span>
+        <!-- 动态生成酒店列表 - 按服务类别创建单独卡片 -->
+        {% for hotel in hotels %}
+            {% if hotel.service_category_ratings and hotel.service_category_ratings|length > 0 %}
+                <!-- 有服务类别评分时，为每个服务类别创建单独卡片 -->
+                {% for service_category, rating_info in hotel.service_category_ratings.items() %}
+                <div class="resource-card" data-id="{{ hotel.merchant_id }}" data-type="hotel" data-service="{{ service_category }}">
+                    <div class="resource-image">
+                        {% if hotel.images and hotel.images|length > 0 %}
+                        <img src="{{ hotel.images[0] }}" alt="{{ service_category }}">
+                        {% else %}
+                        <img src="https://picsum.photos/id/1031/800/500" alt="{{ service_category }}">
+                        {% endif %}
                     </div>
-                    <button class="btn btn-primary book-now">立即预订</button>
-                </div>
-            </div>
-        </div>
-        
-        <!-- 酒店2 -->
-        <div class="resource-card" data-id="2" data-type="hotel">
-            <div class="resource-image">
-                <img src="https://picsum.photos/id/1040/800/500" alt="城市中心精品酒店">
-            </div>
-            <div class="resource-content">
-                <h3 class="resource-title">城市中心精品酒店</h3>
-                <div class="resource-location">
-                    <i class="icon-map-marker">&#x1F4CD;</i>
-                    <span>北京市朝阳区建国门外大街88号</span>
-                </div>
-                <div class="resource-rating">
-                    <div class="star-rating">★★★★</div>
-                    <div class="rating-score">4.7 (186条评价)</div>
-                </div>
-                <p>地处北京商务中心区，交通便利，紧邻地铁站和购物中心，客房设计现代舒适。</p>
-                <div class="resource-price">
-                    <div>
-                        <span class="price-value">¥688</span>
-                        <span class="price-unit">/晚起</span>
+                    <div class="resource-content">
+                        <h3 class="resource-title">{{ service_category }}</h3>
+                        <div class="resource-location">
+                            <i class="icon-map-marker">📍</i>
+                            <span>{{ hotel.address }}</span>
+                        </div>
+                        
+                        <!-- 服务类别评分 -->
+                        <div class="resource-rating">
+                            <div class="star-rating">
+                                {% for i in range(5) %}
+                                    {% if i < rating_info.avg_rating | int %}
+                                        <span class="star filled">★</span>
+                                    {% else %}
+                                        <span class="star">☆</span>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            <span class="rating-score">{{ "%.1f"|format(rating_info.avg_rating) }}</span>
+                            <span class="review-count">({{ rating_info.review_count }}条评价)</span>
+                        </div>
+                        
+                        <p>{{ hotel.description }}</p>
+                        <div class="resource-price">
+                            <div>
+                                <span class="price-value">¥{{ hotel.price_range }}</span>
+                                <span class="price-unit">/晚起</span>
+                            </div>
+                            <button class="btn btn-primary book-now" data-merchant-id="{{ hotel.merchant_id }}" data-service="{{ service_category }}">立即预订</button>
+                        </div>
                     </div>
-                    <button class="btn btn-primary book-now">立即预订</button>
                 </div>
-            </div>
-        </div>
-        
-        <!-- 酒店3 -->
-        <div class="resource-card" data-id="3" data-type="hotel">
-            <div class="resource-image">
-                <img src="https://picsum.photos/id/164/800/500" alt="古城墙精品民宿">
-            </div>
-            <div class="resource-content">
-                <h3 class="resource-title">古城墙精品民宿</h3>
-                <div class="resource-location">
-                    <i class="icon-map-marker">&#x1F4CD;</i>
-                    <span>西安市碑林区南大街15号</span>
-                </div>
-                <div class="resource-rating">
-                    <div class="star-rating">★★★★</div>
-                    <div class="rating-score">4.8 (152条评价)</div>
-                </div>
-                <p>位于西安古城墙内，保留了传统建筑风格，同时提供现代化设施，步行可达多个景点。</p>
-                <div class="resource-price">
-                    <div>
-                        <span class="price-value">¥458</span>
-                        <span class="price-unit">/晚起</span>
+                {% endfor %}
+            {% else %}
+                <!-- 没有服务类别评分时，显示原始酒店卡片 -->
+                <div class="resource-card" data-id="{{ hotel.merchant_id }}" data-type="hotel">
+                    <div class="resource-image">
+                        {% if hotel.images and hotel.images|length > 0 %}
+                        <img src="{{ hotel.images[0] }}" alt="{{ hotel.name }}">
+                        {% else %}
+                        <img src="https://picsum.photos/id/1031/800/500" alt="{{ hotel.name }}">
+                        {% endif %}
                     </div>
-                    <button class="btn btn-primary book-now">立即预订</button>
+                    <div class="resource-content">
+                        <h3 class="resource-title">{{ hotel.merchant_name }}</h3>
+                        <div class="resource-location">
+                            <i class="icon-map-marker">📍</i>
+                            <span>{{ hotel.address }}</span>
+                        </div>
+                        
+                        <!-- 评分显示 -->
+                        <div class="resource-rating">
+                            <div class="star-rating">
+                                {% for i in range(5) %}
+                                    {% if i < hotel.avg_rating | int %}
+                                        <span class="star filled">★</span>
+                                    {% else %}
+                                        <span class="star">☆</span>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            <span class="rating-score">{{ "%.1f"|format(hotel.avg_rating) }}</span>
+                            <span class="review-count">({{ hotel.review_count }}条评价)</span>
+                        </div>
+                        
+                        <p>{{ hotel.description }}</p>
+                        <div class="resource-price">
+                            <div>
+                                <span class="price-value">¥{{ hotel.price_range }}</span>
+                                <span class="price-unit">/晚起</span>
+                            </div>
+                            <button class="btn btn-primary book-now" data-merchant-id="{{ hotel.merchant_id }}">立即预订</button>
+                        </div>                    
+                    </div>
                 </div>
-            </div>
-        </div>
+            {% endif %}
+        {% endfor %}
     </div>
     
     <div class="pagination">
@@ -434,240 +410,163 @@
 
 <!-- 景区内容 -->
 <div class="booking-content" id="attractions-content">
-    <div class="filter-bar">
-        <div class="form-group">
-            <label for="attraction-location">所在地</label>
-            <input type="text" id="attraction-location" class="form-control" placeholder="请输入城市或地区">
-        </div>
-        <div class="form-group">
-            <label for="attraction-date">参观日期</label>
-            <input type="date" id="attraction-date" class="form-control">
-        </div>
-        <div class="form-group">
-            <label for="attraction-category">类型</label>
-            <select id="attraction-category" class="form-control">
-                <option value="all" selected>不限</option>
-                <option value="museum">博物馆</option>
-                <option value="nature">自然风光</option>
-                <option value="historical">历史古迹</option>
-                <option value="amusement">主题乐园</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="attraction-price">价格区间</label>
-            <select id="attraction-price" class="form-control">
-                <option value="all" selected>不限</option>
-                <option value="free">免费</option>
-                <option value="0-50">0-50元</option>
-                <option value="50-100">50-100元</option>
-                <option value="100+">100元以上</option>
-            </select>
-        </div>
-        <div class="form-group" style="display: flex; align-items: flex-end;">
-            <button id="attraction-search" class="btn btn-primary">搜索</button>
-        </div>
-    </div>
-    
     <div class="resource-grid">
-        <!-- 景区1 -->
-        <div class="resource-card" data-id="101" data-type="attraction">
-            <div class="resource-image">
-                <img src="https://picsum.photos/id/252/800/500" alt="故宫博物院">
-            </div>
-            <div class="resource-content">
-                <h3 class="resource-title">故宫博物院</h3>
-                <div class="resource-location">
-                    <i class="icon-map-marker">&#x1F4CD;</i>
-                    <span>北京市东城区景山前街4号</span>
-                </div>
-                <div class="resource-rating">
-                    <div class="star-rating">★★★★★</div>
-                    <div class="rating-score">4.9 (1258条评价)</div>
-                </div>
-                <p>中国明清两代的皇家宫殿，世界上现存规模最大、保存最为完整的木质结构古建筑之一。</p>
-                <div class="resource-price">
-                    <div>
-                        <span class="price-value">¥60</span>
-                        <span class="price-unit">/人</span>
+        <!-- 动态生成景区列表 - 按服务类别创建单独卡片 -->
+        {% for attraction in attractions %}
+            {% if attraction.service_category_ratings and attraction.service_category_ratings|length > 0 %}
+                <!-- 有服务类别评分时，为每个服务类别创建单独卡片 -->
+                {% for service_category, rating_info in attraction.service_category_ratings.items() %}
+                <div class="resource-card" data-id="{{ attraction.merchant_id }}" data-type="attraction" data-service="{{ service_category }}">
+                    <div class="resource-image">
+                        {% if attraction.images and attraction.images|length > 0 %}
+                        <img src="{{ attraction.images[0] }}" alt="{{ attraction.merchant_name }}">
+                        {% else %}
+                        <img src="https://picsum.photos/id/1036/800/500" alt="{{ attraction.merchant_name }}">
+                        {% endif %}
                     </div>
-                    <button class="btn btn-primary book-now">立即预订</button>
-                </div>
-            </div>
-        </div>
-        
-        <!-- 景区2 -->
-        <div class="resource-card" data-id="102" data-type="attraction">
-            <div class="resource-image">
-                <img src="https://picsum.photos/id/10/800/500" alt="长城 - 八达岭段">
-            </div>
-            <div class="resource-content">
-                <h3 class="resource-title">长城 - 八达岭段</h3>
-                <div class="resource-location">
-                    <i class="icon-map-marker">&#x1F4CD;</i>
-                    <span>北京市延庆区军都山关沟古道北口</span>
-                </div>
-                <div class="resource-rating">
-                    <div class="star-rating">★★★★★</div>
-                    <div class="rating-score">4.8 (986条评价)</div>
-                </div>
-                <p>万里长城的重要组成部分，是明长城的一个隘口，以其宏伟的景观、完善的设施和深厚的文化历史内涵而著称于世。</p>
-                <div class="resource-price">
-                    <div>
-                        <span class="price-value">¥40</span>
-                        <span class="price-unit">/人</span>
+                    <div class="resource-content">
+                        <h3 class="resource-title">{{ attraction.merchant_name }}</h3>
+                        <div class="resource-subtitle">{{ service_category }}</div>
+                        <div class="resource-location">
+                            <i class="icon-map-marker">📍</i>
+                            <span>{{ attraction.address }}</span>
+                        </div>
+                        
+                        <!-- 服务类别评分 -->
+                        <div class="resource-rating">
+                            <div class="star-rating">
+                                {% for i in range(5) %}
+                                    {% if i < rating_info.avg_rating | int %}
+                                        <span class="star filled">★</span>
+                                    {% else %}
+                                        <span class="star">☆</span>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            <span class="rating-score">{{ "%.1f"|format(rating_info.avg_rating) }}</span>
+                            <span class="review-count">({{ rating_info.review_count }}条评价)</span>
+                        </div>
+                        
+                        <p>{{ attraction.description }}</p>
+                        <div class="resource-price">
+                            <div>
+                                <span class="price-value">¥{{ attraction.price_range }}</span>
+                                <span class="price-unit">/人起</span>
+                            </div>
+                            <button class="btn btn-primary book-now" data-merchant-id="{{ attraction.merchant_id }}" data-service="{{ service_category }}">立即预订</button>
+                        </div>
                     </div>
-                    <button class="btn btn-primary book-now">立即预订</button>
                 </div>
-            </div>
-        </div>
-        
-        <!-- 景区3 -->
-        <div class="resource-card" data-id="103" data-type="attraction">
-            <div class="resource-image">
-                <img src="https://picsum.photos/id/325/800/500" alt="张家界国家森林公园">
-            </div>
-            <div class="resource-content">
-                <h3 class="resource-title">张家界国家森林公园</h3>
-                <div class="resource-location">
-                    <i class="icon-map-marker">&#x1F4CD;</i>
-                    <span>湖南省张家界市武陵源区</span>
-                </div>
-                <div class="resource-rating">
-                    <div class="star-rating">★★★★★</div>
-                    <div class="rating-score">4.9 (1568条评价)</div>
-                </div>
-                <p>中国第一个国家森林公园，以峰林、峡谷、溪流、瀑布等景观著称，被誉为"中国山水画的原本"。</p>
-                <div class="resource-price">
-                    <div>
-                        <span class="price-value">¥225</span>
-                        <span class="price-unit">/人</span>
+                {% endfor %}
+            {% else %}
+                <!-- 没有服务类别评分时，显示原始景区卡片 -->
+                <div class="resource-card" data-id="{{ attraction.merchant_id }}" data-type="attraction">
+                    <div class="resource-image">
+                        {% if attraction.images and attraction.images|length > 0 %}
+                        <img src="{{ attraction.images[0] }}" alt="{{ attraction.merchant_name }}">
+                        {% else %}
+                        <img src="https://picsum.photos/id/1036/800/500" alt="{{ attraction.merchant_name }}">
+                        {% endif %}
                     </div>
-                    <button class="btn btn-primary book-now">立即预订</button>
+                    <div class="resource-content">
+                        <h3 class="resource-title">{{ attraction.merchant_name }}</h3>
+                        <div class="resource-location">
+                            <i class="icon-map-marker">📍</i>
+                            <span>{{ attraction.address }}</span>
+                        </div>
+                        
+                        <!-- 景区评分显示 -->
+                        <div class="resource-rating">
+                            <div class="star-rating">
+                                {% for i in range(5) %}
+                                    {% if i < attraction.avg_rating | int %}
+                                        <span class="star filled">★</span>
+                                    {% else %}
+                                        <span class="star">☆</span>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            <span class="rating-score">{{ "%.1f"|format(attraction.avg_rating) }}</span>
+                            <span class="review-count">({{ attraction.review_count }}条评价)</span>
+                        </div>
+                        
+                        <p>{{ attraction.description }}</p>
+                        <div class="resource-price">
+                            <div>
+                                <span class="price-value">¥{{ attraction.price_range }}</span>
+                                <span class="price-unit">/人起</span>
+                            </div>
+                            <button class="btn btn-primary book-now" data-merchant-id="{{ attraction.merchant_id }}">立即预订</button>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
+            {% endif %}
+        {% endfor %}
     </div>
 </div>
 
-<!-- 餐饮内容 -->
+<!-- 餐厅内容 -->
 <div class="booking-content" id="restaurants-content">
-    <div class="filter-bar">
-        <div class="form-group">
-            <label for="restaurant-location">所在地</label>
-            <input type="text" id="restaurant-location" class="form-control" placeholder="请输入城市或地区">
-        </div>
-        <div class="form-group">
-            <label for="restaurant-date">用餐日期</label>
-            <input type="date" id="restaurant-date" class="form-control">
-        </div>
-        <div class="form-group">
-            <label for="restaurant-time">用餐时间</label>
-            <input type="time" id="restaurant-time" class="form-control">
-        </div>
-        <div class="form-group">
-            <label for="restaurant-guests">人数</label>
-            <select id="restaurant-guests" class="form-control">
-                <option value="1">1人</option>
-                <option value="2" selected>2人</option>
-                <option value="3-4">3-4人</option>
-                <option value="5-6">5-6人</option>
-                <option value="7+">7人及以上</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="restaurant-cuisine">菜系</label>
-            <select id="restaurant-cuisine" class="form-control">
-                <option value="all" selected>不限</option>
-                <option value="chinese">中餐</option>
-                <option value="western">西餐</option>
-                <option value="japanese">日料</option>
-                <option value="korean">韩餐</option>
-                <option value="other">其他</option>
-            </select>
-        </div>
-        <div class="form-group" style="display: flex; align-items: flex-end;">
-            <button id="restaurant-search" class="btn btn-primary">搜索</button>
-        </div>
-    </div>
-    
     <div class="resource-grid">
-        <!-- 餐厅1 -->
-        <div class="resource-card" data-id="201" data-type="restaurant">
+        <!-- 动态生成餐厅列表 - 按服务类别创建单独卡片 -->
+        {% for restaurant in restaurants %}
+        <div class="resource-card" data-id="{{ restaurant.merchant_id }}" data-type="restaurant">
             <div class="resource-image">
-                <img src="https://picsum.photos/id/292/800/500" alt="江南风味馆">
+                {% if restaurant.images and restaurant.images|length > 0 %}
+                <img src="{{ restaurant.images[0] }}" alt="{{ restaurant.merchant_name }}">
+                {% else %}
+                <img src="https://picsum.photos/id/292/800/500" alt="{{ restaurant.merchant_name }}">
+                {% endif %}
             </div>
             <div class="resource-content">
-                <h3 class="resource-title">江南风味馆</h3>
+                <h3 class="resource-title">{{ restaurant.merchant_name }}</h3>
                 <div class="resource-location">
-                    <i class="icon-map-marker">&#x1F4CD;</i>
-                    <span>上海市黄浦区南京东路123号</span>
+                    <i class="icon-map-marker">📍</i>
+                    <span>{{ restaurant.address }}</span>
                 </div>
+                
+                <!-- 餐厅评分显示 -->
+                {% if restaurant.shop_info and restaurant.feedback_info %}
                 <div class="resource-rating">
-                    <div class="star-rating">★★★★★</div>
-                    <div class="rating-score">4.9 (568条评价)</div>
+                    <div class="star-rating">
+                        {% for i in range(5) %}
+                            {% if i < restaurant.feedback_info.avg_rating | int %}
+                                <span class="star filled">★</span>
+                            {% else %}
+                                <span class="star">☆</span>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <span class="rating-score">{{ "%.1f"|format(restaurant.feedback_info.avg_rating) }}</span>
+                    <span class="review-count">({{ restaurant.feedback_info.review_count }}条评价)</span>
                 </div>
-                <p>正宗江南风味餐厅，提供精致的江浙沪菜系，环境优雅，服务周到。特色菜：西湖醋鱼、龙井虾仁。</p>
+                {% else %}
+                <div class="resource-rating">
+                    <div class="star-rating">
+                        {% for i in range(5) %}
+                            {% if i < restaurant.avg_rating | int %}
+                                <span class="star filled">★</span>
+                            {% else %}
+                                <span class="star">☆</span>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <span class="rating-score">{{ "%.1f"|format(restaurant.avg_rating) }}</span>
+                    <span class="review-count">({{ restaurant.review_count }}条评价)</span>
+                </div>
+                {% endif %}
+                
+                <p>{{ restaurant.description }}</p>
                 <div class="resource-price">
                     <div>
-                        <span class="price-value">¥188</span>
+                        <span class="price-value">¥{{ restaurant.price_range }}</span>
                         <span class="price-unit">/人起</span>
                     </div>
                     <button class="btn btn-primary book-now">立即预订</button>
                 </div>
             </div>
         </div>
-        
-        <!-- 餐厅2 -->
-        <div class="resource-card" data-id="202" data-type="restaurant">
-            <div class="resource-image">
-                <img src="https://picsum.photos/id/314/800/500" alt="长安食府">
-            </div>
-            <div class="resource-content">
-                <h3 class="resource-title">长安食府</h3>
-                <div class="resource-location">
-                    <i class="icon-map-marker">&#x1F4CD;</i>
-                    <span>西安市碑林区南大街56号</span>
-                </div>
-                <div class="resource-rating">
-                    <div class="star-rating">★★★★★</div>
-                    <div class="rating-score">4.8 (425条评价)</div>
-                </div>
-                <p>百年老字号餐厅，提供正宗陕西风味美食，装修典雅，具有浓郁的西北风情。特色菜：肉夹馍、羊肉泡馍。</p>
-                <div class="resource-price">
-                    <div>
-                        <span class="price-value">¥128</span>
-                        <span class="price-unit">/人起</span>
-                    </div>
-                    <button class="btn btn-primary book-now">立即预订</button>
-                </div>
-            </div>
-        </div>
-        
-        <!-- 餐厅3 -->
-        <div class="resource-card" data-id="203" data-type="restaurant">
-            <div class="resource-image">
-                <img src="https://picsum.photos/id/365/800/500" alt="海景西餐厅">
-            </div>
-            <div class="resource-content">
-                <h3 class="resource-title">海景西餐厅</h3>
-                <div class="resource-location">
-                    <i class="icon-map-marker">&#x1F4CD;</i>
-                    <span>三亚市海棠湾路88号</span>
-                </div>
-                <div class="resource-rating">
-                    <div class="star-rating">★★★★★</div>
-                    <div class="rating-score">4.9 (356条评价)</div>
-                </div>
-                <p>位于海边的高端西餐厅，提供正宗西式料理，可欣赏无敌海景，适合情侣约会和商务宴请。特色菜：香煎龙虾、牛排。</p>
-                <div class="resource-price">
-                    <div>
-                        <span class="price-value">¥298</span>
-                        <span class="price-unit">/人起</span>
-                    </div>
-                    <button class="btn btn-primary book-now">立即预订</button>
-                </div>
-            </div>
-        </div>
+        {% endfor %}
     </div>
 </div>
 
@@ -675,111 +574,8 @@
 <div class="booking-content" id="history-content">
     <div class="order-history">
         <h3>我的订单</h3>
-        
-        <!-- 订单1 -->
-        <div class="order-item">
-            <div class="order-header">
-                <div class="order-id">订单编号：ORD-20230528-001</div>
-                <div class="order-status status-confirmed">已确认</div>
-            </div>
-            <div class="order-details">
-                <div class="detail-item">
-                    <div class="detail-label">预订项目</div>
-                    <div class="detail-value">豪华海景酒店 - 海景大床房</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">入住日期</div>
-                    <div class="detail-value">2023-06-10</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">离店日期</div>
-                    <div class="detail-value">2023-06-13</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">客人数量</div>
-                    <div class="detail-value">2位成人</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">总金额</div>
-                    <div class="detail-value">¥2664</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">预订时间</div>
-                    <div class="detail-value">2023-05-28 14:30</div>
-                </div>
-            </div>
-            <div class="order-actions">
-                <button class="btn btn-secondary">查看详情</button>
-                <button class="btn btn-secondary">申请退订</button>
-                <button class="btn btn-primary">评价</button>
-            </div>
-        </div>
-        
-        <!-- 订单2 -->
-        <div class="order-item">
-            <div class="order-header">
-                <div class="order-id">订单编号：ORD-20230515-002</div>
-                <div class="order-status status-pending">处理中</div>
-            </div>
-            <div class="order-details">
-                <div class="detail-item">
-                    <div class="detail-label">预订项目</div>
-                    <div class="detail-value">故宫博物院门票 - 成人票</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">参观日期</div>
-                    <div class="detail-value">2023-06-05</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">门票数量</div>
-                    <div class="detail-value">3张</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">总金额</div>
-                    <div class="detail-value">¥180</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">预订时间</div>
-                    <div class="detail-value">2023-05-15 09:15</div>
-                </div>
-            </div>
-            <div class="order-actions">
-                <button class="btn btn-secondary">查看详情</button>
-                <button class="btn btn-secondary">取消预订</button>
-            </div>
-        </div>
-        
-        <!-- 订单3 -->
-        <div class="order-item">
-            <div class="order-header">
-                <div class="order-id">订单编号：ORD-20230420-003</div>
-                <div class="order-status status-cancelled">已取消</div>
-            </div>
-            <div class="order-details">
-                <div class="detail-item">
-                    <div class="detail-label">预订项目</div>
-                    <div class="detail-value">江南风味馆 - 四人套餐</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">用餐日期</div>
-                    <div class="detail-value">2023-05-01</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">用餐时间</div>
-                    <div class="detail-value">19:00</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">总金额</div>
-                    <div class="detail-value">¥752</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">预订时间</div>
-                    <div class="detail-value">2023-04-20 16:45</div>
-                </div>
-            </div>
-            <div class="order-actions">
-                <button class="btn btn-secondary">查看详情</button>
-            </div>
+        <div style="text-align: center; padding: 40px; color: #666;">
+            <p>点击上方"订单历史"标签加载您的订单</p>
         </div>
     </div>
 </div>
@@ -811,25 +607,6 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="contact-email">电子邮箱</label>
-                    <input type="email" id="contact-email" name="contact_email" class="form-control" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="special-requests">特殊要求（可选）</label>
-                    <textarea id="special-requests" name="special_requests" class="form-control" rows="3" placeholder="如有特殊要求，请在此说明"></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="payment-method">支付方式</label>
-                    <select id="payment-method" name="payment_method" class="form-control" required>
-                        <option value="wechat">微信支付</option>
-                        <option value="alipay">支付宝</option>
-                        <option value="credit_card">信用卡</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
                     <label class="form-check-label">
                         <input type="checkbox" name="agree_terms" class="form-check-input" required>
                         我已阅读并同意<a href="#" target="_blank">预订条款</a>和<a href="#" target="_blank">退款政策</a>
@@ -845,9 +622,251 @@
 </div>
 
 {% endblock %}
-
 {% block js %}
 <script>
+// 加载用户订单
+function loadUserOrders() {
+    showLoading();
+    
+    fetch('/user_orders', {
+        method: 'GET',
+        credentials: 'same-origin'
+    })
+    .then(response => {
+        if (response.status === 401) {
+            hideLoading();
+            showAlert('请先登录以查看订单历史', 'info');
+            return null;
+        }
+        return response.json();
+    })
+    .then(data => {
+        hideLoading();
+        if (data && data.success) {
+            renderOrders(data.orders);
+        } else if (data) {
+            showAlert(data.message || '获取订单失败', 'error');
+        }
+    })
+    .catch(error => {
+        hideLoading();
+        showAlert('网络错误，请稍后重试', 'error');
+    });
+}
+
+// 渲染订单列表 - 优化版（防止重复订单）
+function renderOrders(orders) {
+    const orderHistoryContainer = document.querySelector('#history-content .order-history');
+    
+    // 验证容器是否存在
+    if (!orderHistoryContainer) {
+        console.error('订单容器元素不存在');
+        return;
+    }
+    
+    // 清空容器（关键：防止重复追加）
+    orderHistoryContainer.innerHTML = '';
+    
+    if (orders.length === 0) {
+        orderHistoryContainer.innerHTML = `
+            <div style="text-align: center; padding: 40px; color: #666;">
+                <h4>暂无订单</h4>
+                <p>您还没有任何预订记录</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // 去重处理：通过订单ID确保唯一性
+    const uniqueOrders = Array.from(
+        new Map(orders.map(order => [order.id, order])).values()
+    );
+    
+    let ordersHtml = '<h3>我的订单</h3>';
+    
+    uniqueOrders.forEach(order => {
+        // 格式化状态显示
+        let statusClass = 'status-pending';
+        let statusText = '处理中';
+        if (order.status === 'confirmed') {
+            statusClass = 'status-confirmed';
+            statusText = '已确认';
+        } else if (order.status === 'cancelled') {
+            statusClass = 'status-cancelled';
+            statusText = '已取消';
+        }
+        
+        // 确定日期标签文本
+        const dateLabel = order.category === 'hotel' ? '入住' : 
+                          order.category === 'restaurant' ? '用餐' : '参观';
+        
+        ordersHtml += `
+            <div class="order-item" data-order-id="${order.id}">
+                <div class="order-header">
+                    <div class="order-id">订单编号：ORD-${order.id}</div>
+                    <div class="order-status ${statusClass}">${statusText}</div>
+                </div>
+                <div class="order-details">
+                    <div class="detail-item">
+                        <div class="detail-label">预订项目</div>
+                        <div class="detail-value">${order.service_name}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">${dateLabel}日期</div>
+                        <div class="detail-value">${order.service_start_time ? order.service_start_time.split(' ')[0] : '未设置'}</div>
+                    </div>
+                    ${order.category === 'hotel' && order.service_end_time ? `
+                    <div class="detail-item">
+                        <div class="detail-label">离店日期</div>
+                        <div class="detail-value">${order.service_end_time.split(' ')[0]}</div>
+                    </div>
+                    ` : ''}
+                    <div class="detail-item">
+                        <div class="detail-label">总金额</div>
+                        <div class="detail-value">¥${order.price || 0}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">预订时间</div>
+                        <div class="detail-value">${order.book_time || '未知时间'}</div>
+                    </div>
+                </div>
+                <div class="order-actions">
+                    ${order.status === 'confirmed' ? '<button class="btn btn-secondary cancel-order" data-id="' + order.id + '">申请退订</button>' : ''}
+                </div>
+            </div>
+        `;
+    });
+    
+    orderHistoryContainer.innerHTML = ordersHtml;
+    // 在订单渲染完成后绑定事件监听器
+    bindOrderActionEvents();
+}
+
+// 绑定订单操作按钮事件
+function bindOrderActionEvents() {
+    const cancelButtons = document.querySelectorAll('.cancel-order');
+    cancelButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const orderId = this.getAttribute('data-id');
+            
+            if (confirm('确定要申请退订此订单吗？')) {
+                showLoading();
+                
+                // 发送退订请求到后端
+                fetch('/cancel_order', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ order_id: orderId })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    hideLoading();
+                    if (data.success) {
+                        showAlert(data.message, 'success');
+                        // 重新加载订单列表
+                        loadUserOrders();
+                    } else {
+                        showAlert(data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    hideLoading();
+                    showAlert('网络错误，请稍后重试', 'error');
+                });
+            }
+        });
+    });
+}
+
+// 在页面加载时监听订单历史标签点击事件
+document.addEventListener('DOMContentLoaded', function() {
+    // 监听订单历史标签点击
+    const historyTab = document.querySelector('.booking-tab[data-tab="history"]');
+    if (historyTab) {
+        historyTab.addEventListener('click', function() {
+            loadUserOrders();
+        });
+    }
+});
+    // 在<script>标签开始处添加以下函数定义
+    function showLoading() {
+        // 检查是否已经有加载元素，如果没有则创建
+        let loadingElement = document.getElementById('loading-overlay');
+        if (!loadingElement) {
+            loadingElement = document.createElement('div');
+            loadingElement.id = 'loading-overlay';
+            loadingElement.style.position = 'fixed';
+            loadingElement.style.top = '0';
+            loadingElement.style.left = '0';
+            loadingElement.style.width = '100%';
+            loadingElement.style.height = '100%';
+            loadingElement.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+            loadingElement.style.display = 'flex';
+            loadingElement.style.justifyContent = 'center';
+            loadingElement.style.alignItems = 'center';
+            loadingElement.style.zIndex = '1000';
+            loadingElement.innerHTML = '<div style="background-color: white; padding: 20px; border-radius: 8px;">处理中...</div>';
+            document.body.appendChild(loadingElement);
+        }
+        loadingElement.style.display = 'flex';
+    }
+    
+    function hideLoading() {
+        const loadingElement = document.getElementById('loading-overlay');
+        if (loadingElement) {
+            loadingElement.style.display = 'none';
+        }
+    }
+    
+    function showAlert(message, type = 'info') {
+        // 检查是否已经有提示元素，如果没有则创建
+        let alertElement = document.getElementById('custom-alert');
+        if (!alertElement) {
+            alertElement = document.createElement('div');
+            alertElement.id = 'custom-alert';
+            alertElement.style.position = 'fixed';
+            alertElement.style.top = '20px';
+            alertElement.style.left = '50%';
+            alertElement.style.transform = 'translateX(-50%)';
+            alertElement.style.padding = '15px 20px';
+            alertElement.style.borderRadius = '8px';
+            alertElement.style.color = 'white';
+            alertElement.style.fontWeight = '500';
+            alertElement.style.zIndex = '1001';
+            alertElement.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+            alertElement.style.transition = 'opacity 0.3s ease';
+            document.body.appendChild(alertElement);
+        }
+        
+        // 设置提示类型对应的背景颜色
+        if (type === 'success') {
+            alertElement.style.backgroundColor = '#28a745'; // 绿色
+        } else if (type === 'error') {
+            alertElement.style.backgroundColor = '#dc3545'; // 红色
+        } else if (type === 'info') {
+            alertElement.style.backgroundColor = '#17a2b8'; // 蓝色
+        } else {
+            alertElement.style.backgroundColor = '#6c757d'; // 灰色
+        }
+        
+        // 设置提示信息并显示
+        alertElement.textContent = message;
+        alertElement.style.opacity = '1';
+        
+        // 3秒后自动隐藏
+        setTimeout(() => {
+            alertElement.style.opacity = '0';
+            setTimeout(() => {
+                alertElement.style.display = 'none';
+            }, 300);
+        }, 3000);
+    }
+    
+    // 全局商家服务数据
+    window.merchantServices = {{ merchant_services | tojson | safe }} || {};
+    
     document.addEventListener('DOMContentLoaded', function() {
         // 标签页切换功能
         const bookingTabs = document.querySelectorAll('.booking-tab');
@@ -892,6 +911,31 @@
                 // 根据资源类型生成不同的预订字段
                 generateBookingFields(resourceType);
                 
+                // 修复：同步筛选栏中的日期到预订模态框
+                if (resourceType === 'hotel') {
+                    const filterCheckin = document.getElementById('hotel-checkin');
+                    const modalCheckin = document.getElementById('modal-hotel-checkin');
+                    if (filterCheckin && filterCheckin.value && modalCheckin) {
+                        modalCheckin.value = filterCheckin.value;
+                    }
+                    const filterCheckout = document.getElementById('hotel-checkout');
+                    const modalCheckout = document.getElementById('modal-hotel-checkout');
+                    if (filterCheckout && filterCheckout.value && modalCheckout) {
+                        modalCheckout.value = filterCheckout.value;
+                    }
+                } else if (resourceType === 'restaurant') {
+                    const filterDate = document.getElementById('restaurant-date');
+                    const modalDate = document.getElementById('modal-restaurant-date');
+                    if (filterDate && filterDate.value && modalDate) {
+                        modalDate.value = filterDate.value;
+                    }
+                    const filterTime = document.getElementById('restaurant-time');
+                    const modalTime = document.getElementById('modal-restaurant-time');
+                    if (filterTime && filterTime.value && modalTime) {
+                        modalTime.value = filterTime.value;
+                    }
+                }
+                
                 // 显示模态框
                 bookingModal.classList.add('active');
             });
@@ -914,32 +958,64 @@
         // 根据资源类型生成预订字段
         function generateBookingFields(resourceType) {
             let fieldsHtml = '';
+            const resourceTitle = document.getElementById('modal-resource-title').textContent.replace('预订：', '');
             
             if (resourceType === 'hotel') {
+                // 获取当前酒店的服务项目
+                const hotelServices = window.merchantServices[resourceTitle] || [];
+                
+                let roomOptions = '<option value="">请选择房型</option>';
+                hotelServices.forEach(service => {
+                    roomOptions += `<option value="${service.name}">${service.name}  ¥${service.price}</option>`;
+                });
+                
+                // 如果没有服务项目，使用默认选项
+                if (hotelServices.length === 0) {
+                    roomOptions = `
+                        <option value="standard">标准间</option>
+                        <option value="deluxe">豪华间</option>
+                        <option value="suite">套房</option>
+                    `;
+                }
+                
                 fieldsHtml = `
                     <div class="form-group">
                         <label for="hotel-checkin">入住日期</label>
-                        <input type="date" id="hotel-checkin" name="checkin_date" class="form-control" required>
+                        <input type="date" id="modal-hotel-checkin" name="checkin_date" class="form-control" required>
                     </div>
                     <div class="form-group">
                         <label for="hotel-checkout">离店日期</label>
-                        <input type="date" id="hotel-checkout" name="checkout_date" class="form-control" required>
+                        <input type="date" id="modal-hotel-checkout" name="checkout_date" class="form-control" required>
                     </div>
                     <div class="form-group">
                         <label for="hotel-room-type">房型</label>
                         <select id="hotel-room-type" name="room_type" class="form-control" required>
-                            <option value="standard">标准间</option>
-                            <option value="deluxe">豪华间</option>
-                            <option value="suite">套房</option>
+                            ${roomOptions}
                         </select>
                     </div>
+                `;
+            } else if (resourceType === 'restaurant') {
+                // 获取当前餐厅的服务项目
+                const restaurantServices = window.merchantServices[resourceTitle] || [];
+                
+                let menuOptions = '<option value="">不选择套餐</option>';
+                restaurantServices.forEach(service => {
+                    menuOptions += `<option value="${service.name}">${service.name}  ¥${service.price}</option>`;
+                });
+                
+                fieldsHtml = `
                     <div class="form-group">
-                        <label for="hotel-guests">客人数量</label>
-                        <select id="hotel-guests" name="guests" class="form-control" required>
-                            <option value="1">1位成人</option>
-                            <option value="2" selected>2位成人</option>
-                            <option value="2_1">2位成人, 1位儿童</option>
-                            <option value="2_2">2位成人, 2位儿童</option>
+                        <label for="restaurant-date">用餐日期</label>
+                        <input type="date" id="modal-restaurant-date" name="dining_date" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="restaurant-time">用餐时间</label>
+                        <input type="time" id="modal-restaurant-time" name="dining_time" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="modal-restaurant-menu">套餐选择（可选）</label>
+                        <select id="modal-restaurant-menu" name="menu" class="form-control">
+                            ${menuOptions}
                         </select>
                     </div>
                 `;
@@ -947,75 +1023,148 @@
                 fieldsHtml = `
                     <div class="form-group">
                         <label for="attraction-date">参观日期</label>
-                        <input type="date" id="attraction-date" name="visit_date" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="attraction-ticket-type">票种</label>
-                        <select id="attraction-ticket-type" name="ticket_type" class="form-control" required>
-                            <option value="adult">成人票</option>
-                            <option value="child">儿童票</option>
-                            <option value="student">学生票</option>
-                            <option value="senior">老人票</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="attraction-ticket-count">数量</label>
-                        <input type="number" id="attraction-ticket-count" name="ticket_count" class="form-control" min="1" value="1" required>
-                    </div>
-                `;
-            } else if (resourceType === 'restaurant') {
-                fieldsHtml = `
-                    <div class="form-group">
-                        <label for="restaurant-date">用餐日期</label>
-                        <input type="date" id="restaurant-date" name="dining_date" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="restaurant-time">用餐时间</label>
-                        <input type="time" id="restaurant-time" name="dining_time" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="restaurant-guests">人数</label>
-                        <select id="restaurant-guests" name="guests" class="form-control" required>
-                            <option value="1">1人</option>
-                            <option value="2" selected>2人</option>
-                            <option value="3-4">3-4人</option>
-                            <option value="5-6">5-6人</option>
-                            <option value="7+">7人及以上</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="restaurant-menu">套餐选择（可选）</label>
-                        <select id="restaurant-menu" name="menu" class="form-control">
-                            <option value="">不选择套餐</option>
-                            <option value="set1">双人套餐A - ¥368</option>
-                            <option value="set2">双人套餐B - ¥428</option>
-                            <option value="set3">精选套餐 - ¥568</option>
-                        </select>
+                        <input type="date" id="modal-attraction-date" name="visit_date" class="form-control" required>
                     </div>
                 `;
             }
-            
             bookingFields.innerHTML = fieldsHtml;
         }
         
-        // 提交预订表单
-        bookingForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            showLoading();
-            
-            // 模拟预订请求
-            setTimeout(() => {
-                hideLoading();
-                bookingModal.classList.remove('active');
-                
-                // 显示预订成功提示
-                showAlert('预订提交成功！我们将尽快处理您的预订请求。', 'success');
-                
-                // 重置表单
-                bookingForm.reset();
-            }, 2000);
-        });
+// 提交预订表单
+bookingForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    showLoading();
+    
+    // 收集表单数据
+    const formData = {
+        merchant_id: document.getElementById('resource-id').value,
+        category: document.getElementById('resource-type').value,
+        service_name: document.getElementById('modal-resource-title').textContent.replace('预订：', ''),
+        customer_name: document.getElementById('contact-name').value,
+        phonenumber: document.getElementById('contact-phone').value,
+        price: 0 // 需要根据选择的房型/套餐获取价格
+    };
+    
+    // 根据资源类型添加特定字段
+    const resourceType = formData.category;
+    if (resourceType === 'hotel') {
+        // 获取酒店日期并验证
+        const checkinDate = document.getElementById('modal-hotel-checkin').value;
+        const checkoutDate = document.getElementById('modal-hotel-checkout').value;
         
+        // 验证日期顺序
+        if (checkinDate > checkoutDate) {
+            showAlert('入住日期不能晚于离店日期', 'error');
+            hideLoading();
+            return;
+        }
+        
+        if (!checkinDate || !checkoutDate) {
+        showAlert('请选择入住和离店日期', 'error');
+        hideLoading();
+        return;
+        }
+        
+        formData.service_start_time = checkinDate + ' 14:00:00';
+        formData.service_end_time = checkoutDate + ' 12:00:00';
+        
+        // 获取房型价格
+        const roomSelect = document.getElementById('hotel-room-type');
+        const selectedOption = roomSelect.options[roomSelect.selectedIndex];
+        if (selectedOption.value) {
+            const priceMatch = selectedOption.text.match(/¥(\d+)/);
+            if (priceMatch) {
+                formData.price = priceMatch[1];
+            }
+        }
+    } else if (resourceType === 'restaurant') {
+        const diningDate = document.getElementById('modal-restaurant-date').value;
+        const diningTime = document.getElementById('modal-restaurant-time').value;
+        
+        // 添加日期验证
+        if (!diningDate) {
+            showAlert('请选择用餐日期', 'error');
+            hideLoading();
+            return;
+        }
+        
+        // 确保时间格式正确
+        if (diningTime && diningTime.includes(':')) {
+            const [hours, minutes] = diningTime.split(':');
+            formData.service_start_time = `${diningDate} ${hours}:${minutes}:00`;
+            
+            // 计算结束时间（用餐时间+2小时）
+            const endHours = (parseInt(hours) + 2) % 24;
+            const formattedEndHours = endHours.toString().padStart(2, '0');
+            formData.service_end_time = `${diningDate} ${formattedEndHours}:${minutes}:00`;
+        } else {
+            // 如果时间格式无效，使用默认值
+            formData.service_start_time = `${diningDate} 12:00:00`;
+            formData.service_end_time = `${diningDate} 14:00:00`;
+        }
+        
+        // 获取套餐价格 - 修改ID为正确的modal-restaurant-menu
+        const menuSelect = document.getElementById('modal-restaurant-menu');
+        if (menuSelect && menuSelect.selectedIndex >= 0) {
+            const selectedOption = menuSelect.options[menuSelect.selectedIndex];
+            if (selectedOption.value) {
+                const priceMatch = selectedOption.text.match(/¥(\d+)/);
+                if (priceMatch) {
+                    formData.price = priceMatch[1];
+                }
+            }
+        }
+    } else if (resourceType === 'attraction') {        
+        const visitDate = document.getElementById('modal-attraction-date').value;
+        
+        // 添加日期验证
+        if (!visitDate) {
+            showAlert('请选择参观日期', 'error');
+            hideLoading();
+            return;
+        }
+        
+        formData.service_start_time = `${visitDate} 09:00:00`;
+        formData.service_end_time = `${visitDate} 17:00:00`;
+        // 修复：从merchant_services中提取景区服务价格
+        const resourceTitle = document.getElementById('modal-resource-title').textContent.replace('预订：', '');
+        const attractionServices = window.merchantServices[resourceTitle] || [];
+    
+        if (attractionServices.length > 0) {
+            // 使用第一个服务项目的价格
+            formData.price = attractionServices[0].price || 0;
+        } else {
+        // 如果没有服务项目，使用默认价格50元
+            formData.price = 50;
+        }
+    }
+    
+    // 发送AJAX请求到后端
+    fetch('/submit_booking', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        hideLoading();
+        bookingModal.classList.remove('active');
+        
+        if (data.success) {
+            showAlert(data.message, 'success');
+            bookingForm.reset();
+        } else {
+            showAlert(data.message, 'error');
+        }
+    })
+    .catch(error => {
+        hideLoading();
+        showAlert('网络错误，请稍后重试', 'error');
+    });
+});
+
         // 搜索按钮点击事件
         document.getElementById('hotel-search').addEventListener('click', function() {
             performSearch('hotel');
@@ -1040,41 +1189,45 @@
             }, 1500);
         }
         
-        // 订单操作按钮事件
+        // 订单操作按钮事件（约1163-1185行）
         const orderButtons = document.querySelectorAll('.order-actions button');
         orderButtons.forEach(button => {
             button.addEventListener('click', function() {
                 const action = this.textContent.trim();
-                const orderId = this.closest('.order-item').querySelector('.order-id').textContent;
+                const orderIdElement = this.closest('.order-item').querySelector('.order-id');
+                const orderIdText = orderIdElement.textContent;
                 
                 if (action === '取消预订' || action === '申请退订') {
                     if (confirm(`确定要${action}此订单吗？`)) {
                         showLoading();
                         
-                        // 模拟取消/退订请求
-                        setTimeout(() => {
+                        // 提取订单ID（从订单编号中提取）
+                        const orderId = orderIdText.replace('订单编号：ORD-', '');
+                        
+                        // 发送退订请求到后端
+                        fetch('/cancel_order', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ order_id: orderId })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
                             hideLoading();
-                            showAlert(`订单${action}申请已提交，请等待处理结果。`, 'info');
-                        }, 1500);
+                            if (data.success) {
+                                showAlert(data.message, 'success');
+                                // 重新加载订单列表
+                                loadUserOrders();
+                            } else {
+                                showAlert(data.message, 'error');
+                            }
+                        })
+                        .catch(error => {
+                            hideLoading();
+                            showAlert('网络错误，请稍后重试', 'error');
+                        });
                     }
-                } else if (action === '查看详情') {
-                    showLoading();
-                    
-                    // 模拟查看详情请求
-                    setTimeout(() => {
-                        hideLoading();
-                        showAlert(`正在加载订单${orderId}的详细信息...`, 'info');
-                        // 在实际应用中，这里会打开订单详情模态框
-                    }, 1000);
-                } else if (action === '评价') {
-                    showLoading();
-                    
-                    // 模拟跳转到评价页面
-                    setTimeout(() => {
-                        hideLoading();
-                        // 在实际应用中，这里会跳转到评价页面或打开评价模态框
-                        alert('即将跳转到评价页面...');
-                    }, 1000);
                 }
             });
         });
