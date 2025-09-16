@@ -532,201 +532,7 @@
 <div class="data-report-container">
     <div class="page-header">
         <h1 class="page-title">数据报表管理</h1>
-        <div class="admin-info">
-            <div class="admin-avatar">管</div>
-            <div class="admin-details">
-                <div class="admin-name">系统管理员</div>
-                <div class="admin-role">超级管理员</div>
-            </div>
-            <button class="logout-btn">退出登录</button>
-        </div>
-    </div>
-    
-    <!-- 管理员导航 -->
-    <nav class="admin-nav">
-        <a href="admin_dashboard.html" class="admin-nav-item">数据看板</a>
-        <a href="admin_merchant_review.html" class="admin-nav-item">商户审核</a>
-        <a href="admin_data_report.html" class="admin-nav-item active">数据报表</a>
-    </nav>
-    
-    <!-- 报表筛选工具栏 -->
-    <div class="report-filter-toolbar">
-        <div class="filter-group">
-            <label class="filter-label">报表类型:</label>
-            <select class="filter-select" id="report-type-filter">
-                <option value="overview" selected>数据概览</option>
-                <option value="users">用户报表</option>
-                <option value="merchants">商户报表</option>
-                <option value="orders">订单报表</option>
-                <option value="revenue">营收报表</option>
-                <option value="popularity">热门景点报表</option>
-            </select>
-        </div>
-        
-        <div class="filter-group">
-            <label class="filter-label">时间范围:</label>
-            <select class="filter-select" id="time-range-filter">
-                <option value="today">今日</option>
-                <option value="week">近一周</option>
-                <option value="month" selected>近一月</option>
-                <option value="quarter">近三月</option>
-                <option value="year">近一年</option>
-                <option value="custom">自定义</option>
-            </select>
-        </div>
-        
-        <div class="filter-group date-range" id="date-range-picker" style="display: none;">
-            <input type="date" class="filter-input" id="start-date">
-            <span>至</span>
-            <input type="date" class="filter-input" id="end-date">
-        </div>
-        
-        <div class="filter-group">
-            <label class="filter-label">数据粒度:</label>
-            <select class="filter-select" id="data-granularity-filter">
-                <option value="day">按日</option>
-                <option value="week">按周</option>
-                <option value="month" selected>按月</option>
-                <option value="quarter">按季度</option>
-                <option value="year">按年</option>
-            </select>
-        </div>
-        
-        <div class="filter-group">
-            <label class="filter-label">地区:</label>
-            <select class="filter-select" id="region-filter">
-                <option value="all" selected>全部地区</option>
-                <option value="beijing">北京</option>
-                <option value="shanghai">上海</option>
-                <option value="guangzhou">广州</option>
-                <option value="shenzhen">深圳</option>
-                <option value="hangzhou">杭州</option>
-                <option value="chengdu">成都</option>
-                <option value="other">其他地区</option>
-            </select>
-        </div>
-        
-        <div class="filter-actions">
-            <button class="generate-report-btn" id="generate-report-btn">生成报表</button>
-            <button class="export-btn" id="export-report-btn">导出报表</button>
-        </div>
-    </div>
-    
-    <!-- 报表概览卡片 -->
-    <div class="report-cards" id="report-overview-cards">
-        <div class="report-card">
-            <div class="report-card-header">
-                <div>
-                    <div class="report-card-title">总用户数</div>
-                    <div class="report-card-value">12,580</div>
-                </div>
-                <div class="report-card-icon" style="background-color: #3498db;">
-                    <i class="fas fa-users"></i>
-                </div>
-            </div>
-            <div class="report-card-change positive">
-                <i class="fas fa-arrow-up"></i> 12.5% 较上月
-            </div>
-        </div>
-        
-        <div class="report-card">
-            <div class="report-card-header">
-                <div>
-                    <div class="report-card-title">活跃商户</div>
-                    <div class="report-card-value">326</div>
-                </div>
-                <div class="report-card-icon" style="background-color: #2ecc71;">
-                    <i class="fas fa-store"></i>
-                </div>
-            </div>
-            <div class="report-card-change positive">
-                <i class="fas fa-arrow-up"></i> 8.3% 较上月
-            </div>
-        </div>
-        
-        <div class="report-card">
-            <div class="report-card-header">
-                <div>
-                    <div class="report-card-title">总订单数</div>
-                    <div class="report-card-value">18,750</div>
-                </div>
-                <div class="report-card-icon" style="background-color: #f39c12;">
-                    <i class="fas fa-shopping-cart"></i>
-                </div>
-            </div>
-            <div class="report-card-change positive">
-                <i class="fas fa-arrow-up"></i> 15.7% 较上月
-            </div>
-        </div>
-        
-        <div class="report-card">
-            <div class="report-card-header">
-                <div>
-                    <div class="report-card-title">总交易额</div>
-                    <div class="report-card-value">¥1,582,360</div>
-                </div>
-                <div class="report-card-icon" style="background-color: #e74c3c;">
-                    <i class="fas fa-yuan-sign"></i>
-                </div>
-            </div>
-            <div class="report-card-change positive">
-                <i class="fas fa-arrow-up"></i> 22.3% 较上月
-            </div>
-        </div>
-    </div>
-    
-    <!-- 图表区域 -->
-    <div class="charts-container">
-        <!-- 用户增长趋势图 -->
-        <div class="chart-card">
-            <div class="chart-header">
-                <h3 class="chart-title">用户增长趋势</h3>
-                <div class="chart-actions">
-                    <button class="chart-action-btn" data-period="week">周</button>
-                    <button class="chart-action-btn active" data-period="month">月</button>
-                    <button class="chart-action-btn" data-period="year">年</button>
-                </div>
-            </div>
-            <div class="chart-content" id="user-growth-chart"></div>
-        </div>
-        
-        <!-- 订单类型分布图 -->
-        <div class="chart-card">
-            <div class="chart-header">
-                <h3 class="chart-title">订单类型分布</h3>
-                <div class="chart-actions">
-                    <button class="chart-action-btn active" data-view="percentage">百分比</button>
-                    <button class="chart-action-btn" data-view="count">数量</button>
-                </div>
-            </div>
-            <div class="chart-content" id="order-type-chart"></div>
-        </div>
-        
-        <!-- 营收趋势图 -->
-        <div class="chart-card">
-            <div class="chart-header">
-                <h3 class="chart-title">营收趋势</h3>
-                <div class="chart-actions">
-                    <button class="chart-action-btn" data-period="week">周</button>
-                    <button class="chart-action-btn active" data-period="month">月</button>
-                    <button class="chart-action-btn" data-period="year">年</button>
-                </div>
-            </div>
-            <div class="chart-content" id="revenue-trend-chart"></div>
-        </div>
-        
-        <!-- 地区分布图 -->
-        <div class="chart-card">
-            <div class="chart-header">
-                <h3 class="chart-title">业务地区分布</h3>
-                <div class="chart-actions">
-                    <button class="chart-action-btn active" data-type="users">用户</button>
-                    <button class="chart-action-btn" data-type="merchants">商户</button>
-                    <button class="chart-action-btn" data-type="orders">订单</button>
-                </div>
-            </div>
-            <div class="chart-content" id="region-distribution-chart"></div>
-        </div>
+
     </div>
     
     <!-- 数据表格 -->
@@ -753,70 +559,27 @@
                 </tr>
             </thead>
             <tbody>
+                {% for item in daily_data %}
                 <tr>
-                    <td>2023-06-01</td>
-                    <td>256</td>
-                    <td>1,250</td>
-                    <td>8</td>
-                    <td>456</td>
-                    <td>42,560</td>
-                    <td>93.33</td>
-                    <td>36.48%</td>
+                    <td>{{ item.date }}</td>
+                    <td>{{ item.new_users }}</td>
+                    <td>{{ "{:,}".format(item.active_users) }}</td>
+                    <td>{{ item.new_merchants }}</td>
+                    <td>{{ item.order_count }}</td>
+                    <td>{{ "{:,}".format(item.total_amount|int) }}</td>
+                    <td>{{ "{:.2f}".format(item.avg_order_value) }}</td>
+                    <td>{{ "%.2f%%"|format(item.conversion_rate * 100) }}</td>
                 </tr>
-                <tr>
-                    <td>2023-06-02</td>
-                    <td>234</td>
-                    <td>1,180</td>
-                    <td>5</td>
-                    <td>420</td>
-                    <td>38,950</td>
-                    <td>92.74</td>
-                    <td>35.59%</td>
-                </tr>
-                <tr>
-                    <td>2023-06-03</td>
-                    <td>280</td>
-                    <td>1,320</td>
-                    <td>7</td>
-                    <td>480</td>
-                    <td>45,200</td>
-                    <td>94.17</td>
-                    <td>36.36%</td>
-                </tr>
-                <tr>
-                    <td>2023-06-04</td>
-                    <td>320</td>
-                    <td>1,450</td>
-                    <td>9</td>
-                    <td>520</td>
-                    <td>48,800</td>
-                    <td>93.85</td>
-                    <td>35.86%</td>
-                </tr>
-                <tr>
-                    <td>2023-06-05</td>
-                    <td>290</td>
-                    <td>1,380</td>
-                    <td>6</td>
-                    <td>490</td>
-                    <td>46,500</td>
-                    <td>94.90</td>
-                    <td>35.51%</td>
-                </tr>
+                {% endfor %}
             </tbody>
         </table>
         
         <div class="table-pagination">
-            <div class="table-pagination-info">显示 1-5 条，共 30 条记录</div>
+            <div class="table-pagination-info">显示 1-{{ daily_data|length }} 条，共 {{ daily_data|length }} 条记录</div>
             <div class="table-pagination-buttons">
                 <button class="pagination-btn" disabled>上一页</button>
                 <button class="pagination-btn active">1</button>
-                <button class="pagination-btn">2</button>
-                <button class="pagination-btn">3</button>
-                <button class="pagination-btn">4</button>
-                <button class="pagination-btn">5</button>
-                <button class="pagination-btn">6</button>
-                <button class="pagination-btn">下一页</button>
+                <button class="pagination-btn" disabled>下一页</button>
             </div>
         </div>
     </div>
@@ -908,21 +671,56 @@
             this.disabled = true;
             this.textContent = '生成中...';
             
-            // 模拟报表生成过程
-            setTimeout(() => {
-                // 根据报表类型更新页面内容
-                updateReportContent(reportType);
-                
-                // 重新初始化图表
-                initCharts();
-                
-                // 恢复按钮状态
-                this.disabled = false;
-                this.textContent = '生成报表';
-                
-                // 显示成功提示
-                showAlert('报表生成成功', 'success');
-            }, 1500);
+            // 显示加载状态
+        this.disabled = true;
+        this.textContent = '加载中...';
+        
+        // 向服务器请求数据
+        fetch('/admin/data_report', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                report_type: reportType,
+                time_range: timeRange,
+                data_granularity: dataGranularity,
+                region: region,
+                start_date: startDate,
+                end_date: endDate
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            // 更新页面数据
+            pageData.userGrowth = data.user_growth || pageData.userGrowth;
+            pageData.orderType = data.order_type || pageData.orderType;
+            pageData.revenueTrend = data.revenue_trend || pageData.revenueTrend;
+            pageData.regionDistribution = data.region_distribution || pageData.regionDistribution;
+            
+            // 根据报表类型更新页面内容
+            updateReportContent(reportType);
+            
+            // 重新初始化图表
+            initCharts();
+            
+            // 恢复按钮状态
+            this.disabled = false;
+            this.textContent = '生成报表';
+            
+            // 显示成功提示
+            showAlert('报表生成成功', 'success');
+        })
+        .catch(error => {
+            console.error('Error fetching report data:', error);
+            
+            // 恢复按钮状态
+            this.disabled = false;
+            this.textContent = '生成报表';
+            
+            // 显示错误提示
+            showAlert('报表生成失败，请重试', 'error');
+        });
         });
         
         // 导出报表按钮
@@ -1047,6 +845,14 @@
         });
     });
     
+    // 页面数据，从后端获取
+    const pageData = {
+        userGrowth: JSON.parse('{{ user_growth_json|safe }}'),
+        orderType: JSON.parse('{{ order_type_json|safe }}'),
+        revenueTrend: JSON.parse('{{ revenue_trend_json|safe }}'),
+        regionDistribution: JSON.parse('{{ region_distribution_json|safe }}')
+    };
+    
     // 初始化所有图表
     function initCharts() {
         initUserGrowthChart('month');
@@ -1057,20 +863,14 @@
     
     // 初始化用户增长趋势图
     function initUserGrowthChart(period) {
-        // 模拟不同周期的数据
-        let labels = [];
-        let data = [];
+        // 使用后端数据
+        const userGrowthData = pageData.userGrowth[period] || {
+            labels: ['第1周', '第2周', '第3周', '第4周'],
+            data: [0, 0, 0, 0]
+        };
         
-        if (period === 'week') {
-            labels = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
-            data = [120, 190, 150, 220, 280, 350, 320];
-        } else if (period === 'month') {
-            labels = ['第1周', '第2周', '第3周', '第4周'];
-            data = [850, 920, 1050, 1200];
-        } else if (period === 'year') {
-            labels = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
-            data = [3200, 2800, 4500, 5200, 6800, 7500, 8200, 9500, 10200, 11500, 12500, 13800];
-        }
+        const labels = userGrowthData.labels;
+        const data = userGrowthData.data;
         
         // 创建图表
         const ctx = document.getElementById('user-growth-chart').getContext('2d');
@@ -1131,10 +931,16 @@
     
     // 初始化订单类型分布图
     function initOrderTypeChart(view) {
-        // 模拟数据
-        const labels = ['酒店', '景区门票', '餐饮', '交通', '娱乐', '其他'];
-        const countData = [3500, 2800, 2200, 1500, 1200, 800];
-        const percentageData = [35, 28, 22, 15, 12, 8];
+        // 使用后端数据
+        const orderTypeData = pageData.orderType || {
+            labels: ['酒店', '景区门票', '餐饮', '交通', '娱乐', '其他'],
+            countData: [0, 0, 0, 0, 0, 0],
+            percentageData: [0, 0, 0, 0, 0, 0]
+        };
+        
+        const labels = orderTypeData.labels;
+        const countData = orderTypeData.countData;
+        const percentageData = orderTypeData.percentageData;
         
         // 选择显示的数据
         const data = view === 'percentage' ? percentageData : countData;
@@ -1195,20 +1001,14 @@
     
     // 初始化营收趋势图
     function initRevenueTrendChart(period) {
-        // 模拟不同周期的数据
-        let labels = [];
-        let data = [];
+        // 使用后端数据
+        const revenueTrendData = pageData.revenueTrend[period] || {
+            labels: ['第1周', '第2周', '第3周', '第4周'],
+            data: [0, 0, 0, 0]
+        };
         
-        if (period === 'week') {
-            labels = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
-            data = [12000, 15000, 18000, 16000, 22000, 28000, 25000];
-        } else if (period === 'month') {
-            labels = ['第1周', '第2周', '第3周', '第4周'];
-            data = [380000, 420000, 350000, 432360];
-        } else if (period === 'year') {
-            labels = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
-            data = [850000, 920000, 1150000, 1320000, 1580000, 1850000, 2120000, 2550000, 2220000, 2050000, 1980000, 2150000];
-        }
+        const labels = revenueTrendData.labels;
+        const data = revenueTrendData.data;
         
         // 创建图表
         const ctx = document.getElementById('revenue-trend-chart').getContext('2d');
@@ -1277,19 +1077,21 @@
     
     // 初始化地区分布图
     function initRegionDistributionChart(type) {
-        // 模拟数据
-        const labels = ['北京', '上海', '广州', '深圳', '杭州', '成都', '其他'];
-        let data = [];
+        // 使用后端数据
+        const regionData = pageData.regionDistribution[type] || {
+            labels: ['北京', '上海', '广州', '深圳', '杭州', '成都', '其他'],
+            data: [0, 0, 0, 0, 0, 0, 0]
+        };
+        
+        const labels = regionData.labels;
+        const data = regionData.data;
         let color = '';
         
         if (type === 'users') {
-            data = [3500, 2800, 1800, 1500, 1200, 1000, 1780];
             color = '#3498db';
         } else if (type === 'merchants') {
-            data = [85, 75, 45, 40, 35, 30, 15];
             color = '#2ecc71';
         } else if (type === 'orders') {
-            data = [5200, 4500, 2800, 2500, 2200, 1800, 1750];
             color = '#f39c12';
         }
         
@@ -1391,14 +1193,34 @@
         confirmBtn.disabled = true;
         confirmBtn.textContent = '导出中...';
         
-        // 模拟导出过程
-        setTimeout(() => {
-            // 关闭模态框
-            closeExportModal();
+        // 对于Excel格式，调用后端接口
+        if (selectedFormat === 'excel') {
+            // 创建表单提交到后端导出接口
+            const form = document.createElement('form');
+            form.method = 'GET';
+            form.action = '/admin/export/excel';
+            form.style.display = 'none';
+            document.body.appendChild(form);
+            form.submit();
             
-            // 显示成功提示
-            showAlert(`报表已成功导出为${selectedFormat.toUpperCase()}格式`, 'success');
-        }, 2000);
+            // 导出后操作
+            setTimeout(() => {
+                // 关闭模态框
+                closeExportModal();
+                
+                // 显示成功提示
+                showAlert(`报表已开始导出为${selectedFormat.toUpperCase()}格式`, 'success');
+            }, 500);
+        } else {
+            // 对于其他格式，模拟导出过程
+            setTimeout(() => {
+                // 关闭模态框
+                closeExportModal();
+                
+                // 显示成功提示
+                showAlert(`报表已成功导出为${selectedFormat.toUpperCase()}格式`, 'success');
+            }, 2000);
+        }
     }
     
     // 关闭导出模态框
