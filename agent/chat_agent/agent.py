@@ -451,17 +451,32 @@ class ChatAgent:
             return self._generate_fallback_plan()
 
     def _get_system_prompt(self) -> str:
-        """系统提示词，定义LLM的角色和输出要求"""
-        return """你是一位专业的旅游规划师，需要根据提供的所有信息，制定详细、合理的旅游方案。
-        请遵循以下要求：
-        1. 方案需要包含：推荐路线说明、每日行程安排（交通+景点+美食）、酒店推荐及理由
-        2. 行程安排要考虑用户的偏好和特殊需求，优先选择匹配的景点和美食
-        3. 时间安排要合理，考虑路线距离和游玩时间
-        4. 输出格式清晰，使用标题、分点等方式组织内容，便于阅读
-        5. 语言自然友好，关键信息（如时间、价格、地址）突出显示"""
+        """优化后的系统提示词，明确基于所有搜集信息生成推荐"""
+        return """你是一位专业且经验丰富的旅游规划师，现在需要基于用户的出行信息，以及我们为你搜集到的酒店、美食、景点等详细信息，为用户生成一份精准且个性化的旅游推荐方案。请严格遵循以下要求：
+
+            1. 【信息利用要求】
+            - 必须完全基于提供的用户出行信息、酒店信息、美食信息、景点信息来生成推荐，不得引入其他外部信息。
+            - 充分考虑用户的各项偏好（如景点类型偏好、住宿需求、特殊需求等），在推荐时进行匹配说明。
+
+            2. 【内容结构要求】
+            - 整体方案需包含：行程整体概述、每日详细行程（交通安排、景点游览、美食推荐、住宿安排）、预算概算等部分。
+            - 每日行程要按照“交通安排→景点游览（含推荐理由及与用户偏好的匹配点、建议游玩时长）→美食推荐（含本地特色说明及推荐理由）→住宿安排（含推荐理由）”的顺序组织。
+            - 预算概算部分货币单位统一为人民币，分类清晰（如交通费用、餐饮费用、住宿费用、景点门票费用等）。
+            - 关键信息（如必去景点、特色美食、重要时间节点等）用【】标注，方便用户快速查看。
+
+            3. 【行程合理性要求】
+            - 每日行程的时间安排要合理，充分考虑交通耗时、景点游玩时长、用餐时间等，符合实际旅行节奏。
+            - 景点与美食的地理位置要邻近，避免同一城市内不必要的远距离往返。
+            - 行程整体要与推荐路线的进度相匹配，不能出现与路线无关的城市或地点推荐。
+
+            4. 【语言风格要求】
+            - 语言表达要自然、友好、口语化，避免使用过于专业或生硬的术语。
+            - 解释推荐理由时要结合用户的具体偏好，让用户清楚了解推荐的依据。
+
+            请根据以上要求，生成一份让用户感觉“精准匹配自身需求且实用”的旅游推荐方案。"""
 
     def _prepare_plan_information(self) -> str:
-        """整理所有需要传递给LLM的信息"""
+        """更清晰、完整地整理所有信息传递给大模型"""
         # 计算行程天数
         def calc_days():
             try:
@@ -471,48 +486,46 @@ class ChatAgent:
             except:
                 return 1
 
-        # 用户信息
-        user_info = f"""【用户信息】
-            - 出发城市：{self.user_travel_info.departure_city}
-            - 目的城市：{self.user_travel_info.destination_city}
-            - 行程时间：{self.user_travel_info.start_date} 至 {self.user_travel_info.end_date}（共{calc_days()}天）
-            - 预算：{self.user_travel_info.budget or '未明确'}
-            - 景点偏好：{', '.join(self.user_travel_info.spot_preference) or '无特殊偏好'}
-            - 住宿需求：{', '.join(self.user_travel_info.hotel_preference) or '无特殊需求'}
-            - 特殊需求：{', '.join(self.user_travel_info.special_needs) or '无特殊需求'}
+        # 用户出行信息
+        user_info = f"""
+        【用户出行信息】
+        - 出发城市：{self.user_travel_info.departure_city}
+        - 目的城市：{self.user_travel_info.destination_city}
+        - 行程时间：{self.user_travel_info.start_date} 至 {self.user_travel_info.end_date}（共{calc_days()}天）
+        - 预算范围：{self.user_travel_info.budget or '未明确，可适当灵活调整'}
+        - 景点类型偏好：{', '.join(self.user_travel_info.spot_preference) or '无特殊偏好，可推荐热门且有特色的景点'}
+        - 住宿需求：{', '.join(self.user_travel_info.hotel_preference) or '无特殊需求，推荐舒适且性价比高的住宿'}
+        - 特殊需求：{', '.join(self.user_travel_info.special_needs) or '无特殊需求'}
         """
 
-        # 推荐路线
+        # 推荐路线信息
         recommend_route = self.travel_route_list.routes[self.travel_route_list.recommend_route_index]
-        route_info = f"""【推荐路线】
-            - 路线类型：{recommend_route.route_type}
-            - 总耗时：{recommend_route.total_time}
-            - 总费用：{recommend_route.total_cost}
-            - 途经城市：{', '.join(recommend_route.passing_areas)}
+        route_info = f"""
+        【推荐路线信息】
+        - 路线类型：{recommend_route.route_type}
+        - 总耗时：{recommend_route.total_time}
+        - 总费用：{recommend_route.total_cost}
+        - 途经城市：{', '.join(recommend_route.passing_areas)}
         """
 
-        # 景点信息
-        landmark_info = "【推荐景点】\n"
-        for idx, landmark in enumerate(self.landmark_options[:10], 1):  # 限制最多10个
-            landmark_info += f"- {idx}. {landmark.name}（{landmark.type}）：{landmark.intro[:80]}... 地址：{landmark.address}\n"
+        # 景点信息（详细列出，方便大模型选择）
+        landmark_info = "【搜集到的景点信息】\n"
+        for idx, landmark in enumerate(self.landmark_options, 1):
+            landmark_info += f"{idx}. 名称：{landmark.name}，类型：{landmark.type}，简介：{landmark.intro[:100]}...，地址：{landmark.address}，热度：{landmark.hot}\n"
 
-        # 美食信息
-        food_info = "【推荐美食】\n"
-        for idx, food in enumerate(self.food_options[:10], 1):  # 限制最多10个
-            food_info += f"- {idx}. {food.name}（{food.type}）：招牌菜 {food.recommend}，评分 {food.score}，地址：{food.address}\n"
+        # 美食信息（详细列出，方便大模型选择）
+        food_info = "【搜集到的美食信息】\n"
+        for idx, food in enumerate(self.food_options, 1):
+            food_info += f"{idx}. 名称：{food.name}，类型：{food.type}，招牌菜：{food.recommend}，评分：{food.score}，地址：{food.address}\n"
 
-        # 酒店信息
-        recommend_hotel = self.hotel_option_list.hotels[self.hotel_option_list.recommend_hotel_index]
-        hotel_info = f"""【推荐酒店】
-            - 名称：{recommend_hotel.name}
-            - 星级：{recommend_hotel.star}
-            - 评分：{recommend_hotel.score}
-            - 价格：{recommend_hotel.price}
-            - 地址：{recommend_hotel.address}
-        """
+        # 酒店信息（详细列出，方便大模型选择）
+        hotel_info = "【搜集到的酒店信息】\n"
+        for idx, hotel in enumerate(self.hotel_option_list.hotels, 1):
+            hotel_info += f"{idx}. 名称：{hotel.name}，星级：{hotel.star}，评分：{hotel.score}，价格：{hotel.price}，地址：{hotel.address}\n"
 
         # 整合所有信息
-        return f"{user_info}\n{route_info}\n{landmark_info}\n{food_info}\n{hotel_info}\n请根据以上信息，为我制定一份详细的旅游规划方案。"
+        all_info = f"{user_info}\n{route_info}\n{landmark_info}\n{food_info}\n{hotel_info}"
+        return f"现在需要你基于以下所有信息，为用户生成一份旅游推荐方案：\n{all_info}"
 
     def _generate_fallback_plan(self) -> str:
         """当LLM调用失败时生成的备用方案"""
