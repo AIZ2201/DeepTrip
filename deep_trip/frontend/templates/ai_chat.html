@@ -247,7 +247,40 @@ document.getElementById('chat-form').onsubmit = function(e) {
         method: 'POST',
         body: data
     }).then(r=>r.json()).then(res=>{
-        window.location.href = '/ai/chat?chat_id=' + res.chat_id;
+        var chatHistory = document.getElementById('chat-history');
+        // 插入用户输入
+        if(res.user_input){
+            chatHistory.innerHTML += `
+                <div class="ai-msg user">
+                    <div class="ai-avatar"><span>🧑</span></div>
+                    <div class="ai-msg-content">${res.user_input.replace(/\n/g,'<br>')}</div>
+                </div>
+            `;
+        }
+        // 插入AI回复
+        chatHistory.innerHTML += `
+            <div class="ai-msg ai">
+                <div class="ai-avatar"><span>🤖</span></div>
+                <div class="ai-msg-content">${res.ai_reply.replace(/\n/g,'<br>')}</div>
+            </div>
+        `;
+        textarea.value = '';
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+        // 如果需要规划路线，自动再次请求
+        if(res.planning){
+            fetch('/ai/chat', {
+                method: 'POST',
+                body: new URLSearchParams('planning=1')
+            }).then(r=>r.json()).then(res2=>{
+                chatHistory.innerHTML += `
+                    <div class="ai-msg ai">
+                        <div class="ai-avatar"><span>🤖</span></div>
+                        <div class="ai-msg-content">${res2.ai_reply.replace(/\n/g,'<br>')}</div>
+                    </div>
+                `;
+                chatHistory.scrollTop = chatHistory.scrollHeight;
+            });
+        }
     }).finally(()=>{
         btn.disabled = false;
         btn.textContent = '发送';
@@ -258,5 +291,13 @@ window.onload = function() {
     var history = document.getElementById('chat-history');
     history.scrollTop = history.scrollHeight;
 };
+
+// 支持按Enter发送（Shift+Enter换行）
+document.querySelector('.ai-chat-form textarea').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        document.getElementById('chat-form').dispatchEvent(new Event('submit', {cancelable: true, bubbles: true}));
+    }
+});
 </script>
 {% endblock %}

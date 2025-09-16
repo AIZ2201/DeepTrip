@@ -10,11 +10,10 @@ def test():
     tourism_info = agent.get_tourism_info()
     food_info = agent.get_food_info()
     travel_plan = agent.generate_comprehensive_travel_plan()
-    # 5. 输出/返回规划结果（前端展示、对话回复等）
-    print("="*50)
-    print("📅 完整旅游规划")
-    print("="*50)
-    print(travel_plan)
+    print("="*50, flush=True)
+    print("📅 完整旅游规划", flush=True)
+    print("="*50, flush=True)
+    print(travel_plan, flush=True)
 
 
 if __name__ == "__main__":
