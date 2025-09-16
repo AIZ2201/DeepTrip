@@ -1,5 +1,5 @@
-from .chat_agent.agent import ChatAgent
-from .chat_agent.key_point_extract import key_point_extract
+from agent.chat_agent.agent import ChatAgent
+from agent.chat_agent.key_point_extract import key_point_extract
 
 def test():
     agent = ChatAgent()

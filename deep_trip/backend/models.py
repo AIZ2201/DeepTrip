@@ -9,7 +9,6 @@ class User(db.Model):
     email = db.Column(db.String(64), unique=True, nullable=False)
     phonenumber = db.Column(db.String(16), unique=True, nullable=True)
     password = db.Column(db.String(64), nullable=False)
-    # ...existing code...
 
 class Feedback(db.Model):
     __tablename__ = 'feedback'
@@ -26,7 +25,6 @@ class Feedback(db.Model):
     created_at = db.Column(db.DateTime, nullable=False)
     merchant_feedback = db.Column(db.Text, nullable=True)
     merchant_reply_time = db.Column(db.DateTime, nullable=True)
-    # ...existing code...
 
 class Admin(db.Model):
     __tablename__ = 'admin'
@@ -34,7 +32,6 @@ class Admin(db.Model):
     username = db.Column(db.String(32), unique=True, nullable=False)
     email = db.Column(db.String(64), unique=True, nullable=False)
     password = db.Column(db.String(64), nullable=False)
-    # ...existing code...
 
 class Merchant(db.Model):
     __tablename__ = 'merchant_login'
@@ -69,3 +66,22 @@ class ShopInfo(db.Model):
     created_at = db.Column(db.DateTime, nullable=True)
     status = db.Column(db.String(16), nullable=False, default='nsave')
     # ...existing code...
+
+class AIChatSession(db.Model):
+    __tablename__ = 'ai_chat_session'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user_login.id'), nullable=False)  # 匿名用户可为null
+    title = db.Column(db.String(128), nullable=True)  # 会话标题，可自动生成或用户自定义
+    created_at = db.Column(db.DateTime, nullable=False)
+    updated_at = db.Column(db.DateTime, nullable=False)
+    status = db.Column(db.String(16), nullable=False, default='active')  # active/deleted等
+    user = db.relationship('User', backref='ai_chat_sessions')
+
+class AIChatMessage(db.Model):
+    __tablename__ = 'ai_chat_message'
+    id = db.Column(db.Integer, primary_key=True)
+    session_id = db.Column(db.Integer, db.ForeignKey('ai_chat_session.id'), nullable=False)
+    sender = db.Column(db.String(8), nullable=False)  # 'user' or 'ai'
+    content = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False)
+    session = db.relationship('AIChatSession', backref='messages')
