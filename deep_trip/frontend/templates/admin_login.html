@@ -91,37 +91,7 @@
     
     /* 记住我和忘记密码 */
     .login-options {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 25px;
-    }
-    
-    .remember-me {
-        display: flex;
-        align-items: center;
-    }
-    
-    .remember-me input[type="checkbox"] {
-        margin-right: 8px;
-    }
-    
-    .remember-me label {
-        margin-bottom: 0;
-        font-weight: normal;
-        color: #7f8c8d;
-    }
-    
-    .forgot-password {
-        color: #3498db;
-        text-decoration: none;
-        font-size: 14px;
-        transition: color 0.3s ease;
-    }
-    
-    .forgot-password:hover {
-        color: #2980b9;
-        text-decoration: underline;
+        display: none;
     }
     
     /* 按钮样式 */
@@ -236,27 +206,17 @@
 <form id="admin-login-form">
     <div class="form-group">
         <label for="admin-username">用户名</label>
-        <!-- 添加 name="email" -->
         <input type="text" id="admin-username" name="email" class="form-control" placeholder="请输入用户名" required autofocus>
     </div>
     
     <div class="form-group">
         <label for="admin-password">密码</label>
         <div class="password-input-container">
-            <!-- 添加 name="password" -->
             <input type="password" id="admin-password" name="password" class="form-control" placeholder="请输入密码" required>
             <button type="button" class="toggle-password" id="toggle-password">
                 <i class="far fa-eye"></i>
             </button>
         </div>
-    </div>
-    
-    <div class="login-options">
-        <div class="remember-me">
-            <input type="checkbox" id="remember-me" name="remember-me">
-            <label for="remember-me">记住我</label>
-        </div>
-        <a href="#" class="forgot-password">忘记密码？</a>
     </div>
     
     <div class="form-group">
@@ -292,52 +252,6 @@
         const togglePasswordBtn = document.getElementById('toggle-password');
         const passwordInput = document.getElementById('admin-password');
         const usernameInput = document.getElementById('admin-username');
-        const rememberMeCheckbox = document.getElementById('remember-me');
-        const forgotPasswordLink = document.querySelector('.forgot-password');
-        
-        // 检查是否有记住的用户名
-        const savedUsername = localStorage.getItem('adminUsername');
-        if (savedUsername) {
-            usernameInput.value = savedUsername;
-            rememberMeCheckbox.checked = true;
-            passwordInput.focus();
-        }
-        
-        // 切换密码可见性
-        if (togglePasswordBtn) {
-            togglePasswordBtn.addEventListener('click', function() {
-                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                passwordInput.setAttribute('type', type);
-                
-                // 切换图标
-                const icon = this.querySelector('i');
-                if (type === 'password') {
-                    icon.classList.remove('fa-eye-slash');
-                    icon.classList.add('fa-eye');
-                } else {
-                    icon.classList.remove('fa-eye');
-                    icon.classList.add('fa-eye-slash');
-                }
-            });
-        }
-        
-        // 忘记密码链接
-        if (forgotPasswordLink) {
-            forgotPasswordLink.addEventListener('click', function(e) {
-                e.preventDefault();
-                showAlert('请联系系统管理员重置密码', 'info');
-            });
-        }
-        
-        // 简单校验
-        function validEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
-        
-        // 显示提示信息
-        function showAlert(message, type) {
-            // 这里需要实现一个显示提示信息的方法
-            // 可以使用alert或自定义的提示框
-            alert(message);
-        }
         
         // 表单提交处理
         if (loginForm) {

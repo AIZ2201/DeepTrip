@@ -43,6 +43,24 @@
     justify-content: center;
     color: white;
     font-size: 40px;
+    position: relative;
+  }
+
+  .user-logo .user-logo-icon {
+    font-size: 32px;
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+    color: #fff;
+    opacity: 0.85;
+    background: #2980b9;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #fff;
   }
 
   /* 表单样式增强 */
@@ -315,7 +333,8 @@
 <div class="user-login-container">
   <div class="user-login-header">
     <div class="user-logo">
-      <i class="fas fa-user"></i>
+      <!-- 新增小图标，风格与 merchant login 一致 -->
+      <span style="font-size:36px;line-height:1;">👤</span>
     </div>
     <h1 class="user-login-title">用户登录</h1>
     <p class="user-login-subtitle">登录您的旅游小助手账号</p>

@@ -26,6 +26,10 @@
     .merchant-logo{width:60px;height:60px;font-size:30px}
     .merchant-login-title{font-size:24px}
   }
+
+  .form-group.form-check {
+    display: none;
+  }
 </style>
 {% endblock %}
 
@@ -47,19 +51,8 @@
     <div class="form-group" style="position:relative">
       <label for="merchant-password">
         密码
-        <a href="/user/forgot-password" class="float-right" style="font-weight:normal;font-size:14px;">忘记密码？</a>
       </label>
       <input type="password" id="merchant-password" name="password" class="form-control" placeholder="请输入您的密码" required>
-      <!-- 切换可见按钮 -->
-      <button type="button" id="togglePwd" aria-label="显示/隐藏密码"
-              style="position:absolute;right:12px;top:38px;background:none;border:none;cursor:pointer;">👁️</button>
-    </div>
-
-    <div class="form-group form-check">
-      <label class="form-check-label">
-        <input type="checkbox" class="form-check-input" id="remember" name="remember" value="1">
-        记住我 30 天
-      </label>
     </div>
 
     <div class="form-group">
@@ -90,13 +83,6 @@ document.addEventListener('DOMContentLoaded', function () {
   const loading = document.getElementById('login-loading');
   const emailInput = document.getElementById('merchant-email');
   const pwdInput = document.getElementById('merchant-password');
-  const togglePwd = document.getElementById('togglePwd');
-
-  // 密码可见性
-  togglePwd.addEventListener('click', () => {
-    const t = pwdInput.getAttribute('type') === 'password' ? 'text' : 'password';
-    pwdInput.setAttribute('type', t);
-  });
 
   // 简单校验
   function validEmail(v){
