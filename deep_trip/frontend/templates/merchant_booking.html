@@ -99,12 +99,9 @@
                     <td><span class="status-badge status-{{ order.status }}">{{ order.status_text }}</span></td>
                     <td>{{ order.order_time }}</td>
                     <td>
-                        <button class="btn-action btn-view" data-id="{{ order.order_id }}">查看</button>
                         {% if order.status == 'pending' %}
-                        <button class="btn-action btn-confirm" data-id="{{ order.order_id }}">确认</button>
-                        <button class="btn-action btn-cancel" data-id="{{ order.order_id }}">取消</button>
-                        {% elif order.status == 'confirmed' %}
-                        <button class="btn-action btn-complete" data-id="{{ order.order_id }}">完成</button>
+                        <button class="btn-action btn-confirm" data-id="{{ order.order_id }}">同意</button>
+                        <button class="btn-action btn-cancel" data-id="{{ order.order_id }}">驳回</button>
                         {% endif %}
                     </td>
                 </tr>
@@ -127,18 +124,63 @@
 {% block js %}
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.btn-view').forEach(btn=>{
-        btn.onclick = ()=> alert("查看订单 " + btn.dataset.id);
+    // 查看订单按钮
+    document.querySelectorAll('.btn-view').forEach(btn => {
+        btn.onclick = () => alert("查看订单 " + btn.dataset.id);
     });
-    document.querySelectorAll('.btn-confirm').forEach(btn=>{
-        btn.onclick = ()=> alert("确认订单 " + btn.dataset.id);
+    
+    // 确认退款按钮 - 当状态为pending时显示（用户申请退款后）
+    document.querySelectorAll('.btn-confirm').forEach(btn => {
+        btn.onclick = function() {
+            const orderId = this.dataset.id;
+            if (confirm(`确定要确认订单 ${orderId} 的退款申请吗？确认后订单将被取消。`)) {
+                updateOrderStatus(orderId, 'confirm_refund', '确认退款');
+            }
+        };
     });
-    document.querySelectorAll('.btn-cancel').forEach(btn=>{
-        btn.onclick = ()=> alert("取消订单 " + btn.dataset.id);
+    
+    // 驳回退款按钮 - 当状态为pending时显示（用户申请退款后）
+    document.querySelectorAll('.btn-cancel').forEach(btn => {
+        btn.onclick = function() {
+            const orderId = this.dataset.id;
+            if (confirm(`确定要驳回订单 ${orderId} 的退款申请吗？驳回后订单将恢复为已完成状态。`)) {
+                updateOrderStatus(orderId, 'reject_refund', '驳回退款');
+            }
+        };
     });
-    document.querySelectorAll('.btn-complete').forEach(btn=>{
-        btn.onclick = ()=> alert("完成订单 " + btn.dataset.id);
+    
+    // 完成订单按钮
+    document.querySelectorAll('.btn-complete').forEach(btn => {
+        btn.onclick = () => alert("完成订单 " + btn.dataset.id);
     });
+    
+    // 发送AJAX请求更新订单状态
+    function updateOrderStatus(orderId, action, actionText) {
+        fetch('/merchant/orders/update_status', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                order_id: orderId,
+                action: action
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(`订单 ${orderId} ${actionText}成功！`);
+                // 刷新页面以显示最新状态
+                location.reload();
+            } else {
+                alert(`操作失败：${data.message}`);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('网络错误，请重试');
+        });
+    }
 });
 </script>
 {% endblock %}
