@@ -1,32 +1,14 @@
-import pymysql
+from db_util import get_db_connection
 from pymysql.cursors import DictCursor
 
 class UserLogin:
-    def __init__(self):
-        self.db_config = {
-            'host': 'localhost',
-            'user': 'root',
-            'password': '123456',
-            'db': 'deeptrip',
-            'charset': 'utf8mb4',
-            'cursorclass': DictCursor
-        }
-
-    def get_db_connection(self):
-        """获取数据库连接"""
-        try:
-            return pymysql.connect(** self.db_config)
-        except Exception as e:
-            print(f"数据库连接失败: {e}")
-            return None
-
     def check_user_login(self, email, password):
         """验证用户登录信息"""
         # 空值检查
         if not email or not password:
             return False
             
-        conn = self.get_db_connection()
+        conn = get_db_connection()
         if not conn:
             return False
             
@@ -39,7 +21,7 @@ class UserLogin:
                 
                 # 如果找到用户则返回True
                 return user is not None
-        except pymysql.MySQLError as e:
+        except Exception as e:
             print(f"数据库查询错误: {e}")
             return False
         finally:
@@ -49,7 +31,7 @@ class UserLogin:
 
     def get_user_info(self, email):
         """获取用户详细信息"""
-        conn = self.get_db_connection()
+        conn = get_db_connection()
         if not conn:
             return None
             
@@ -58,7 +40,7 @@ class UserLogin:
                 sql = "SELECT * FROM user_login WHERE email = %s"
                 cursor.execute(sql, (email,))
                 return cursor.fetchone()
-        except pymysql.MySQLError as e:
+        except Exception as e:
             print(f"获取用户信息错误: {e}")
             return None
         finally:

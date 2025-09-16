@@ -1,23 +1,7 @@
-import pymysql
 from flask import Blueprint, request, jsonify
+from db_util import get_db_connection
 
 merchant_register_bp = Blueprint('merchant_register', __name__)
-
-DB_CONFIG = {
-    'host': 'localhost',
-    'user': 'root',
-    'password': '123456',
-    'db': 'deeptrip',
-    'charset': 'utf8mb4',
-    'cursorclass': pymysql.cursors.DictCursor
-}
-
-def get_db_connection():
-    try:
-        return pymysql.connect(**DB_CONFIG)
-    except Exception as e:
-        print(f"[MerchantRegister] 数据库连接失败: {e}")
-        return None
 
 @merchant_register_bp.route('/merchant/register', methods=['POST'])
 def merchant_register():

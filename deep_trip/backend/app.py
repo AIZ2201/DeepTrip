@@ -21,6 +21,18 @@ from merchant_register import merchant_register_bp
 from admin_dashboard import admin_dashboard_bp
 from admin_merchant_review import admin_merchant_review_bp
 from admin_data_report import admin_data_report_bp
+import pymysql
+from pymysql.cursors import DictCursor
+import configparser
+
+# 读取 db_config.ini
+config = configparser.ConfigParser()
+config.read(os.path.join(os.path.dirname(__file__), 'db_config.ini'), encoding='utf-8')
+db_user = config.get('mysql', 'user')
+db_password = config.get('mysql', 'password')
+db_host = config.get('mysql', 'host')
+db_name = config.get('mysql', 'db')
+db_charset = config.get('mysql', 'charset')
 
 app = Flask(
     __name__,
@@ -28,7 +40,7 @@ app = Flask(
     static_folder='../frontend/static'
 )
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:123456@localhost/deeptrip?charset=utf8mb4'
+app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://{db_user}:{db_password}@{db_host}/{db_name}?charset={db_charset}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 app.secret_key = os.getenv('FLASK_SECRET_KEY', 'dev_only_change_me')

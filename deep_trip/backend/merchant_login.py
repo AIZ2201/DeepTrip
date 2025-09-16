@@ -1,26 +1,12 @@
 # merchant_login.py
-import pymysql
+from db_util import get_db_connection
 from pymysql.cursors import DictCursor
 from datetime import datetime, timedelta
 import random
 
 class MerchantAuth:
-    def __init__(self):
-        self.db_config = {
-            'host': 'localhost',
-            'user': 'root',
-            'password': '123456',
-            'db': 'deeptrip',
-            'charset': 'utf8mb4',
-            'cursorclass': DictCursor
-        }
-
     def _conn(self):
-        try:
-            return pymysql.connect(**self.db_config)
-        except Exception as e:
-            print(f"[MerchantAuth] DB connect error: {e}")
-            return None
+        return get_db_connection()
 
     # ---------- 校验唯一性 ----------
     def exists_by_email(self, email: str) -> bool:

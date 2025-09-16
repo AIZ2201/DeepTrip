@@ -1,32 +1,14 @@
+from db_util import get_db_connection
 import pymysql
-from pymysql.cursors import DictCursor
 
 class AdminLogin:
-    def __init__(self):
-        self.db_config = {
-            'host': 'localhost',
-            'user': 'root',
-            'password': '123456',
-            'db': 'deeptrip',
-            'charset': 'utf8mb4',
-            'cursorclass': DictCursor
-        }
-
-    def get_db_connection(self):
-        """获取数据库连接"""
-        try:
-            return pymysql.connect(** self.db_config)
-        except Exception as e:
-            print(f"数据库连接失败: {e}")
-            return None
-
     def check_admin_login(self, email, password):
         """验证管理员登录信息"""
         # 空值检查
         if not email or not password:
             print("邮箱或密码为空")
             return False
-        conn = self.get_db_connection()
+        conn = get_db_connection()
         if not conn:
             return False
         try:
@@ -46,6 +28,25 @@ class AdminLogin:
         finally:
             # 确保连接关闭
             if conn:
+                conn.close()
+
+    def get_admin_info(self, email):
+        """获取管理员详细信息"""
+        conn = get_db_connection() # boolean
+        if not conn:
+            return None
+            
+        try:
+            with conn.cursor() as cursor:
+                sql = "SELECT * FROM admin_login WHERE email = %s"
+                cursor.execute(sql, (email,))
+                return cursor.fetchone()
+        except pymysql.MySQLError as e:
+            print(f"获取管理员信息错误: {e}")
+            return None
+        finally:
+            if conn:
+                conn.close()
                 conn.close()
 
     def get_admin_info(self, email):
