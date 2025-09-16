@@ -12,9 +12,7 @@ def admin_login():
     if request.method == 'POST':
         email = request.form.get('email', '').strip()
         password = request.form.get('password', '').strip()
-        ###### 测试无法登入的情况 ######
         print(email+" and "+password)
-        ##############################
         if not email or not password:
             return jsonify({'success': False, 'message': '邮箱和密码不能为空'})
         if not re.match(r'^[^\s@]+@[^\s@]+\.[^\s@]+$', email):
@@ -31,7 +29,7 @@ def admin_login():
             return jsonify({
                 'success': True,
                 'message': '登录成功',
-                'redirect': url_for('admin_dashboard.dashboard')  # 修改这里
+                'redirect': url_for('admin_dashboard.dashboard')
             })
         else:
             session['admin'] = None

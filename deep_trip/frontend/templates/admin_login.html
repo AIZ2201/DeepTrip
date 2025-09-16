@@ -197,7 +197,7 @@
     <div class="admin-login-header">
         <div class="admin-logo">🛡️</div>
         <h2 class="admin-login-title">管理系统登录</h2>
-        <p class="admin-login-subtitle">请输入您的管理员账号和密码</p>
+        <p class="admin-login-subtitle">请输入您的管理员邮箱和密码</p>
     </div>
     
     <!-- 错误提示 -->
@@ -205,15 +205,15 @@
     
 <form id="admin-login-form">
     <div class="form-group">
-        <label for="admin-username">用户名</label>
-        <input type="text" id="admin-username" name="email" class="form-control" placeholder="请输入用户名" required autofocus>
+        <label for="admin-email">邮箱</label>
+        <input type="text" id="admin-email" name="email" class="form-control" placeholder="请输入邮箱" required autofocus>
     </div>
     
     <div class="form-group">
         <label for="admin-password">密码</label>
         <div class="password-input-container">
             <input type="password" id="admin-password" name="password" class="form-control" placeholder="请输入密码" required>
-            <button type="button" class="toggle-password" id="toggle-password">
+            <button type="button" class="toggle-password" id="toggle-password" title="显示/隐藏密码">
                 <i class="far fa-eye"></i>
             </button>
         </div>
@@ -221,7 +221,8 @@
     
     <div class="form-group">
         <button type="submit" class="btn-primary" id="login-button">
-            登录
+            <span class="button-text">登录</span>
+            <span class="button-loading" style="display:none;">登录中...</span>
         </button>
     </div>
 </form>
@@ -244,21 +245,48 @@
 
 {% block js %}
 <script>
+    // 简单邮箱校验
+    function validEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+    // 显示错误/成功提示
+    function showAlert(msg, type) {
+        const errorMessage = document.getElementById('error-message');
+        if (!errorMessage) return;
+        errorMessage.textContent = msg;
+        errorMessage.style.display = 'block';
+        errorMessage.style.backgroundColor = type === 'error' ? '#fee' : '#e6ffe6';
+        errorMessage.style.borderColor = type === 'error' ? '#fcc' : '#b2f2b2';
+        errorMessage.style.color = type === 'error' ? '#c33' : '#228B22';
+        setTimeout(() => { errorMessage.style.display = 'none'; }, 3000);
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
         const loginForm = document.getElementById('admin-login-form');
         const loginButton = document.getElementById('login-button');
-        const loginLoading = document.getElementById('login-loading');
-        const errorMessage = document.getElementById('error-message');
         const togglePasswordBtn = document.getElementById('toggle-password');
         const passwordInput = document.getElementById('admin-password');
-        const usernameInput = document.getElementById('admin-username');
-        
+        const emailInput = document.getElementById('admin-email');
+
+        // 密码显示/隐藏
+        if (togglePasswordBtn && passwordInput) {
+            togglePasswordBtn.addEventListener('click', function() {
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    togglePasswordBtn.innerHTML = '<i class="far fa-eye-slash"></i>';
+                } else {
+                    passwordInput.type = 'password';
+                    togglePasswordBtn.innerHTML = '<i class="far fa-eye"></i>';
+                }
+            });
+        }
+
         // 表单提交处理
         if (loginForm) {
             loginForm.addEventListener('submit', function (e) {
                 e.preventDefault();
 
-                const email = usernameInput.value.trim();
+                const email = emailInput.value.trim();
                 const pwd = passwordInput.value.trim();
 
                 if (!email || !pwd) {
@@ -270,7 +298,6 @@
                     return;
                 }
 
-                // UI: loading 状态
                 if (togglePasswordBtn) togglePasswordBtn.disabled = true;
                 if (loginButton) {
                     const txt = loginButton.querySelector('.button-text');
@@ -279,12 +306,10 @@
                     if (loading) loading.style.display = 'inline-block';
                 }
 
-                // 使用 FormData 提交
                 const fd = new FormData(loginForm);
                 fetch('/admin/login', {method: 'POST', body: fd})
                 .then(r => r.json())
                 .then(data => {
-                    // 恢复按钮状态
                     if (togglePasswordBtn) togglePasswordBtn.disabled = false;
                     if (loginButton) {
                         const txt = loginButton.querySelector('.button-text');
@@ -294,8 +319,6 @@
                     }
 
                     if (data.success) {
-                        // ✅ admin登录成功，固定跳转 admin_dashboard.html
-                        // showAlert('登录成功，正在跳转...', 'success');
                         setTimeout(() => {
                             window.location.href = data.redirect || '/admin/dashboard';
                         }, 800);
@@ -318,8 +341,8 @@
         }
         
         // 添加键盘事件处理
-        if (usernameInput) {
-            usernameInput.addEventListener('keydown', function(e) {
+        if (emailInput) {
+            emailInput.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter') {
                     passwordInput.focus();
                 }

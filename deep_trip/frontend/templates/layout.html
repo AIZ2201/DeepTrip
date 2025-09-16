@@ -16,16 +16,18 @@
                 </div>
                 <ul class="nav-links">
                     {% if current_user and current_user.role == 'traveller' %}
-                        <li><a href="/path/list">路线规划</a></li>
+                        <li><a href="/user/home">用户主页</a></li>
+                        <li><a href="/route/planner">路线规划</a></li>
                         <li><a href="/ai/chat">旅游问答</a></li>
-                        <li><a href="/booking/list">资源预定</a></li>
-                        <li><a href="/comment/list">服务反馈</a></li>
-                        <li><a href="/user/profile">个人中心</a></li>
+                        <li><a href="/booking">资源预定</a></li>
+                        <li><a href="/feedback">服务反馈</a></li>
                         <li><a href="/user/logout">退出登录</a></li>
                     {% elif current_user and current_user.role == 'merchant' %}
+                        <li><a href="/merchant/home">商家主页</a></li>
                         <li><a href="/merchant/info">店铺信息</a></li>
                         <li><a href="/merchant/feedback">用户评价</a></li>
-                        <li><a href="/merchant/home">商家中心</a></li>
+                        <li><a href="/merchant/booking">订单管理</a></li>
+                        <li><a href="/merchant/center">商家中心</a></li>
                         <li><a href="/user/logout">退出登录</a></li>
                     {% elif current_user and current_user.role == 'admin' %}
                         <li><a href="/admin/dashboard">数据看板</a></li>
