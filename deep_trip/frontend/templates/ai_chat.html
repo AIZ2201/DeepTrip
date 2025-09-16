@@ -239,19 +239,6 @@
 <h1>旅游问答</h1>
 <p>有任何旅游相关的问题？随时向AI助手提问，我们将为您提供专业的解答！</p>
 
-<!-- 预设问题区域 -->
-<div class="preset-questions">
-    <h3>热门问题</h3>
-    <div class="question-tags">
-        <div class="question-tag" data-question="故宫门票怎么预订？">故宫门票怎么预订？</div>
-        <div class="question-tag" data-question="三亚最佳旅游季节是什么时候？">三亚最佳旅游季节</div>
-        <div class="question-tag" data-question="如何从上海浦东机场到市区？">机场到市区交通</div>
-        <div class="question-tag" data-question="张家界景区门票价格？">张家界门票价格</div>
-        <div class="question-tag" data-question="西安有哪些必吃美食？">西安必吃美食</div>
-        <div class="question-tag" data-question="长城一日游攻略">长城一日游攻略</div>
-    </div>
-</div>
-
 <!-- 会话历史记录 -->
 <div class="chat-history">
     <div class="flex justify-between items-center">
@@ -306,9 +293,6 @@
             <div class="input-group">
                 <textarea id="message-input" class="chat-textarea" placeholder="请输入您的问题..." required></textarea>
                 <div class="chat-controls">
-                    <button type="button" class="voice-btn" title="语音输入">
-                        <i class="icon-mic">&#x1F3A4;</i>
-                    </button>
                     <button type="submit" class="send-btn" title="发送消息">
                         <i class="icon-send">&#x27A1;</i>
                     </button>
@@ -326,9 +310,7 @@
         const chatForm = document.getElementById('chat-form');
         const messageInput = document.getElementById('message-input');
         const chatMessages = document.getElementById('chat-messages');
-        const voiceBtn = document.querySelector('.voice-btn');
         const sendBtn = document.querySelector('.send-btn');
-        const questionTags = document.querySelectorAll('.question-tag');
         const historyItems = document.querySelectorAll('.history-item');
         const newChatBtn = document.getElementById('new-chat');
         
@@ -440,16 +422,6 @@
             return "感谢您的提问！这是一个很好的问题。我需要为您查询更详细的信息，请稍候...\n\n（在实际应用中，这里会调用AI模型生成更准确的回答）";
         }
         
-        // 预设问题点击处理
-        questionTags.forEach(tag => {
-            tag.addEventListener('click', function() {
-                const question = this.getAttribute('data-question');
-                messageInput.value = question;
-                sendBtn.disabled = false;
-                messageInput.focus();
-            });
-        });
-        
         // 会话历史点击处理
         historyItems.forEach(item => {
             item.addEventListener('click', function() {
@@ -495,13 +467,6 @@
             chatMessages.innerHTML = '';
             addMessageToChat('您好！我是您的旅游助手，请问有什么可以帮助您的？', 'ai');
         }
-        
-        // 语音输入按钮点击处理
-        voiceBtn.addEventListener('click', function() {
-            // 模拟语音输入功能
-            // 在实际应用中，这里会调用浏览器的语音识别API
-            showAlert('语音输入功能正在开发中...', 'info');
-        });
         
         // 监听输入框变化，启用/禁用发送按钮
         messageInput.addEventListener('input', function() {
