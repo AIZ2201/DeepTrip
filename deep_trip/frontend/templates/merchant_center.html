@@ -1,0 +1,213 @@
+{% extends "layout.html" %}
+{% block title %}商家个人中心 - 旅游小助手{% endblock %}
+
+{% block css %}
+<style>
+    .center-container { max-width: 900px; margin: 0 auto; padding: 40px; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-top: 30px; margin-bottom: 30px; }
+    .center-header { text-align: center; margin-bottom: 40px; }
+    .center-title { font-size: 28px; font-weight: 600; color: #2c3e50; margin-bottom: 10px; }
+    .center-subtitle { color: #7f8c8d; }
+    .section { margin-bottom: 30px; }
+    .section-title { font-size: 20px; font-weight: 600; color: #34495e; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #3498db; }
+    .info-list { list-style: none; padding: 0; }
+    .info-list li { margin-bottom: 12px; }
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; margin-bottom: 8px; font-weight: 500; color: #34495e; }
+    .form-control { width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 4px; font-size: 16px; transition: border-color 0.3s ease; }
+    .form-control:focus { outline: none; border-color: #3498db; }
+    .btn-primary { padding: 12px 30px; font-size: 16px; font-weight: 600; border: none; border-radius: 4px; background: #3498db; color: white; cursor: pointer; }
+    .btn-primary:hover { background: #2980b9; }
+    .form-actions { display: flex; gap: 20px; justify-content: flex-start; margin-top: 20px; }
+    .image-preview { width: 100px; height: 100px; border-radius: 8px; object-fit: cover; margin-right: 10px; }
+    .edit-btn {
+        margin-left: 12px;
+        padding: 4px 12px;
+        font-size: 14px;
+        background: #f1c40f;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background .2s;
+    }
+    .edit-btn:hover {
+        background: #e67e22;
+    }
+    .modal-backdrop {
+        position: fixed; top:0; left:0; width:100vw; height:100vh;
+        background: rgba(0,0,0,0.25); z-index: 9998;
+        display: none;
+    }
+    .modal-dialog {
+        position: fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+        background: #fff; border-radius: 8px; box-shadow: 0 2px 16px rgba(0,0,0,0.18);
+        z-index: 9999; min-width: 320px; max-width: 90vw; padding: 30px 24px;
+        display: none;
+    }
+    .modal-title { font-size: 20px; font-weight: 600; margin-bottom: 18px; }
+    .modal-close { position: absolute; right: 18px; top: 18px; background: none; border: none; font-size: 22px; color: #888; cursor: pointer; }
+    .modal-actions { margin-top: 22px; display: flex; gap: 16px; }
+    .modal-actions .btn-primary { flex: 1; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="center-container">
+    <div class="center-header">
+        <h2 class="center-title">商家个人中心</h2>
+        <p class="center-subtitle">管理您的账号和店铺信息</p>
+    </div>
+    <div class="section">
+        <h3 class="section-title">账号信息</h3>
+        <ul class="info-list">
+            <li>
+                <strong>用户名：</strong>{{ merchant.username }}
+                <button class="edit-btn" data-field="username">修改</button>
+            </li>
+            <li>
+                <strong>邮箱：</strong>{{ merchant.email }}
+                <button class="edit-btn" data-field="email">修改</button>
+            </li>
+            <li>
+                <strong>手机号：</strong>{{ merchant.phone }}
+                <button class="edit-btn" data-field="phone">修改</button>
+            </li>
+            <li>
+                <strong>商家类别：</strong>
+                {% set type_map = {'hotel':'酒店住宿','attraction':'旅游景区','restaurant':'餐饮美食','other':'其他服务'} %}
+                {{ type_map.get(merchant.business_type, merchant.business_type) }}
+                <button class="edit-btn" data-field="business_type">修改</button>
+            </li>
+            <li>
+                <strong>账号状态：</strong>
+                {% set status_map = {'pending':'审核中','active':'活跃','suspended':'暂停使用'} %}
+                {{ status_map.get(merchant.status, merchant.status) }}
+            </li>
+            <li>
+                <strong>密码：</strong>********
+                <button class="edit-btn" data-field="password">修改</button>
+            </li>
+        </ul>
+    </div>
+    <div class="section">
+        <h3 class="section-title">店铺信息</h3>
+        {% if shop_info %}
+        {% set type_map = {'hotel':'酒店住宿','attraction':'旅游景区','restaurant':'餐饮美食','other':'其他服务'} %}
+        {% set price_map = {'budget':'经济型','standard':'标准型','mid_range':'中档型','luxury':'高档型'} %}
+        <ul class="info-list">
+            <li><strong>店铺名称：</strong>{{ shop_info.name }}</li>
+            <li><strong>类别：</strong>{{ type_map.get(shop_info.category, shop_info.category) }}</li>
+            <li><strong>价格区间：</strong>{{ price_map.get(shop_info.price_range, shop_info.price_range) }}</li>
+            <li><strong>描述：</strong>{{ shop_info.description }}</li>
+            <li><strong>地址：</strong>{{ shop_info.address }}</li>
+            <li><strong>城市：</strong>{{ shop_info.city }}</li>
+            <li><strong>区域：</strong>{{ shop_info.district }}</li>
+            <li><strong>电话：</strong>{{ shop_info.phone }}</li>
+            <li><strong>邮箱：</strong>{{ shop_info.email }}</li>
+            <li><strong>网站：</strong>{{ shop_info.website }}</li>
+            <li><strong>微信：</strong>{{ shop_info.wechat }}</li>
+            <li><strong>节假日说明：</strong>{{ shop_info.holiday_info }}</li>
+            <li><strong>营业时间：</strong>
+                <ul>
+                {% for bh in shop_info.business_hours %}
+                    <li>{{ bh.day }}: {% if bh.isOpen %}{{ bh.startTime }}-{{ bh.endTime }}{% else %}休息{% endif %}</li>
+                {% endfor %}
+                </ul>
+            </li>
+            <li><strong>服务项目：</strong>
+                <ul>
+                {% for s in shop_info.service_items %}
+                    <li>{{ s.name }} - {{ s.price }}元</li>
+                {% endfor %}
+                </ul>
+            </li>
+            <li><strong>店铺图片：</strong>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                {% for img in shop_info.images %}
+                    <img src="{{ img }}" class="image-preview">
+                {% endfor %}
+                </div>
+            </li>
+        </ul>
+        {% else %}
+        <div style="color:#e74c3c;">暂无店铺信息，请先完善店铺信息。</div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- 通用弹窗 -->
+<div class="modal-backdrop" id="modal-backdrop"></div>
+<div class="modal-dialog" id="modal-dialog">
+    <button class="modal-close" id="modal-close">&times;</button>
+    <div class="modal-title" id="modal-title"></div>
+    <form id="modal-form">
+        <div id="modal-field"></div>
+        <div class="modal-actions">
+            <button type="submit" class="btn-primary">保存</button>
+            <button type="button" class="btn-secondary" id="modal-cancel">取消</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+const fieldMap = {
+    username: { label: '用户名', type: 'text', value: '{{ merchant.username }}' },
+    email: { label: '邮箱', type: 'email', value: '{{ merchant.email }}' },
+    phone: { label: '手机号', type: 'text', value: '{{ merchant.phone }}' },
+    business_type: { label: '商家类别', type: 'text', value: '{{ merchant.business_type }}' },
+    password: { label: '密码', type: 'password', value: '' }
+};
+
+function showModal(field) {
+    const dialog = document.getElementById('modal-dialog');
+    const backdrop = document.getElementById('modal-backdrop');
+    const title = document.getElementById('modal-title');
+    const fieldDiv = document.getElementById('modal-field');
+    const form = document.getElementById('modal-form');
+    const info = fieldMap[field];
+    title.textContent = '修改' + info.label;
+    fieldDiv.innerHTML = `<label>${info.label}</label>
+        <input type="${info.type}" name="value" class="form-control" value="${info.value}" required>`;
+    form.dataset.field = field;
+    dialog.style.display = 'block';
+    backdrop.style.display = 'block';
+}
+
+function hideModal() {
+    document.getElementById('modal-dialog').style.display = 'none';
+    document.getElementById('modal-backdrop').style.display = 'none';
+}
+
+document.querySelectorAll('.edit-btn').forEach(btn => {
+    btn.onclick = function() {
+        showModal(this.dataset.field);
+    };
+});
+document.getElementById('modal-close').onclick = hideModal;
+document.getElementById('modal-cancel').onclick = hideModal;
+document.getElementById('modal-backdrop').onclick = hideModal;
+
+// 异步提交单项修改
+document.getElementById('modal-form').onsubmit = function(e) {
+    e.preventDefault();
+    const field = this.dataset.field;
+    const value = this.value.value.trim();
+    if (!value) { alert('请输入内容'); return; }
+    fetch('{{ url_for("merchant_center.edit_account_field") }}', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ field, value })
+    }).then(res => res.json()).then(result => {
+        if (result.success) {
+            alert('修改成功');
+            location.reload();
+        } else {
+            alert(result.message || '修改失败');
+        }
+    });
+};
+
+</script>
+{% endblock %}

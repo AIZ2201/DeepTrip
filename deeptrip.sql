@@ -11,7 +11,7 @@
  Target Server Version : 80402 (8.4.2)
  File Encoding         : 65001
 
- Date: 12/09/2025 15:25:51
+ Date: 15/09/2025 17:08:44
 */
 
 SET NAMES utf8mb4;
@@ -50,6 +50,7 @@ CREATE TABLE `feedback`  (
   `service_rating` int NOT NULL,
   `value_rating` int NOT NULL,
   `feedback_content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
+  `feedback_content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
   `images` json NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `merchant_feedback` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
@@ -68,7 +69,6 @@ DROP TABLE IF EXISTS `merchant_login`;
 CREATE TABLE `merchant_login`  (
   `id` int NOT NULL AUTO_INCREMENT,
   `username` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `phone` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
@@ -76,12 +76,13 @@ CREATE TABLE `merchant_login`  (
   `status` enum('pending','active','suspended') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT 'pending',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of merchant_login
 -- ----------------------------
-INSERT INTO `merchant_login` VALUES (1, '1234', '1234', '111@111.com', '12345679801', '11111111', 'hotel', 'pending', '2025-09-09 10:09:53');
+INSERT INTO `merchant_login` VALUES (1, '12', '111@111.com', '12345679801', '11111111', 'hotel', 'active', '2025-09-09 10:09:53');
+INSERT INTO `merchant_login` VALUES (2, '1143', '113@111.com', '15345678901', '111', 'hotel', 'pending', '2025-09-15 14:45:07');
 
 -- ----------------------------
 -- Table structure for merchant_order
@@ -174,7 +175,7 @@ CREATE TABLE `shop_info`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `shop_info_merchant_login_id_fk`(`merchant_id` ASC) USING BTREE,
   CONSTRAINT `shop_info_merchant_login_id_fk` FOREIGN KEY (`merchant_id`) REFERENCES `merchant_login` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of shop_info
@@ -196,12 +197,13 @@ CREATE TABLE `user_login`  (
   `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `phonenumber` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of user_login
 -- ----------------------------
 INSERT INTO `user_login` VALUES (1, '11', 'a1111111', '112@111.com', '18172645645');
+INSERT INTO `user_login` VALUES (2, '434', '11111111', '123@111.com', '18172641645');
 
 SET FOREIGN_KEY_CHECKS = 1;
 

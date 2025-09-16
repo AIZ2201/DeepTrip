@@ -35,3 +35,37 @@ class Admin(db.Model):
     email = db.Column(db.String(64), unique=True, nullable=False)
     password = db.Column(db.String(64), nullable=False)
     # ...existing code...
+
+class Merchant(db.Model):
+    __tablename__ = 'merchant_login'
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(32), unique=True, nullable=False)
+    email = db.Column(db.String(64), unique=True, nullable=False)
+    phone = db.Column(db.String(16), unique=True, nullable=False)
+    password = db.Column(db.String(64), nullable=False)
+    business_type = db.Column(db.String(32), nullable=False)
+    status = db.Column(db.String(16), nullable=False, default='pending')
+    # 可根据实际表结构补充其它字段
+
+class ShopInfo(db.Model):
+    __tablename__ = 'shop_info'
+    id = db.Column(db.Integer, primary_key=True)
+    merchant_id = db.Column(db.Integer, db.ForeignKey('merchant_login.id'), nullable=False)
+    name = db.Column(db.String(128), nullable=False)
+    category = db.Column(db.String(32), nullable=False)
+    price_range = db.Column(db.String(32), nullable=False)
+    description = db.Column(db.Text, nullable=False)
+    address = db.Column(db.String(256), nullable=False)
+    city = db.Column(db.String(64), nullable=False)
+    district = db.Column(db.String(64), nullable=False)
+    phone = db.Column(db.String(32), nullable=False)
+    email = db.Column(db.String(128), nullable=True)
+    website = db.Column(db.String(128), nullable=True)
+    wechat = db.Column(db.String(64), nullable=True)
+    holiday_info = db.Column(db.Text, nullable=True)
+    images = db.Column(db.Text, nullable=True)
+    business_hours = db.Column(db.Text, nullable=True)
+    service_items = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, nullable=True)
+    status = db.Column(db.String(16), nullable=False, default='nsave')
+    # ...existing code...

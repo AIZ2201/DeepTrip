@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
-from models import db, Admin  # 只从models导入
+from models import db, Admin, User, Merchant
 from admin_login import AdminLogin
 from datetime import datetime, timedelta, date
 from sqlalchemy import text
@@ -31,16 +31,12 @@ def admin_login():
             return jsonify({
                 'success': True,
                 'message': '登录成功',
-                'redirect': url_for('admin.admin_dashboard')
+                'redirect': url_for('admin_dashboard.dashboard')  # 修改这里
             })
         else:
             session['admin'] = None
             return jsonify({'success': False, 'message': '邮箱或密码错误，或账号未激活'})
     return render_template('admin_login.html')
-
-@admin_bp.route('/admin/dashboard')
-def admin_dashboard():
-    return render_template('admin_dashboard.html')
 
 @admin_bp.route('/admin/merchant/review')
 def admin_merchant_review():
@@ -49,3 +45,14 @@ def admin_merchant_review():
 @admin_bp.route('/admin/data/report')
 def admin_data_report():
     return render_template('admin_data_report.html')
+    # 查询活跃商户数
+    active_merchants = db.session.query(Merchant).filter(Merchant.status == 'active').count()
+    # 订单和交易额暂未实现
+    orders_today = 0
+    total_amount = 0
+    return render_template('admin_dashboard.html',
+        total_users=total_users,
+        active_merchants=active_merchants,
+        orders_today=orders_today,
+        total_amount=total_amount
+    )
