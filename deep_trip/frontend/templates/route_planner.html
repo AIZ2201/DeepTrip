@@ -320,19 +320,19 @@
         <form id="route-form">
             <div class="form-group">
                 <label for="start-city">起点城市</label>
-                <input type="text" id="start-city" name="start-city" class="form-control" placeholder="请输入起点城市" required>
+                <input type="text" id="start-city" name="start_city" class="form-control" placeholder="请输入起点城市" required>
             </div>
             <div class="form-group">
                 <label for="end-city">终点城市</label>
-                <input type="text" id="end-city" name="end-city" class="form-control" placeholder="请输入终点城市" required>
+                <input type="text" id="end-city" name="end_city" class="form-control" placeholder="请输入终点城市" required>
             </div>
             <div class="form-group">
                 <label for="start-date">开始日期</label>
-                <input type="date" id="start-date" name="start-date" class="form-control" required>
+                <input type="date" id="start-date" name="start_date" class="form-control" required>
             </div>
             <div class="form-group">
                 <label for="end-date">结束日期</label>
-                <input type="date" id="end-date" name="end-date" class="form-control" required>
+                <input type="date" id="end-date" name="end_date" class="form-control" required>
             </div>
             <div class="form-group">
                 <label for="budget">预算 (元)</label>
@@ -341,7 +341,7 @@
             <div class="form-group">
                 <label>兴趣标签</label>
                 <div class="tag-selection">
-                    {% for tag in ['自然风光', '历史文化', '美食探索', '购物血拼', '亲子活动', '户外探险', '艺术展览', '休闲度假'] %}
+                    {% for tag in ['自然风光', '历史文化', '美食探索', '亲子活动', '户外探险', '艺术展览', '休闲度假'] %}
                         <label class="checkbox-tag">
                             <input type="checkbox" name="interests" value="{{ tag }}">
                             <span>{{ tag }}</span>
@@ -355,10 +355,10 @@
     
     <div class="route-results">
         <h3>我的AI路线</h3>
-        <div class="route-list">
+        <div class="route-list" id="route-list">
             {% if routes %}
                 {% for route in routes %}
-                <div class="route-card">
+                <div class="route-card" data-route-id="{{ route.id }}">
                     <div class="route-header">
                         <h4 class="route-title">{{ route.start }} → {{ route.end }}</h4>
                         <span class="tag">{{ route.tags or '无标签' }}</span>
@@ -399,27 +399,89 @@
         </div>
     </div>
 </div>
-
 {% endblock %}
 
 {% block js %}
 <script>
+    // 路线数据缓存
+    let routes = {{ routes|tojson }};
+    // 表单提交处理
+    document.getElementById('route-form').onsubmit = function(e) {
+        e.preventDefault();
+        // 校验必填项
+        const start = document.getElementById('start-city').value.trim();
+        const end = document.getElementById('end-city').value.trim();
+        const startDate = document.getElementById('start-date').value;
+        const endDate = document.getElementById('end-date').value;
+        const budget = document.getElementById('budget').value.trim();
+        if (!start || !end || !startDate || !endDate || !budget) {
+            alert('请填写所有必填项');
+            return;
+        }
+        const formData = new FormData(this);
+        const btn = this.querySelector('button[type="submit"]');
+        btn.disabled = true;
+        btn.textContent = '生成中...';
+        fetch('/route/planner', {
+            method: 'POST',
+            body: formData
+        }).then(r=>r.json()).then(res=>{
+            if(res.success && res.route){
+                // 新路线插入到前端
+                routes.unshift(res.route);
+                const route = res.route;
+                const routeList = document.getElementById('route-list');
+                const tagsHtml = (route.tags||'').split(',').filter(Boolean).map(t=>`<span class="tag">${t}</span>`).join('');
+                const card = document.createElement('div');
+                card.className = 'route-card';
+                card.setAttribute('data-route-id', route.id);
+                card.innerHTML = `
+                    <div class="route-header">
+                        <h4 class="route-title">${route.start} → ${route.end}</h4>
+                        <span class="tag">${route.tags||'无标签'}</span>
+                    </div>
+                    <div>
+                        <span>天数：</span>${route.days}<br>
+                        <span>预算：</span>${route.budget}
+                    </div>
+                    <div class="route-tags" style="margin: 10px 0;">
+                        ${tagsHtml}
+                    </div>
+                    <button class="btn btn-secondary view-route" data-route-id="${route.id}">查看详情</button>
+                `;
+                routeList.insertBefore(card, routeList.firstChild);
+                // 绑定查看详情事件
+                card.querySelector('.view-route').onclick = function() {
+                    showRouteDetail(route.id);
+                };
+                // 自动弹出详情
+                showRouteDetail(route.id);
+            } else {
+                alert(res.msg || '生成失败');
+            }
+        }).catch(()=>{
+            alert('生成失败');
+        }).finally(()=>{
+            btn.disabled = false;
+            btn.textContent = '生成路线';
+        });
+    };
+
+    // 查看路线详情
+    function showRouteDetail(routeId) {
+        const route = routes.find(r => r.id == routeId);
+        document.getElementById('modal-title').textContent = route ? (route.start + " → " + route.end + " 详情") : "路线详情";
+        document.getElementById('modal-content').innerHTML = route && route.description
+            ? route.description.replace(/\n/g, '<br>')
+            : '暂无详情';
+        document.getElementById('route-modal').style.display = 'block';
+    }
     document.addEventListener('DOMContentLoaded', function() {
-        // 查看路线详情
         document.querySelectorAll('.view-route').forEach(button => {
             button.addEventListener('click', function() {
-                const routeId = this.getAttribute('data-route-id');
-                // 在页面变量routes中查找对应description
-                const routes = {{ routes|tojson }};
-                const route = routes.find(r => r.id == routeId);
-                document.getElementById('modal-title').textContent = route ? (route.start + " → " + route.end + " 详情") : "路线详情";
-                document.getElementById('modal-content').innerHTML = route && route.description
-                    ? route.description.replace(/\n/g, '<br>')
-                    : '暂无详情';
-                document.getElementById('route-modal').style.display = 'block';
+                showRouteDetail(this.getAttribute('data-route-id'));
             });
         });
-        // 关闭模态框
         document.querySelectorAll('.close-modal').forEach(btn => {
             btn.addEventListener('click', function() {
                 document.getElementById('route-modal').style.display = 'none';
