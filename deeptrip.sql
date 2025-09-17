@@ -11,7 +11,7 @@
  Target Server Version : 80402 (8.4.2)
  File Encoding         : 65001
 
- Date: 16/09/2025 11:25:56
+ Date: 17/09/2025 17:21:44
 */
 
 SET NAMES utf8mb4;
@@ -47,7 +47,7 @@ CREATE TABLE `feedback`  (
   `service_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `overall_rating` int NOT NULL,
   `environment_rating` int NOT NULL,
-  `service_rating` int NOT NULL,、、
+  `service_rating` int NOT NULL,
   `value_rating` int NOT NULL,
   `feedback_content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
   `images` json NULL,
@@ -64,6 +64,29 @@ CREATE TABLE `feedback`  (
 -- ----------------------------
 -- Records of feedback
 -- ----------------------------
+
+-- ----------------------------
+-- Table structure for main_route
+-- ----------------------------
+DROP TABLE IF EXISTS `main_route`;
+CREATE TABLE `main_route`  (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int NOT NULL,
+  `start` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `end` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `days` int NOT NULL,
+  `budget` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `tags` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `main_route_user_login_id_fk`(`user_id` ASC) USING BTREE,
+  CONSTRAINT `main_route_user_login_id_fk` FOREIGN KEY (`user_id`) REFERENCES `user_login` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of main_route
+-- ----------------------------
+INSERT INTO `main_route` VALUES (7, 1, '南京', '无锡', 4, '2000元', '未明确', '根据您从南京出发至无锡的自驾需求，结合途经城市特色景点及预算控制，为您定制以下5日深度游方案：\n\n**行程整体概述**\n自驾路线贯穿宁镇常锡四城精华景点，融合自然风光与人文景观，全程预算严格控制在2000元内。精选【栖霞山秋色】【镇江三山文化】【常州恐龙主题】【太湖绝佳处】四大核心体验，住宿优选高评分性价比酒店。\n\n---\n\n**每日详细行程**\n\n**DAY1（10.1）南京→镇江**\n🚗交通：南京市区→栖霞山（30分钟）→镇江金山景区（1小时）\n📍景点：\n1. 【栖霞山】（2.5小时）秋日红叶胜地，登千佛岩俯瞰长江，红枫与古刹相映成趣\n2. 【金山寺】（2小时）白娘子传说发源地，登慈寿塔赏\"江天一览\"胜景\n🍜美食：镇江锅盖面（推荐肴肉面+水晶肴肉）\n🏨住宿：镇江精选经济型酒店（约200元/晚）\n\n**DAY2（10.2）镇江→常州**\n🚗交通：镇江→句容茅山（1小时）→常州环球恐龙城（1.5小时）\n📍景点：\n1. 【茅山景区】（3小时）道教圣地，乘索道登顶感悟\"第一福地\"\n2. 【环球恐龙城】（3小时）沉浸式恐龙主题乐园，夜游迪诺水镇灯光秀\n🍜美食：常州银丝面+蟹粉小笼包\n🏨住宿：常州精选商务酒店（约220元/晚）\n\n**DAY3（10.3）常州→无锡**\n🚗交通：常州→无锡鼋头渚（1.5小时）\n📍景点：\n1. 【鼋头渚】（4小时）太湖第一名胜，乘船观太湖仙岛，赏中秋明月\n2. 【蠡园】（2小时）范蠡西施传说地，江南园林典范\n🍜美食：太湖三白（银鱼/白虾/白鱼）\n🏨住宿：无锡梅里古镇亚朵酒店（参考价300元/晚）\n\n**DAY4（10.4）无锡深度游**\n📍景点：\n1. 【灵山胜境】（4小时）88米青铜大佛+梵宫精粹，参与中秋禅修体验\n2. 【惠山古镇】（3小时）千年祠堂建筑群，体验惠山泥人手作\n🍜美食：无锡小笼包+三凤桥酱排骨\n🏨住宿：美丽豪酒店（参考价280元/晚）\n\n**DAY5（10.5）返程**\n🚗交通：无锡→南京（2.5小时）\n📍景点：根据返程时间灵活调整，建议：\n- 无锡博物院（免费）了解吴文化\n- 南长街运河畔品早茶\n\n---\n\n**预算概算**\n💰总预算：1980元\n1. 交通：油费+过路费 300元\n2. 住宿：200+220+300+280=1000元\n3. 餐饮：60元/天×5=300元\n4. 门票：\n   - 栖霞山40+金山65+茅山120+恐龙城230+鼋头渚90+灵山210=755元\n   （注：提前1天网购享9折优惠，实付680元）\n\n---\n\n**行程亮点**\n1. 中秋特别体验：鼋头渚赏月专线+灵山抄经活动\n2. 错峰设计：首日避开南京热门景区，直达栖霞山赏初秋红叶\n3. 文化动线：金山寺→茅山→灵山构成宗教文化脉络\n\n建议携带汉服/旗袍在惠山古镇拍摄，无锡段行程可购买【文旅联票】享折扣。自驾注意沪宁高速节假日前夕拥堵，建议每日8:00前出发。');
 
 -- ----------------------------
 -- Table structure for merchant_login
@@ -159,24 +182,6 @@ CREATE TABLE `orders`  (
 
 -- ----------------------------
 -- Records of orders
--- ----------------------------
-
--- ----------------------------
--- Table structure for password_reset_codes
--- ----------------------------
-DROP TABLE IF EXISTS `password_reset_codes`;
-CREATE TABLE `password_reset_codes`  (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `code` varchar(6) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `expire_at` datetime NOT NULL,
-  `used` tinyint(1) NOT NULL DEFAULT 0,
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
-
--- ----------------------------
--- Records of password_reset_codes
 -- ----------------------------
 
 -- ----------------------------
