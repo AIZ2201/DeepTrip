@@ -6,6 +6,7 @@ from ..gaode_agent.agent import parse_gaode_result
 from ..xiecheng_agent.agent import XiechengAgent
 from ..food_agent.agent import Agent as FoodAgent
 from ..tourism_agent.agent import Agent as TourismAgent
+from agent.xiecheng_agent.agent import XiechengAgent
 from .dataclass import (
     UserTravelPreference, 
     TravelRoute,  # 导入单个路线的数据类

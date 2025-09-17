@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
-from models import db, Admin, User, Merchant
-from admin_login import AdminLogin
+from .models import db, Admin, User, Merchant
+from .admin_login import AdminLogin
 from datetime import datetime, timedelta, date
 from sqlalchemy import text
 import re

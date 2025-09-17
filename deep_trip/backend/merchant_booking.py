@@ -1,6 +1,6 @@
 # 在文件顶部添加缺失的导入
 from flask import Blueprint, render_template, request, redirect, url_for, session
-from models import db
+from .models import db
 from sqlalchemy import text
 import math
 from datetime import datetime, timedelta

@@ -1,5 +1,5 @@
 # user_register.py
-from db_util import get_db_connection
+from .db_util import get_db_connection
 
 class UserRegister:
     def register_user(self, username, email, phone, password):

@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, jsonify
-from models import db, Merchant, ShopInfo
+from .models import db, Merchant, ShopInfo
 from sqlalchemy import or_
 
 admin_merchant_review_bp = Blueprint('admin_merchant_review', __name__)

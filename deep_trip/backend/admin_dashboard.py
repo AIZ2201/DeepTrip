@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, session, redirect, url_for
-from models import db, User, Merchant
+from .models import db, User, Merchant
 
 admin_dashboard_bp = Blueprint('admin_dashboard', __name__)
 

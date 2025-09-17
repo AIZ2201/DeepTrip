@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from db_util import get_db_connection
+from .db_util import get_db_connection
 
 merchant_register_bp = Blueprint('merchant_register', __name__)
 

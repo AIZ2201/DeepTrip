@@ -1,8 +1,10 @@
+import sys
+import os
 import json
 import requests
 import pandas as pd
 from .config import Config
-import os
+
 class XiechengAgent:
     def __init__(self):
         self.config = Config()

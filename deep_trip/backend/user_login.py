@@ -1,4 +1,4 @@
-from db_util import get_db_connection
+from .db_util import get_db_connection
 from pymysql.cursors import DictCursor
 
 class UserLogin:

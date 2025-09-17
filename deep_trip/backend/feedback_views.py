@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, render_template, request, redirect, url_for, session, flash
-from models import db, Feedback, User  # 假设你的模型名为 Feedback, User
+from .models import db, Feedback, User  # 假设你的模型名为 Feedback, User
 import datetime
 import json
 from sqlalchemy import text  # 导入text函数用于SQL查询

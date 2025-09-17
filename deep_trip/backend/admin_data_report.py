@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, jsonify
-from models import db, User, Merchant
+from .models import db, User, Merchant
 from datetime import datetime, timedelta, date
 from sqlalchemy import text
 import json

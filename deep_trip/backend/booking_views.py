@@ -1,6 +1,6 @@
 # 完整修改后的booking_views.py
 from flask import Blueprint, render_template, request, jsonify, session
-from models import db
+from .models import db
 from sqlalchemy import text, func
 import json
 import re

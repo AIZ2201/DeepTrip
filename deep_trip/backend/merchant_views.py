@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
-from models import db
-from merchant_login import MerchantAuth
+from .models import db
+from .merchant_login import MerchantAuth
 from sqlalchemy import text
 from datetime import datetime, timedelta, date
 import re

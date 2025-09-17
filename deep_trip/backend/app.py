@@ -1,26 +1,26 @@
 # app.py
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
-from user_views import user_bp
+from .user_views import user_bp
 from datetime import timedelta
 import os
-from merchant_login import MerchantAuth   # <- 如果你的文件叫 merchant_login.py，就改成 from merchant_login import MerchantAuth
-from feedback_views import feedback_bp
-from merchant_feedback import merchant_feedback_bp
-from merchant_info_upload import merchant_info_bp
-from merchant_booking import merchant_booking_bp
-from admin_views import admin_bp
-from models import db
+from .merchant_login import MerchantAuth   # <- 如果你的文件叫 merchant_login.py，就改成 from merchant_login import MerchantAuth
+from .feedback_views import feedback_bp
+from .merchant_feedback import merchant_feedback_bp
+from .merchant_info_upload import merchant_info_bp
+from .merchant_booking import merchant_booking_bp
+from .admin_views import admin_bp
+from .models import db
 from sqlalchemy import text
 from datetime import datetime, timedelta, date
-from merchant_views import merchant_bp
-from booking_views import booking_bp
-from ai_views import ai_bp
-from route_views import route_bp
-from merchant_center import merchant_center_bp
-from merchant_register import merchant_register_bp
-from admin_dashboard import admin_dashboard_bp
-from admin_merchant_review import admin_merchant_review_bp
-from admin_data_report import admin_data_report_bp
+from .merchant_views import merchant_bp
+from .booking_views import booking_bp
+from .ai_views import ai_bp
+from .route_views import route_bp
+from .merchant_center import merchant_center_bp
+from .merchant_register import merchant_register_bp
+from .admin_dashboard import admin_dashboard_bp
+from .admin_merchant_review import admin_merchant_review_bp
+from .admin_data_report import admin_data_report_bp
 import pymysql
 from pymysql.cursors import DictCursor
 import configparser

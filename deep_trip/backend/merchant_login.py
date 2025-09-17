@@ -1,5 +1,5 @@
 # merchant_login.py
-from db_util import get_db_connection
+from .db_util import get_db_connection
 from pymysql.cursors import DictCursor
 from datetime import datetime, timedelta
 import random
