@@ -3,7 +3,6 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 from .user_views import user_bp
 from datetime import timedelta
 import os
-from .merchant_login import MerchantAuth   # <- 如果你的文件叫 merchant_login.py，就改成 from merchant_login import MerchantAuth
 from .feedback_views import feedback_bp
 from .merchant_feedback import merchant_feedback_bp
 from .merchant_info_upload import merchant_info_bp

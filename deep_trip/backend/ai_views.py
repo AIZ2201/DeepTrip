@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify, render_template, session
-from agent.chat_agent.agent import ChatAgent
-from agent.chat_agent.key_point_extract import get_response, system_prompt
+from ...agent.chat_agent.agent import ChatAgent
+from ...agent.chat_agent.key_point_extract import get_response, system_prompt
 import json
 
 ai_bp = Blueprint('ai', __name__, url_prefix='/ai')
