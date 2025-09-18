@@ -68,7 +68,6 @@ def ai_chat():
     if 'route_id' not in session:
         session['route_id'] = None
 
-    # 聊天历史仅在本地变量，不再存 session
     if 'ai_messages' in session:
         messages = session['ai_messages']
     else:
@@ -94,13 +93,11 @@ def ai_chat():
 
     if user_input or flag == True:
         messages.append({"role": "user", "content": user_input})
-        # 只要还没收集到完整字典，就继续交互
         if state == "collecting":
             response = get_response(messages)
             assistant_content = response.choices[0].message.content
             messages.append({"role": "assistant", "content": assistant_content})
 
-            # 判断是否为最终字典
             is_final_dict = (
                 "{" in assistant_content and "}" in assistant_content
                 and all(key in assistant_content for key in ["出发点", "目的地", "行程时间"])
@@ -117,17 +114,16 @@ def ai_chat():
                     if travel_dict.get(key) == ["无"]:
                         travel_dict[key] = ["未明确"]
                 session['ai_travel_dict'] = travel_dict
-                session['ai_state'] = "finished"
-                state = "finished"
+                session['ai_state'] = "confirm"
+                state = "confirm"
                 flag = True
 
-                # 新增：保存路线基本信息到main_route
+                # 保存路线基本信息到main_route
                 user = session.get('user')
                 if user:
                     user_id = user.get('id')
                     start = travel_dict.get("出发点", "")[:20]
                     end = travel_dict.get("目的地", "")[:20]
-                    # 计算天数
                     days = 1
                     try:
                         in_date = travel_dict.get("行程时间", {}).get("入住日期", "")
@@ -164,13 +160,14 @@ def ai_chat():
                         if conn:
                             conn.close()
                 else:
-                    # 未登录用户不保存路线
                     session['route_id'] = None
-                ai_reply = "已获取你的完整旅游偏好，整理如下：<br>" + json.dumps(travel_dict, ensure_ascii=False, indent=2) + "<br>输入任意内容后为您生成完整旅游规划"
+                ai_reply = "已获取你的完整旅游偏好，整理如下：<br>" + json.dumps(travel_dict, ensure_ascii=False, indent=2) + "<br>如无误，请输入任意内容为您生成完整旅游规划"
             else:
                 ai_reply = assistant_content
-        else:
-            # 已收集完毕，直接调用 ChatAgent 生成规划
+
+        elif state == "confirm":
+            # 用户确认后，生成完整规划
+            travel_dict = session.get('ai_travel_dict')
             if not travel_dict:
                 ai_reply = "会话已失效，请刷新页面重新开始。"
                 session.clear()
@@ -185,14 +182,13 @@ def ai_chat():
                 travel_plan = agent.generate_comprehensive_travel_plan()
                 ai_reply = f"{travel_plan}"
 
-                # 仅在已登录且有 route_id 时自动保存
+                # 自动保存
                 user = session.get('user')
                 route_id = session.get('route_id')
                 if user and route_id and travel_plan:
                     conn = db.engine.raw_connection()
                     try:
                         with conn.cursor() as cur:
-                            # 直接存储完整 travel_plan，不做截断
                             cur.execute("UPDATE main_route SET description=%s WHERE id=%s", (travel_plan, route_id))
                             conn.commit()
                     except Exception as e:
@@ -201,13 +197,18 @@ def ai_chat():
                         traceback.print_exc()
                     finally:
                         conn.close()
+                session['ai_state'] = "finished"
             except Exception as e:
                 import traceback
                 traceback.print_exc()
                 ai_reply = "生成旅游规划时发生错误，请稍后重试。"
+
+        else:
+            # 已生成规划后继续对话
+            ai_reply = "如需重新规划，请刷新页面。"
+
         chat_msgs.append({'sender': 'user', 'content': user_input})
         chat_msgs.append({'sender': 'ai', 'content': ai_reply})
-        # 只保存最近10条消息到 session，防止 session 过大
         session['ai_messages'] = messages[-10:]
         session.modified = True
         return jsonify({'user_input': user_input, 'ai_reply': ai_reply})
