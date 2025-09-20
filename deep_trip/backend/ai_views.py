@@ -1,80 +1,32 @@
 from flask import Blueprint, request, jsonify, render_template, session
 from ...agent.chat_agent.agent import ChatAgent
 from ...agent.chat_agent.key_point_extract import get_response, system_prompt
-from .models import db
-from sqlalchemy import text
 import json
 
 ai_bp = Blueprint('ai', __name__, url_prefix='/ai')
 
 def clean_city(name):
-    provinces = ["河北","山西","辽宁","吉林","黑龙江","江苏","浙江","安徽","福建","江西","山东","河南","湖北","湖南","广东","海南","四川","贵州","云南","陕西","甘肃","青海","台湾","内蒙古","广西","宁夏","新疆","西藏","香港","澳门"]
+    provinces = [
+        "河北","山西","辽宁","吉林","黑龙江","江苏","浙江","安徽","福建","江西","山东",
+        "河南","湖北","湖南","广东","海南","四川","贵州","云南","陕西","甘肃","青海",
+        "台湾","内蒙古","广西","宁夏","新疆","西藏","香港","澳门"
+    ]
     for p in provinces:
         if name.startswith(p):
             return name.replace(p, "").strip()
     return name
 
-def parse_travel_plan(plan_text):
-    """
-    解析AI返回的旅游规划文本，提取description、每日行程、预算等信息。
-    返回: description(str), days(list of str), budget(str)
-    """
-    import re
-    # description: 首行
-    lines = plan_text.strip().splitlines()
-    description = ""
-    days = []
-    budget = ""
-    day_section = False
-    budget_section = False
-    day_buffer = []
-    for line in lines:
-        if not description and line.strip():
-            description = line.strip()
-            continue
-        if "每日详细行程" in line:
-            day_section = True
-            continue
-        if day_section and (line.strip().startswith("###") or line.strip().startswith("---")):
-            continue
-        if day_section and re.match(r"^####?\s*DAY\d+", line, re.I):
-            if day_buffer:
-                days.append('\n'.join(day_buffer).strip())
-                day_buffer = []
-            day_buffer.append(line)
-            continue
-        if day_section and (line.strip().startswith("### 预算概算") or "预算概算" in line):
-            if day_buffer:
-                days.append('\n'.join(day_buffer).strip())
-                day_buffer = []
-            day_section = False
-            budget_section = True
-            continue
-        if day_section:
-            day_buffer.append(line)
-        if budget_section:
-            budget += line + "\n"
-    if day_buffer:
-        days.append('\n'.join(day_buffer).strip())
-    budget = budget.strip()
-    return description, days, budget
-
 @ai_bp.route('/chat', methods=['GET', 'POST'])
 def ai_chat():
-    if 'ai_state' not in session:
+    # 初始化session
+    if 'ai_messages' not in session:
+        session['ai_messages'] = [{"role": "system", "content": system_prompt}]
         session['ai_state'] = "collecting"
-    if 'ai_travel_dict' not in session:
         session['ai_travel_dict'] = None
-    if 'route_id' not in session:
-        session['route_id'] = None
 
-    if 'ai_messages' in session:
-        messages = session['ai_messages']
-    else:
-        messages = [{"role": "system", "content": system_prompt}]
+    messages = session['ai_messages']
     state = session.get('ai_state', "collecting")
     travel_dict = session.get('ai_travel_dict')
-    route_id = session.get('route_id')
 
     if request.method == 'GET':
         # 首次进入页面
@@ -83,21 +35,20 @@ def ai_chat():
         session.modified = True
         return render_template('ai_chat.html', chat_sessions=[], chat=None, messages=chat_msgs)
 
-    user_input = request.form.get('user_input', '')
-    if user_input is not None:
-        user_input = user_input.strip()
-    else:
-        user_input = ''
+    user_input = request.form.get('user_input', '').strip()
     chat_msgs = []
     flag = False
 
-    if user_input or flag == True:
+    if user_input or flag:
         messages.append({"role": "user", "content": user_input})
+
+        # 信息收集阶段
         if state == "collecting":
             response = get_response(messages)
             assistant_content = response.choices[0].message.content
             messages.append({"role": "assistant", "content": assistant_content})
 
+            # 判断是否为最终字典
             is_final_dict = (
                 "{" in assistant_content and "}" in assistant_content
                 and all(key in assistant_content for key in ["出发点", "目的地", "行程时间"])
@@ -114,59 +65,36 @@ def ai_chat():
                     if travel_dict.get(key) == ["无"]:
                         travel_dict[key] = ["未明确"]
                 session['ai_travel_dict'] = travel_dict
-                session['ai_state'] = "confirm"
-                state = "confirm"
-                flag = True
-
-                # 保存路线基本信息到main_route
-                user = session.get('user')
-                if user:
-                    user_id = user.get('id')
-                    start = travel_dict.get("出发点", "")[:20]
-                    end = travel_dict.get("目的地", "")[:20]
-                    days = 1
-                    try:
-                        in_date = travel_dict.get("行程时间", {}).get("入住日期", "")
-                        out_date = travel_dict.get("行程时间", {}).get("离店日期", "")
-                        if len(in_date) == 8 and len(out_date) == 8:
-                            from datetime import datetime
-                            d1 = datetime.strptime(in_date, "%Y%m%d")
-                            d2 = datetime.strptime(out_date, "%Y%m%d")
-                            days = (d2 - d1).days
-                            if days < 1:
-                                days = 1
-                    except Exception:
-                        days = 1
-                    budget = str(travel_dict.get("经费预算", ""))[:20]
-                    tags = ",".join(travel_dict.get("特殊需求", []))[:255]
-                    conn = None
-                    try:
-                        conn = db.engine.raw_connection()
-                        with conn.cursor() as cur:
-                            cur.execute(
-                                "INSERT INTO main_route (user_id, start, end, days, budget, tags, description) VALUES (%s,%s,%s,%s,%s,%s,'')",
-                                (user_id, start, end, days, budget, tags)
-                            )
-                            conn.commit()
-                            cur.execute("SELECT LAST_INSERT_ID()")
-                            rid = cur.fetchone()[0]
-                            session['route_id'] = rid
-                    except Exception as e:
-                        import traceback
-                        print("插入main_route异常:", e)
-                        traceback.print_exc()
-                        session['route_id'] = None
-                    finally:
-                        if conn:
-                            conn.close()
-                else:
-                    session['route_id'] = None
-                ai_reply = "已获取你的完整旅游偏好，整理如下：<br>" + json.dumps(travel_dict, ensure_ascii=False, indent=2) + "<br>如无误，请输入任意内容为您生成完整旅游规划"
+                # 格式化关键信息供用户确认
+                confirm_text = (
+                    f"请确认以下信息：<br>"
+                    f"出发点：{travel_dict.get('出发点','')}<br>"
+                    f"目的地：{travel_dict.get('目的地','')}<br>"
+                    f"入住日期：{travel_dict.get('行程时间',{}).get('入住日期','')}<br>"
+                    f"离店日期：{travel_dict.get('行程时间',{}).get('离店日期','')}<br>"
+                    f"住宿需求：{'、'.join(travel_dict.get('住宿需求',[]))}<br>"
+                    f"特殊需求：{'、'.join(travel_dict.get('特殊需求',[]))}<br>"
+                    f"经费预算：{travel_dict.get('经费预算','')}<br>"
+                    f"如无误，请输入“确认”或任意内容继续。"
+                )
+                ai_reply = confirm_text
+                session['ai_state'] = "wait_confirm"
             else:
                 ai_reply = assistant_content
 
+        # 等待用户确认阶段
+        elif state == "wait_confirm":
+            travel_dict = session.get('ai_travel_dict')
+            if not travel_dict:
+                ai_reply = "会话已失效，请刷新页面重新开始。"
+                session.clear()
+                return jsonify({'user_input': user_input, 'ai_reply': ai_reply})
+            # 保存路线基本信息到main_route（如有需要可补充）
+            session['ai_state'] = "confirm"
+            ai_reply = "如需生成完整旅游规划，请输入“生成”或任意内容继续。"
+
+        # 生成完整规划阶段
         elif state == "confirm":
-            # 用户确认后，生成完整规划
             travel_dict = session.get('ai_travel_dict')
             if not travel_dict:
                 ai_reply = "会话已失效，请刷新页面重新开始。"
@@ -181,22 +109,6 @@ def ai_chat():
                 food_info = agent.get_food_info()
                 travel_plan = agent.generate_comprehensive_travel_plan()
                 ai_reply = f"{travel_plan}"
-
-                # 自动保存
-                user = session.get('user')
-                route_id = session.get('route_id')
-                if user and route_id and travel_plan:
-                    conn = db.engine.raw_connection()
-                    try:
-                        with conn.cursor() as cur:
-                            cur.execute("UPDATE main_route SET description=%s WHERE id=%s", (travel_plan, route_id))
-                            conn.commit()
-                    except Exception as e:
-                        import traceback
-                        print("自动保存行程异常:", e)
-                        traceback.print_exc()
-                    finally:
-                        conn.close()
                 session['ai_state'] = "finished"
             except Exception as e:
                 import traceback
@@ -209,18 +121,15 @@ def ai_chat():
 
         chat_msgs.append({'sender': 'user', 'content': user_input})
         chat_msgs.append({'sender': 'ai', 'content': ai_reply})
-        session['ai_messages'] = messages[-10:]
+        session['ai_messages'] = messages
         session.modified = True
         return jsonify({'user_input': user_input, 'ai_reply': ai_reply})
 
-    # GET 或无输入时
+    # GET 或无输入时，回显历史
     chat_msgs = []
     for m in messages[1:]:
         if m['role'] == 'user':
             chat_msgs.append({'sender': 'user', 'content': m['content']})
         elif m['role'] == 'assistant':
             chat_msgs.append({'sender': 'ai', 'content': m['content']})
-    # 只保存最近10条消息到 session
-    session['ai_messages'] = messages[-10:]
-    session.modified = True
     return render_template('ai_chat.html', chat_sessions=[], chat=None, messages=chat_msgs)
